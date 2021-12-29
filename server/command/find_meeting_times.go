@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/remote"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/utils"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils"
 )
 
 func (c *Command) findMeetings(parameters ...string) (string, bool, error) {

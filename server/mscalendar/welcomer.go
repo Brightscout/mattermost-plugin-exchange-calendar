@@ -5,10 +5,10 @@ import (
 
 	"github.com/mattermost/mattermost-server/v5/model"
 
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/config"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/store"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/utils/bot"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/utils/flow"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/store"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/bot"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/flow"
 )
 
 type Welcomer interface {

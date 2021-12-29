@@ -1,10 +1,10 @@
 {
-    "id": "com.mattermost.mscalendar",
+    "id": "com.mattermost.exchange-mscalendar",
     "name": "Microsoft Calendar",
     "description": "Microsoft Calendar Integration",
     "homepage_url": "https://mattermost.gitbook.io/plugin-mscalendar",
-    "support_url": "https://github.com/mattermost/mattermost-plugin-mscalendar/issues",
-    "release_notes_url": "https://github.com/mattermost/mattermost-plugin-mscalendar/releases/tag/v1.1.0",
+    "support_url": "https://github.com/Brightscout/mattermost-plugin-exchange-mscalendar/issues",
+    "release_notes_url": "https://github.com/Brightscout/mattermost-plugin-exchange-mscalendar/releases/tag/v1.1.0",
     "icon_path": "assets/profile.svg",
     "version": "1.1.0",
     "min_server_version": "5.24.0",

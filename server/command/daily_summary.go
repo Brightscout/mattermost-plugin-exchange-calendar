@@ -3,7 +3,7 @@ package command
 import (
 	"fmt"
 
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/store"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/store"
 )
 
 const dailySummaryHelp = "### Daily summary commands:\n" +

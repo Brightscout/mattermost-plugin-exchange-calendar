@@ -9,7 +9,7 @@ import (
 	"github.com/mattermost/mattermost-server/v5/model"
 	"github.com/mattermost/mattermost-server/v5/plugin"
 
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/store"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/store"
 )
 
 type API struct {

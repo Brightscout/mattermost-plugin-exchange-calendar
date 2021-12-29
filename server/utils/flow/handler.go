@@ -10,8 +10,8 @@ import (
 
 	"github.com/mattermost/mattermost-server/v5/model"
 
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/utils"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/utils/httputils"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/httputils"
 )
 
 type fh struct {

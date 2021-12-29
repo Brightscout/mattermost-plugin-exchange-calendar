@@ -6,7 +6,7 @@ package command
 import (
 	"time"
 
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/mscalendar/views"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/mscalendar/views"
 )
 
 func (c *Command) viewCalendar(parameters ...string) (string, bool, error) {

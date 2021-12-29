@@ -6,7 +6,7 @@ package jobs
 import (
 	"time"
 
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/mscalendar"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/mscalendar"
 )
 
 // Unique id for the daily summary job

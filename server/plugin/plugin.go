@@ -18,23 +18,22 @@ import (
 	"github.com/mattermost/mattermost-server/v5/plugin"
 	"github.com/pkg/errors"
 
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/api"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/command"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/config"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/enterprise"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/jobs"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/mscalendar"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/remote"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/remote/msgraph"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/store"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/tracker"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/utils/bot"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/utils/flow"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/utils/httputils"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/utils/oauth2connect"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/utils/pluginapi"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/utils/settingspanel"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/utils/telemetry"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/api"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/command"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/jobs"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/mscalendar"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote/msgraph"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/store"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/tracker"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/bot"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/flow"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/httputils"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/oauth2connect"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/pluginapi"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/settingspanel"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/telemetry"
 )
 
 const (
@@ -70,11 +69,11 @@ func NewWithEnv(env mscalendar.Env) *Plugin {
 
 func (p *Plugin) OnActivate() error {
 	pluginAPIClient := pluginapiclient.NewClient(p.API, p.Driver)
-	conf := pluginAPIClient.Configuration.GetConfig()
-	license := pluginAPIClient.System.GetLicense()
-	if !enterprise.HasEnterpriseFeatures(conf, license) {
-		return errors.Errorf(licenseErrorMessage, config.ApplicationName)
-	}
+	// conf := pluginAPIClient.Configuration.GetConfig()
+	// license := pluginAPIClient.System.GetLicense()
+	// if !enterprise.HasEnterpriseFeatures(conf, license) {
+	// 	return errors.Errorf(licenseErrorMessage, config.ApplicationName)
+	// }
 
 	stored := config.StoredConfig{}
 	err := p.API.LoadPluginConfiguration(&stored)
@@ -82,11 +81,11 @@ func (p *Plugin) OnActivate() error {
 		return errors.WithMessage(err, "failed to load plugin configuration")
 	}
 
-	if stored.OAuth2Authority == "" ||
-		stored.OAuth2ClientID == "" ||
-		stored.OAuth2ClientSecret == "" {
-		return errors.New("failed to configure: OAuth2 credentials to be set in the config")
-	}
+	// if stored.OAuth2Authority == "" ||
+	// 	stored.OAuth2ClientID == "" ||
+	// 	stored.OAuth2ClientSecret == "" {
+	// 	return errors.New("failed to configure: OAuth2 credentials to be set in the config")
+	// }
 
 	p.initEnv(&p.env, "")
 	bundlePath, err := p.API.GetBundlePath()

@@ -13,10 +13,10 @@ import (
 
 	"github.com/mattermost/mattermost-server/v5/model"
 
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/config"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/mscalendar"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/mscalendar/views"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/utils"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/mscalendar"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/mscalendar/views"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils"
 )
 
 func (api *api) preprocessAction(w http.ResponseWriter, req *http.Request) (mscal mscalendar.MSCalendar, user *mscalendar.User, eventID string, option string, postID string) {

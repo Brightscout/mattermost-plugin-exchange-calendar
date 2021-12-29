@@ -6,7 +6,7 @@ package httputils
 import (
 	"io"
 
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/utils"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils"
 )
 
 type LimitReadCloser struct {

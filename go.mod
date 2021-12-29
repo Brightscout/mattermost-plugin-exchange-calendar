@@ -1,4 +1,4 @@
-module github.com/mattermost/mattermost-plugin-mscalendar
+module github.com/Brightscout/mattermost-plugin-exchange-mscalendar
 
 go 1.13
 
