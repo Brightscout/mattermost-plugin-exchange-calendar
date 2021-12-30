@@ -6,10 +6,7 @@ package msgraph
 import (
 	"crypto/rand"
 	"encoding/base64"
-	"net/http"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/bot"
@@ -31,10 +28,11 @@ func (c *client) CreateMySubscription(notificationURL string) (*remote.Subscript
 		ExpirationDateTime: time.Now().Add(subscribeTTL).Format(time.RFC3339),
 		ClientState:        newRandomString(),
 	}
-	err := c.rbuilder.Subscriptions().Request().JSONRequest(c.ctx, http.MethodPost, "", sub, sub)
-	if err != nil {
-		return nil, errors.Wrap(err, "msgraph CreateMySubscription")
-	}
+	// TODO: Add sibscription API
+	// err := c.rbuilder.Subscriptions().Request().JSONRequest(c.ctx, http.MethodPost, "", sub, sub)
+	// if err != nil {
+	// 	return nil, errors.Wrap(err, "msgraph CreateMySubscription")
+	// }
 
 	c.Logger.With(bot.LogContext{
 		"subscriptionID":     sub.ID,
@@ -47,10 +45,11 @@ func (c *client) CreateMySubscription(notificationURL string) (*remote.Subscript
 }
 
 func (c *client) DeleteSubscription(subscriptionID string) error {
-	err := c.rbuilder.Subscriptions().ID(subscriptionID).Request().Delete(c.ctx)
-	if err != nil {
-		return errors.Wrap(err, "msgraph DeleteSubscription")
-	}
+	// TODO: Add subscription API
+	// err := c.rbuilder.Subscriptions().ID(subscriptionID).Request().Delete(c.ctx)
+	// if err != nil {
+	// 	return errors.Wrap(err, "msgraph DeleteSubscription")
+	// }
 
 	c.Logger.With(bot.LogContext{
 		"subscriptionID": subscriptionID,
@@ -60,17 +59,18 @@ func (c *client) DeleteSubscription(subscriptionID string) error {
 }
 
 func (c *client) RenewSubscription(subscriptionID string) (*remote.Subscription, error) {
-	expires := time.Now().Add(subscribeTTL)
-	v := struct {
-		ExpirationDateTime string `json:"expirationDateTime"`
-	}{
-		expires.Format(time.RFC3339),
-	}
 	sub := remote.Subscription{}
-	err := c.rbuilder.Subscriptions().ID(subscriptionID).Request().JSONRequest(c.ctx, http.MethodPatch, "", v, &sub)
-	if err != nil {
-		return nil, errors.Wrap(err, "msgraph RenewSubscription")
-	}
+	expires := time.Now().Add(subscribeTTL)
+	// TODO: Add subscription API
+	// v := struct {
+	// 	ExpirationDateTime string `json:"expirationDateTime"`
+	// }{
+	// 	expires.Format(time.RFC3339),
+	// }
+	// err := c.rbuilder.Subscriptions().ID(subscriptionID).Request().JSONRequest(c.ctx, http.MethodPatch, "", v, &sub)
+	// if err != nil {
+	// 	return nil, errors.Wrap(err, "msgraph RenewSubscription")
+	// }
 
 	c.Logger.With(bot.LogContext{
 		"subscriptionID":     subscriptionID,
@@ -84,9 +84,10 @@ func (c *client) ListSubscriptions() ([]*remote.Subscription, error) {
 	var v struct {
 		Value []*remote.Subscription `json:"value"`
 	}
-	err := c.rbuilder.Subscriptions().Request().JSONRequest(c.ctx, http.MethodGet, "", nil, &v)
-	if err != nil {
-		return nil, errors.Wrap(err, "msgraph ListSubscriptions")
-	}
+	// TODO: Add subscription API
+	// err := c.rbuilder.Subscriptions().Request().JSONRequest(c.ctx, http.MethodGet, "", nil, &v)
+	// if err != nil {
+	// 	return nil, errors.Wrap(err, "msgraph ListSubscriptions")
+	// }
 	return v.Value, nil
 }

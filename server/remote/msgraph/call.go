@@ -42,7 +42,8 @@ func (c *client) call(method, path, contentType string, inBody io.Reader, out in
 
 	if pathURL.Scheme == "" || pathURL.Host == "" {
 		var baseURL *url.URL
-		baseURL, err = url.Parse(c.rbuilder.URL())
+		// TODO: Change Base URL
+		// baseURL, err = url.Parse(c.rbuilder.URL())
 		if err != nil {
 			return nil, errors.WithMessage(err, errContext)
 		}

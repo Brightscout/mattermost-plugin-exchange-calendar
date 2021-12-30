@@ -6,7 +6,6 @@ package mscalendar
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/mattermost/mattermost-server/v5/model"
 	"github.com/pkg/errors"
@@ -48,30 +47,30 @@ func (app *oauth2App) InitOAuth2(mattermostUserID string) (url string, err error
 	return conf.AuthCodeURL(state, oauth2.AccessTypeOffline), nil
 }
 
-func (app *oauth2App) CompleteOAuth2(authedUserID, code, state string) error {
-	if authedUserID == "" || code == "" || state == "" {
+func (app *oauth2App) CompleteOAuth2(authedUserID string) error {
+	if authedUserID == "" {
 		return errors.New("missing user, code or state")
 	}
 
-	oconf := app.Remote.NewOAuth2Config()
+	// oconf := app.Remote.NewOAuth2Config()
 
-	err := app.Store.VerifyOAuth2State(state)
-	if err != nil {
-		return errors.WithMessage(err, "missing stored state")
-	}
+	// err := app.Store.VerifyOAuth2State(state)
+	// if err != nil {
+	// 	return errors.WithMessage(err, "missing stored state")
+	// }
 
-	mattermostUserID := strings.Split(state, "_")[1]
-	if mattermostUserID != authedUserID {
-		return errors.New("not authorized, user ID mismatch")
-	}
+	// mattermostUserID := strings.Split(state, "_")[1]
+	// if mattermostUserID != authedUserID {
+	// 	return errors.New("not authorized, user ID mismatch")
+	// }
 
 	ctx := context.Background()
-	tok, err := oconf.Exchange(ctx, code)
-	if err != nil {
-		return err
-	}
+	// tok, err := oconf.Exchange(ctx, code)
+	// if err != nil {
+	// 	return err
+	// }
 
-	client := app.Remote.MakeClient(ctx, tok)
+	client := app.Remote.MakeClient(ctx)
 	me, err := client.GetMe()
 	if err != nil {
 		return err
@@ -92,9 +91,8 @@ func (app *oauth2App) CompleteOAuth2(authedUserID, code, state string) error {
 
 	u := &store.User{
 		PluginVersion:    app.Config.PluginVersion,
-		MattermostUserID: mattermostUserID,
+		MattermostUserID: authedUserID,
 		Remote:           me,
-		OAuth2Token:      tok,
 	}
 
 	mailboxSettings, err := client.GetMailboxSettings(me.ID)
@@ -118,7 +116,7 @@ func (app *oauth2App) CompleteOAuth2(authedUserID, code, state string) error {
 		return err
 	}
 
-	app.Welcomer.AfterSuccessfullyConnect(mattermostUserID, me.Mail)
+	app.Welcomer.AfterSuccessfullyConnect(authedUserID, me.Mail)
 
 	return nil
 }
