@@ -79,6 +79,13 @@
                 "type": "text",
                 "help_text": "Microsoft Office Client Secret.",
                 "default": ""
+            },
+            {
+                "key": "ExchangeServerBaseURL",
+                "display_name": "Exchange Server Base URL:",
+                "type": "text",
+                "help_text": "Enter Base URL of exchange server",
+                "default": ""
             }
         ]
     }
