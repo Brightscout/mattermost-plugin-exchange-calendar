@@ -28,7 +28,7 @@ func (c *client) CreateMySubscription(notificationURL string) (*remote.Subscript
 		ExpirationDateTime: time.Now().Add(subscribeTTL).Format(time.RFC3339),
 		ClientState:        newRandomString(),
 	}
-	// TODO: Add sibscription API
+	// TODO: Add subscription API
 	// err := c.rbuilder.Subscriptions().Request().JSONRequest(c.ctx, http.MethodPost, "", sub, sub)
 	// if err != nil {
 	// 	return nil, errors.Wrap(err, "msgraph CreateMySubscription")

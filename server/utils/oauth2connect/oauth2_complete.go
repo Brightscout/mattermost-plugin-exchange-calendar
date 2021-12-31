@@ -15,6 +15,12 @@ func (oa *oa) oauth2Complete(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Not authorized", http.StatusUnauthorized)
 		return
 	}
+	// code := r.URL.Query().Get("code")
+	// if len(code) == 0 {
+	// 	http.Error(w, "missing authorization code", http.StatusBadRequest)
+	// 	return
+	// }
+	// state := r.URL.Query().Get("state")
 
 	err := oa.app.CompleteOAuth2(mattermostUserID)
 	if err != nil {

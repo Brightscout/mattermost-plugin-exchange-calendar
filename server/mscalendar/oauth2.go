@@ -49,7 +49,7 @@ func (app *oauth2App) InitOAuth2(mattermostUserID string) (url string, err error
 
 func (app *oauth2App) CompleteOAuth2(authedUserID string) error {
 	if authedUserID == "" {
-		return errors.New("missing user, code or state")
+		return errors.New("missing user")
 	}
 
 	// oconf := app.Remote.NewOAuth2Config()

@@ -46,6 +46,24 @@ func (r *impl) MakeClient(ctx context.Context) remote.Client {
 
 // MakeSuperuserClient creates a new client used for app-only permissions.
 func (r *impl) MakeSuperuserClient(ctx context.Context) (remote.Client, error) {
+	// httpClient := &http.Client{}
+	// c := &client{
+	// 	conf:       r.conf,
+	// 	ctx:        ctx,
+	// 	httpClient: httpClient,
+	// 	Logger:     r.logger,
+	// 	rbuilder:   msgraph.NewClient(httpClient),
+	// }
+	// token, err := c.GetSuperuserToken()
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// o := &oauth2.Token{
+	// 	AccessToken: token,
+	// 	TokenType:   "Bearer",
+	// }
+	// return r.MakeClient(ctx, o), nil
 	return r.MakeClient(ctx), nil
 }
 

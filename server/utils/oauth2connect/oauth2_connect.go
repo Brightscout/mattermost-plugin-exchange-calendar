@@ -14,5 +14,11 @@ func (oa *oa) oauth2Connect(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// redirectURL, err := oa.app.InitOAuth2(mattermostUserID)
+	// if err != nil {
+	// 	httputils.WriteInternalServerError(w, err)
+	// }
+	// http.Redirect(w, r, redirectURL, http.StatusFound)
+
 	oa.oauth2Complete(w, r)
 }
