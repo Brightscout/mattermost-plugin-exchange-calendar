@@ -4,20 +4,17 @@
 package msgraph
 
 import (
-	"net/http"
-
-	"github.com/pkg/errors"
-
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
 )
 
 func (c *client) GetMailboxSettings(remoteUserID string) (*remote.MailboxSettings, error) {
-	u := c.rbuilder.Users().ID(remoteUserID).URL() + "/mailboxSettings"
+	// TODO: Add GetMailboxSettings API
+	// u := c.rbuilder.Users().ID(remoteUserID).URL() + "/mailboxSettings"
 	out := &remote.MailboxSettings{}
 
-	_, err := c.CallJSON(http.MethodGet, u, nil, out)
-	if err != nil {
-		return nil, errors.Wrap(err, "msgraph GetMailboxSettings")
-	}
+	// _, err := c.CallJSON(http.MethodGet, u, nil, out)
+	// if err != nil {
+	// 	return nil, errors.Wrap(err, "msgraph GetMailboxSettings")
+	// }
 	return out, nil
 }

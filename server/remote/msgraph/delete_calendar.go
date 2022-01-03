@@ -4,16 +4,15 @@
 package msgraph
 
 import (
-	"github.com/pkg/errors"
-
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/bot"
 )
 
 func (c *client) DeleteCalendar(remoteUserID string, calID string) error {
-	err := c.rbuilder.Users().ID(remoteUserID).Calendars().ID(calID).Request().Delete(c.ctx)
-	if err != nil {
-		return errors.Wrap(err, "msgraph DeleteCalendar")
-	}
+	// TODO: Add DeleteCalendar API
+	// err := c.rbuilder.Users().ID(remoteUserID).Calendars().ID(calID).Request().Delete(c.ctx)
+	// if err != nil {
+	// 	return errors.Wrap(err, "msgraph DeleteCalendar")
+	// }
 	c.Logger.With(bot.LogContext{}).Infof("msgraph: DeleteCalendar deleted calendar `%v`.", calID)
 	return nil
 }

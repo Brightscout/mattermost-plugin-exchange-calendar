@@ -9,7 +9,7 @@ import (
 
 type App interface {
 	InitOAuth2(mattermostUserID string) (string, error)
-	CompleteOAuth2(mattermostUserID, code, state string) error
+	CompleteOAuth2(mattermostUserID string) error
 }
 
 type oa struct {

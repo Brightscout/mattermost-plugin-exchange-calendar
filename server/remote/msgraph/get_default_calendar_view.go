@@ -30,14 +30,15 @@ type calendarViewBatchResponse struct {
 }
 
 func (c *client) GetDefaultCalendarView(remoteUserID string, start, end time.Time) ([]*remote.Event, error) {
-	paramStr := getQueryParamStringForCalendarView(start, end)
+	// TODO: Add GetDefaultCalendarView API
+	// paramStr := getQueryParamStringForCalendarView(start, end)
 
 	res := &calendarViewResponse{}
-	err := c.rbuilder.Users().ID(remoteUserID).CalendarView().Request().JSONRequest(
-		c.ctx, http.MethodGet, paramStr, nil, res)
-	if err != nil {
-		return nil, errors.Wrap(err, "msgraph GetDefaultCalendarView")
-	}
+	// err := c.rbuilder.Users().ID(remoteUserID).CalendarView().Request().JSONRequest(
+	// c.ctx, http.MethodGet, paramStr, nil, res)
+	// if err != nil {
+	// 	return nil, errors.Wrap(err, "msgraph GetDefaultCalendarView")
+	// }
 
 	return res.Value, nil
 }

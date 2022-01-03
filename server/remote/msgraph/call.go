@@ -13,6 +13,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
 	"github.com/pkg/errors"
 	msgraph "github.com/yaegashi/msgraph.go/v1.0"
 )
@@ -42,7 +43,7 @@ func (c *client) call(method, path, contentType string, inBody io.Reader, out in
 
 	if pathURL.Scheme == "" || pathURL.Host == "" {
 		var baseURL *url.URL
-		baseURL, err = url.Parse(c.rbuilder.URL())
+		baseURL, err = url.Parse(c.conf.ExchangeServerBaseURL)
 		if err != nil {
 			return nil, errors.WithMessage(err, errContext)
 		}
@@ -102,4 +103,16 @@ func (c *client) call(method, path, contentType string, inBody io.Reader, out in
 		return responseData, err
 	}
 	return responseData, &errResp
+}
+
+func (c *client) GetEndpointURL(email, path string) (string, error) {
+	endpointURL, err := url.Parse(strings.TrimSpace(fmt.Sprintf("%s%s", c.conf.ExchangeServerBaseURL, path)))
+	if err != nil {
+		return "", err
+	}
+	params := url.Values{}
+	params.Add(config.EmailKey, email)
+	endpointURL.RawQuery = params.Encode()
+
+	return endpointURL.String(), nil
 }

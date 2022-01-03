@@ -4,10 +4,6 @@
 package msgraph
 
 import (
-	"net/http"
-
-	"github.com/pkg/errors"
-
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/bot"
 )
@@ -16,12 +12,13 @@ func (c *client) GetCalendars(remoteUserID string) ([]*remote.Calendar, error) {
 	var v struct {
 		Value []*remote.Calendar `json:"value"`
 	}
-	req := c.rbuilder.Users().ID(remoteUserID).Calendars().Request()
-	req.Expand("children")
-	err := req.JSONRequest(c.ctx, http.MethodGet, "", nil, &v)
-	if err != nil {
-		return nil, errors.Wrap(err, "msgraph GetCalendars")
-	}
+	// TODO: Add GetCalendars API
+	// req := c.rbuilder.Users().ID(remoteUserID).Calendars().Request()
+	// req.Expand("children")
+	// err := req.JSONRequest(c.ctx, http.MethodGet, "", nil, &v)
+	// if err != nil {
+	// 	return nil, errors.Wrap(err, "msgraph GetCalendars")
+	// }
 	c.Logger.With(bot.LogContext{
 		"UserID": remoteUserID,
 		"v":      v.Value,
