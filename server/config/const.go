@@ -29,4 +29,5 @@ const (
 	FullPathOAuth2Redirect    = PathOAuth2 + PathComplete
 
 	EventIDKey = "EventID"
+	EmailKey   = "email"
 )
