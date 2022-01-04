@@ -24,6 +24,7 @@ const (
 	PathConfirmStatusChange = "/confirm"
 	PathNotification        = "/notification/v1"
 	PathEvent               = "/event"
+	PathCalendar            = "/api/calendar"
 
 	FullPathEventNotification = PathNotification + PathEvent
 	FullPathOAuth2Redirect    = PathOAuth2 + PathComplete

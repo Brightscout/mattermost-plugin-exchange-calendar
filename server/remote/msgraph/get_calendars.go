@@ -4,24 +4,27 @@
 package msgraph
 
 import (
+	"net/http"
+
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/bot"
+	"github.com/pkg/errors"
 )
 
-func (c *client) GetCalendars(remoteUserID string) ([]*remote.Calendar, error) {
-	var v struct {
-		Value []*remote.Calendar `json:"value"`
+func (c *client) GetCalendars(remoteUserEmail string) ([]*remote.Calendar, error) {
+	calOut := []*remote.Calendar{}
+	url, err := c.GetEndpointURL(remoteUserEmail, config.PathCalendar)
+	if err != nil {
+		return nil, errors.Wrap(err, "msgraph GetCalendars")
 	}
-	// TODO: Add GetCalendars API
-	// req := c.rbuilder.Users().ID(remoteUserID).Calendars().Request()
-	// req.Expand("children")
-	// err := req.JSONRequest(c.ctx, http.MethodGet, "", nil, &v)
-	// if err != nil {
-	// 	return nil, errors.Wrap(err, "msgraph GetCalendars")
-	// }
+	_, err = c.CallJSON(http.MethodGet, url, nil, &calOut)
+	if err != nil {
+		return nil, errors.Wrap(err, "msgraph GetCalendars")
+	}
 	c.Logger.With(bot.LogContext{
-		"UserID": remoteUserID,
-		"v":      v.Value,
-	}).Infof("msgraph: GetUserCalendars returned `%d` calendars.", len(v.Value))
-	return v.Value, nil
+		"UserID": remoteUserEmail,
+		"v":      calOut,
+	}).Infof("msgraph: GetUserCalendars returned `%d` calendars.", len(calOut))
+	return calOut, nil
 }

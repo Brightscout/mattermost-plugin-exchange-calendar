@@ -4,20 +4,27 @@
 package msgraph
 
 import (
+	"net/http"
+
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/bot"
+	"github.com/pkg/errors"
 )
 
 // CreateCalendar creates a calendar
-func (c *client) CreateCalendar(remoteUserID string, calIn *remote.Calendar) (*remote.Calendar, error) {
-	var calOut = remote.Calendar{}
-	// TODO: ADD calendar API
-	// err := c.rbuilder.Users().ID(remoteUserID).Calendars().Request().JSONRequest(c.ctx, http.MethodPost, "", &calIn, &calOut)
-	// if err != nil {
-	// 	return nil, errors.Wrap(err, "msgraph CreateCalendar")
-	// }
+func (c *client) CreateCalendar(remoteUserEmail string, calIn *remote.Calendar) (*remote.Calendar, error) {
+	calOut := &remote.Calendar{}
+	url, err := c.GetEndpointURL(remoteUserEmail, config.PathCalendar)
+	if err != nil {
+		return nil, errors.Wrap(err, "msgraph CreateCalendar")
+	}
+	_, err = c.CallJSON(http.MethodPost, url, calIn, calOut)
+	if err != nil {
+		return nil, errors.Wrap(err, "msgraph CreateCalendar")
+	}
 	c.Logger.With(bot.LogContext{
 		"v": calOut,
 	}).Infof("msgraph: CreateCalendar created the following calendar.")
-	return &calOut, nil
+	return calOut, nil
 }
