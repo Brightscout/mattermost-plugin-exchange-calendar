@@ -13,17 +13,17 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (c *client) DeleteCalendar(remoteUserEmail string, calID string) error {
+func (c *client) DeleteCalendar(remoteUserEmail string, calID string) (*remote.Calendar, error) {
 	calOut := &remote.Calendar{}
 	url, err := c.GetEndpointURL(remoteUserEmail, fmt.Sprintf("%s/%s", config.PathCalendar, calID))
 	fmt.Println("URL is ", url)
 	if err != nil {
-		return errors.Wrap(err, "msgraph DeleteCalendar")
+		return nil, errors.Wrap(err, "msgraph DeleteCalendar")
 	}
 	_, err = c.CallJSON(http.MethodDelete, url, nil, calOut)
 	if err != nil {
-		return errors.Wrap(err, "msgraph DeleteCalendar")
+		return nil, errors.Wrap(err, "msgraph DeleteCalendar")
 	}
 	c.Logger.With(bot.LogContext{}).Infof("msgraph: DeleteCalendar deleted calendar `%v`.", calID)
-	return nil
+	return calOut, nil
 }

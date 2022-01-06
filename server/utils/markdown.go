@@ -20,3 +20,7 @@ func CodeBlock(in string) string {
 func JSONBlock(ref interface{}) string {
 	return fmt.Sprintf("\n```json\n%s\n```\n", JSON(ref))
 }
+
+func JSONHeading(heading string) string {
+	return fmt.Sprintf("\n**%s**", heading)
+}

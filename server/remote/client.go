@@ -16,7 +16,7 @@ type Client interface {
 	CreateEvent(remoteUserID string, calendarEvent *Event) (*Event, error)
 	CreateMySubscription(notificationURL string) (*Subscription, error)
 	DeclineEvent(remoteUserID, eventID string) error
-	DeleteCalendar(remoteUserEmail, calendarID string) error
+	DeleteCalendar(remoteUserEmail, calendarID string) (*Calendar, error)
 	DeleteSubscription(subscriptionID string) error
 	FindMeetingTimes(remoteUserID string, meetingParams *FindMeetingTimesParameters) (*MeetingTimeSuggestionResults, error)
 	GetCalendars(remoteUserEmail string) ([]*Calendar, error)
