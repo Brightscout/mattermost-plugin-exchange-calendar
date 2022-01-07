@@ -16,14 +16,13 @@ import (
 func (c *client) DeleteCalendar(remoteUserEmail string, calID string) (*remote.Calendar, error) {
 	calOut := &remote.Calendar{}
 	url, err := c.GetEndpointURL(remoteUserEmail, fmt.Sprintf("%s/%s", config.PathCalendar, calID))
-	fmt.Println("URL is ", url)
 	if err != nil {
-		return nil, errors.Wrap(err, "msgraph DeleteCalendar")
+		return nil, errors.Wrap(err, "ews DeleteCalendar")
 	}
 	_, err = c.CallJSON(http.MethodDelete, url, nil, calOut)
 	if err != nil {
-		return nil, errors.Wrap(err, "msgraph DeleteCalendar")
+		return nil, errors.Wrap(err, "ews DeleteCalendar")
 	}
-	c.Logger.With(bot.LogContext{}).Infof("msgraph: DeleteCalendar deleted calendar `%v`.", calID)
+	c.Logger.With(bot.LogContext{}).Infof("ews: DeleteCalendar deleted calendar `%v`.", calID)
 	return calOut, nil
 }
