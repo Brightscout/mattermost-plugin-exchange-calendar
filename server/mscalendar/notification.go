@@ -433,7 +433,7 @@ func eventToFields(e *remote.Event, timezone string) fields.Fields {
 		FieldOrganizer: fields.NewStringValue(
 			fmt.Sprintf("[%s](mailto:%s)",
 				e.Organizer.EmailAddress.Name, e.Organizer.EmailAddress.Address)),
-		FieldLocation:       fields.NewStringValue(valueOrNotDefined(e.Location.DisplayName)),
+		FieldLocation:       fields.NewStringValue(valueOrNotDefined(e.Location)),
 		FieldResponseStatus: fields.NewStringValue(e.ResponseStatus.Response),
 		FieldAttendees:      fields.NewMultiValue(attendees...),
 	}

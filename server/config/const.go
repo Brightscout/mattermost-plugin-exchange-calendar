@@ -23,7 +23,7 @@ const (
 	PathTentative           = "/tentative"
 	PathConfirmStatusChange = "/confirm"
 	PathNotification        = "/notification/v1"
-	PathEvent               = "/event"
+	PathEvent               = "/api/event"
 	PathCalendar            = "/api/calendar"
 
 	FullPathEventNotification = PathNotification + PathEvent

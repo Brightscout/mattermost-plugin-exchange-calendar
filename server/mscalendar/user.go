@@ -82,17 +82,13 @@ func (m *mscalendar) ExpandMattermostUser(user *User) error {
 func (m *mscalendar) GetTimezone(user *User) (string, error) {
 	err := m.Filter(
 		withClient,
-		withRemoteUser(user),
+		withUserExpanded(user),
 	)
 	if err != nil {
 		return "", err
 	}
 
-	settings, err := m.client.GetMailboxSettings(user.Remote.ID)
-	if err != nil {
-		return "", err
-	}
-	return settings.TimeZone, nil
+	return user.MattermostUser.Timezone["automaticTimezone"], nil
 }
 
 func (m *mscalendar) GetTimezoneByID(mattermostUserID string) (string, error) {

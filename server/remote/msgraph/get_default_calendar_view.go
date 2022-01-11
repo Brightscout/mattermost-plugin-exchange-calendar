@@ -4,12 +4,14 @@
 package msgraph
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 	"time"
 
 	"github.com/pkg/errors"
 
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
 )
 
@@ -29,18 +31,19 @@ type calendarViewBatchResponse struct {
 	Responses []*calendarViewSingleResponse `json:"responses"`
 }
 
-func (c *client) GetDefaultCalendarView(remoteUserID string, start, end time.Time) ([]*remote.Event, error) {
-	// TODO: Add GetDefaultCalendarView API
-	// paramStr := getQueryParamStringForCalendarView(start, end)
+func (c *client) GetDefaultCalendarView(remoteUserEmail string, start, end time.Time) ([]*remote.Event, error) {
+	var out []*remote.Event
+	url, err := c.GetEndpointURL(remoteUserEmail, config.PathEvent)
+	if err != nil {
+		return nil, errors.Wrap(err, "ews GetDefaultCalendarView")
+	}
+	url = fmt.Sprintf("%s&%s", url, getQueryParamStringForCalendarView(start, end))
+	_, err = c.CallJSON(http.MethodGet, url, nil, &out)
+	if err != nil {
+		return nil, errors.Wrap(err, "ews GetDefaultCalendarView")
+	}
 
-	res := &calendarViewResponse{}
-	// err := c.rbuilder.Users().ID(remoteUserID).CalendarView().Request().JSONRequest(
-	// c.ctx, http.MethodGet, paramStr, nil, res)
-	// if err != nil {
-	// 	return nil, errors.Wrap(err, "msgraph GetDefaultCalendarView")
-	// }
-
-	return res.Value, nil
+	return out, nil
 }
 
 func (c *client) DoBatchViewCalendarRequests(allParams []*remote.ViewCalendarParams) ([]*remote.ViewCalendarResponse, error) {
@@ -84,7 +87,7 @@ func (c *client) DoBatchViewCalendarRequests(allParams []*remote.ViewCalendarPar
 }
 
 func getCalendarViewURL(params *remote.ViewCalendarParams) string {
-	paramStr := getQueryParamStringForCalendarView(params.StartTime, params.EndTime)
+	paramStr := "?" + getQueryParamStringForCalendarView(params.StartTime, params.EndTime)
 	return "/Users/" + params.RemoteUserID + "/calendarView" + paramStr
 }
 
@@ -92,6 +95,5 @@ func getQueryParamStringForCalendarView(start, end time.Time) string {
 	q := url.Values{}
 	q.Add("startDateTime", start.Format(time.RFC3339))
 	q.Add("endDateTime", end.Format(time.RFC3339))
-	q.Add("$top", "20")
-	return "?" + q.Encode()
+	return q.Encode()
 }

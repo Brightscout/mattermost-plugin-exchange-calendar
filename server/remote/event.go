@@ -8,7 +8,7 @@ type Event struct {
 	ICalUID                    string               `json:"iCalUId,omitempty"`
 	Subject                    string               `json:"subject,omitempty"`
 	BodyPreview                string               `json:"bodyPreview,omitempty"`
-	Body                       *ItemBody            `json:"Body,omitempty"`
+	Body                       *ItemBody            `json:"body,omitempty"`
 	Importance                 string               `json:"importance,omitempty"`
 	IsAllDay                   bool                 `json:"isAllDay,omitempty"`
 	IsCancelled                bool                 `json:"isCancelled,omitempty"`
@@ -19,7 +19,7 @@ type Event struct {
 	Start                      *DateTime            `json:"start,omitempty"`
 	End                        *DateTime            `json:"end,omitempty"`
 	ReminderMinutesBeforeStart int                  `json:"reminderMinutesBeforeStart,omitempty"`
-	Location                   *Location            `json:"location,omitempty"`
+	Location                   string               `json:"location,omitempty"`
 	ResponseStatus             *EventResponseStatus `json:"responseStatus,omitempty"`
 	Attendees                  []*Attendee          `json:"attendees,omitempty"`
 	Organizer                  *Attendee            `json:"organizer,omitempty"`

@@ -9,26 +9,26 @@ import (
 )
 
 type Client interface {
-	AcceptEvent(remoteUserID, eventID string) error
+	AcceptEvent(remoteUserEmail, eventID string) error
 	CallFormPost(method, path string, in url.Values, out interface{}) (responseData []byte, err error)
 	CallJSON(method, path string, in, out interface{}) (responseData []byte, err error)
 	CreateCalendar(remoteUserEmail string, calendar *Calendar) (*Calendar, error)
-	CreateEvent(remoteUserID string, calendarEvent *Event) (*Event, error)
+	CreateEvent(remoteUserEmail string, calendarEvent *Event) (*Event, error)
 	CreateMySubscription(notificationURL string) (*Subscription, error)
-	DeclineEvent(remoteUserID, eventID string) error
+	DeclineEvent(remoteUserEmail, eventID string) error
 	DeleteCalendar(remoteUserEmail, calendarID string) (*Calendar, error)
 	DeleteSubscription(subscriptionID string) error
 	FindMeetingTimes(remoteUserID string, meetingParams *FindMeetingTimesParameters) (*MeetingTimeSuggestionResults, error)
 	GetCalendars(remoteUserEmail string) ([]*Calendar, error)
-	GetDefaultCalendarView(remoteUserID string, startTime, endTime time.Time) ([]*Event, error)
+	GetDefaultCalendarView(remoteUserEmail string, startTime, endTime time.Time) ([]*Event, error)
 	DoBatchViewCalendarRequests([]*ViewCalendarParams) ([]*ViewCalendarResponse, error)
-	GetEvent(remoteUserID, eventID string) (*Event, error)
+	GetEvent(remoteUserEmail, eventID string) (*Event, error)
 	GetMailboxSettings(remoteUserID string) (*MailboxSettings, error)
 	GetMe() (*User, error)
 	GetNotificationData(*Notification) (*Notification, error)
 	GetSchedule(requests []*ScheduleUserInfo, startTime, endTime *DateTime, availabilityViewInterval int) ([]*ScheduleInformation, error)
 	ListSubscriptions() ([]*Subscription, error)
 	RenewSubscription(subscriptionID string) (*Subscription, error)
-	TentativelyAcceptEvent(remoteUserID, eventID string) error
+	TentativelyAcceptEvent(remoteUserEmail, eventID string) error
 	GetSuperuserToken() (string, error)
 }
