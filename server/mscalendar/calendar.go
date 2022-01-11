@@ -12,7 +12,7 @@ import (
 type Calendar interface {
 	CreateCalendar(user *User, calendar *remote.Calendar) (*remote.Calendar, error)
 	CreateEvent(user *User, event *remote.Event, mattermostUserIDs []string) (*remote.Event, error)
-	DeleteCalendar(user *User, calendarID string) error
+	DeleteCalendar(user *User, calendarID string) (*remote.Calendar, error)
 	FindMeetingTimes(user *User, meetingParams *remote.FindMeetingTimesParameters) (*remote.MeetingTimeSuggestionResults, error)
 	GetCalendars(user *User) ([]*remote.Calendar, error)
 	ViewCalendar(user *User, from, to time.Time) ([]*remote.Event, error)
@@ -54,7 +54,7 @@ func (m *mscalendar) CreateCalendar(user *User, calendar *remote.Calendar) (*rem
 	if err != nil {
 		return nil, err
 	}
-	return m.client.CreateCalendar(user.Remote.ID, calendar)
+	return m.client.CreateCalendar(user.MattermostUser.Email, calendar)
 }
 
 func (m *mscalendar) CreateEvent(user *User, event *remote.Event, mattermostUserIDs []string) (*remote.Event, error) {
@@ -84,16 +84,16 @@ func (m *mscalendar) CreateEvent(user *User, event *remote.Event, mattermostUser
 	return m.client.CreateEvent(user.Remote.ID, event)
 }
 
-func (m *mscalendar) DeleteCalendar(user *User, calendarID string) error {
+func (m *mscalendar) DeleteCalendar(user *User, calendarID string) (*remote.Calendar, error) {
 	err := m.Filter(
 		withClient,
 		withUserExpanded(user),
 	)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return m.client.DeleteCalendar(user.Remote.ID, calendarID)
+	return m.client.DeleteCalendar(user.MattermostUser.Email, calendarID)
 }
 
 func (m *mscalendar) FindMeetingTimes(user *User, meetingParams *remote.FindMeetingTimesParameters) (*remote.MeetingTimeSuggestionResults, error) {
@@ -117,5 +117,5 @@ func (m *mscalendar) GetCalendars(user *User) ([]*remote.Calendar, error) {
 		return nil, err
 	}
 
-	return m.client.GetCalendars(user.Remote.ID)
+	return m.client.GetCalendars(user.MattermostUser.Email)
 }

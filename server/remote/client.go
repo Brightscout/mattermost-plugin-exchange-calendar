@@ -12,14 +12,14 @@ type Client interface {
 	AcceptEvent(remoteUserID, eventID string) error
 	CallFormPost(method, path string, in url.Values, out interface{}) (responseData []byte, err error)
 	CallJSON(method, path string, in, out interface{}) (responseData []byte, err error)
-	CreateCalendar(remoteUserID string, calendar *Calendar) (*Calendar, error)
+	CreateCalendar(remoteUserEmail string, calendar *Calendar) (*Calendar, error)
 	CreateEvent(remoteUserID string, calendarEvent *Event) (*Event, error)
 	CreateMySubscription(notificationURL string) (*Subscription, error)
 	DeclineEvent(remoteUserID, eventID string) error
-	DeleteCalendar(remoteUserID, calendarID string) error
+	DeleteCalendar(remoteUserEmail, calendarID string) (*Calendar, error)
 	DeleteSubscription(subscriptionID string) error
 	FindMeetingTimes(remoteUserID string, meetingParams *FindMeetingTimesParameters) (*MeetingTimeSuggestionResults, error)
-	GetCalendars(remoteUserID string) ([]*Calendar, error)
+	GetCalendars(remoteUserEmail string) ([]*Calendar, error)
 	GetDefaultCalendarView(remoteUserID string, startTime, endTime time.Time) ([]*Event, error)
 	DoBatchViewCalendarRequests([]*ViewCalendarParams) ([]*ViewCalendarResponse, error)
 	GetEvent(remoteUserID, eventID string) (*Event, error)
