@@ -22,5 +22,5 @@ func JSONBlock(ref interface{}) string {
 }
 
 func JSONHeading(heading string) string {
-	return fmt.Sprintf("\n**%s**", heading)
+	return fmt.Sprintf("%s\n", heading)
 }

@@ -32,6 +32,6 @@ const (
 	EventIDKey = "EventID"
 	EmailKey   = "email"
 
-	CreateCalendarHeading = "Created calendar successfully."
-	DeleteCalendarHeading = "Deleted calendar successfully."
+	CreateCalendarHeading = "Calendar created."
+	DeleteCalendarHeading = "Calendar deleted."
 )
