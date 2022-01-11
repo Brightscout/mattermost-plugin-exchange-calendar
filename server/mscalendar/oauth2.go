@@ -71,19 +71,18 @@ func (app *oauth2App) CompleteOAuth2(authedUserID string) error {
 	// }
 
 	client := app.Remote.MakeClient(ctx)
-	me, err := client.GetMe()
+	user, userErr := app.PluginAPI.GetMattermostUser(authedUserID)
+	if userErr != nil {
+		return userErr
+	}
+
+	me, err := client.GetMe(user.Email)
 	if err != nil {
 		return err
 	}
 
-	uid, err := app.Store.LoadMattermostUserID(me.ID)
+	_, err = app.Store.LoadMattermostUserID(me.ID)
 	if err == nil {
-		user, userErr := app.PluginAPI.GetMattermostUser(uid)
-		if userErr == nil {
-			app.Poster.DM(authedUserID, RemoteUserAlreadyConnected, config.ApplicationName, me.Mail, config.CommandTrigger, user.Username)
-			return fmt.Errorf(RemoteUserAlreadyConnected, config.ApplicationName, me.Mail, config.CommandTrigger, user.Username)
-		}
-
 		// Couldn't fetch connected MM account. Reject connect attempt.
 		app.Poster.DM(authedUserID, RemoteUserAlreadyConnectedNotFound, config.ApplicationName, me.Mail)
 		return fmt.Errorf(RemoteUserAlreadyConnectedNotFound, config.ApplicationName, me.Mail)
