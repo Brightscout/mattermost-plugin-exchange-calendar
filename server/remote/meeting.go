@@ -3,17 +3,8 @@
 
 package remote
 
-import "time"
-
 type FindMeetingTimesParameters struct {
-	Attendees                 []Attendee          `json:"attendees,omitempty"`
-	LocationConstraint        *LocationConstraint `json:"locationConstraint,omitempty"`
-	TimeConstraint            *TimeConstraint     `json:"timeConstraint,omitempty"`
-	MeetingDuration           *time.Duration      `json:"meetingDuration,omitempty"`
-	MaxCandidates             *int                `json:"maxCandidates,omitempty"`
-	IsOrganizerOptional       *bool               `json:"isOrganizerOptional,omitempty"`
-	ReturnSuggestionReasons   *bool               `json:"returnSuggestionReasons,omitempty"`
-	MinimumAttendeePercentage *float64            `json:"minimumAttendeePercentage,omitempty"`
+	Attendees []Attendee `json:"attendees,omitempty"`
 }
 
 type TimeConstraint struct {
@@ -21,13 +12,7 @@ type TimeConstraint struct {
 	TimeSlots      []TimeSlot `json:"timeSlots,omitempty"`
 }
 type MeetingTimeSuggestion struct {
-	AttendeeAvailability  []*AttendeeAvailability
-	Confidence            float32 `json:"confidence"`
-	Locations             []*Location
-	MeetingTimeSlot       *TimeSlot
-	Order                 int32  `json:"order"`
-	OrganizerAvailability string `json:"organizerAvailability"`
-	SuggestionReason      string `json:"suggestionReason"`
+	MeetingTimeSlot *DateTime `json:"meetingTimeSlot"`
 }
 
 type AttendeeAvailability struct {
@@ -37,7 +22,6 @@ type AttendeeAvailability struct {
 
 type MeetingTimeSuggestionResults struct {
 	MeetingTimeSuggestions []*MeetingTimeSuggestion `json:"meetingTimeSuggestions"`
-	EmptySuggestionReason  string                   `json:"emptySuggestionReason"`
 }
 
 type TimeSlot struct {

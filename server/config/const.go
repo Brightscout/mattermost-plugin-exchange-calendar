@@ -25,6 +25,7 @@ const (
 	PathNotification        = "/notification/v1"
 	PathEvent               = "/api/event"
 	PathCalendar            = "/api/calendar"
+	PathFindMeetingTimes    = "/suggestions"
 
 	FullPathEventNotification = PathNotification + PathEvent
 	FullPathOAuth2Redirect    = PathOAuth2 + PathComplete
