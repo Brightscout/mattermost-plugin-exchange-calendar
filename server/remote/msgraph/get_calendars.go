@@ -14,7 +14,7 @@ import (
 
 func (c *client) GetCalendars(remoteUserEmail string) ([]*remote.Calendar, error) {
 	calOut := []*remote.Calendar{}
-	url, err := c.GetEndpointURL(remoteUserEmail, config.PathCalendar)
+	url, err := c.GetEndpointURL(config.PathCalendar, &remoteUserEmail)
 	if err != nil {
 		return nil, errors.Wrap(err, "msgraph GetCalendars")
 	}

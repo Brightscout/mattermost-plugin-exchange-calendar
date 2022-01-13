@@ -105,14 +105,17 @@ func (c *client) call(method, path, contentType string, inBody io.Reader, out in
 	return responseData, &errResp
 }
 
-func (c *client) GetEndpointURL(email, path string) (string, error) {
+func (c *client) GetEndpointURL(path string, email *string) (string, error) {
 	endpointURL, err := url.Parse(strings.TrimSpace(fmt.Sprintf("%s%s", c.conf.ExchangeServerBaseURL, path)))
 	if err != nil {
 		return "", err
 	}
-	params := url.Values{}
-	params.Add(config.EmailKey, email)
-	endpointURL.RawQuery = params.Encode()
+
+	if email != nil {
+		params := url.Values{}
+		params.Add(config.EmailKey, *email)
+		endpointURL.RawQuery = params.Encode()
+	}
 
 	return endpointURL.String(), nil
 }

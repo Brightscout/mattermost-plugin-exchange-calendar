@@ -32,18 +32,14 @@ func (m *mscalendar) ViewCalendar(user *User, from, to time.Time) ([]*remote.Eve
 func (m *mscalendar) getTodayCalendarEvents(user *User, now time.Time, timezone string) ([]*remote.Event, error) {
 	err := m.Filter(
 		withClient,
+		withUserExpanded(user),
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	err = m.ExpandRemoteUser(user)
-	if err != nil {
-		return nil, err
-	}
-
 	from, to := getTodayHoursForTimezone(now, timezone)
-	return m.client.GetDefaultCalendarView(user.Remote.ID, from, to)
+	return m.client.GetDefaultCalendarView(user.MattermostUser.Email, from, to)
 }
 
 func (m *mscalendar) CreateCalendar(user *User, calendar *remote.Calendar) (*remote.Calendar, error) {
