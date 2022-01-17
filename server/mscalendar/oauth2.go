@@ -94,10 +94,9 @@ func (app *oauth2App) CompleteOAuth2(authedUserID string) error {
 		Remote:           me,
 	}
 
-
 	u.Settings.DailySummary = &store.DailySummaryUserSettings{
 		PostTime: "8:00AM",
-		Timezone: user.Timezone["automaticTimeZone"],
+		Timezone: model.GetPreferredTimezone(user.Timezone),
 		Enable:   false,
 	}
 
