@@ -16,11 +16,11 @@ func (c *client) CreateEvent(remoteUserEmail string, in *remote.Event) (*remote.
 	var out = &remote.Event{}
 	url, err := c.GetEndpointURL(remoteUserEmail, config.PathEvent)
 	if err != nil {
-		return nil, errors.Wrap(err, "msgraph CreateEvent")
+		return nil, errors.Wrap(err, "ews CreateEvent")
 	}
 	_, err = c.CallJSON(http.MethodPost, url, in, out)
 	if err != nil {
-		return nil, errors.Wrap(err, "msgraph CreateEvent")
+		return nil, errors.Wrap(err, "ews CreateEvent")
 	}
 	return out, nil
 }
