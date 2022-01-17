@@ -24,7 +24,7 @@ type Client interface {
 	DoBatchViewCalendarRequests([]*ViewCalendarParams) ([]*ViewCalendarResponse, error)
 	GetEvent(remoteUserEmail, eventID string) (*Event, error)
 	GetMailboxSettings(remoteUserID string) (*MailboxSettings, error)
-	GetMe() (*User, error)
+	GetMe(remoteUserEmail string) (*User, error)
 	GetNotificationData(*Notification) (*Notification, error)
 	GetSchedule(requests []*ScheduleUserInfo, startTime, endTime *DateTime, availabilityViewInterval int) ([]*ScheduleInformation, error)
 	ListSubscriptions() ([]*Subscription, error)
