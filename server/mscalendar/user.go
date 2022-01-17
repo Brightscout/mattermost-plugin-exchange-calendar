@@ -88,11 +88,7 @@ func (m *mscalendar) GetTimezone(user *User) (string, error) {
 		return "", err
 	}
 
-	timezoneSettings := user.MattermostUser.Timezone
-	if timezoneSettings["useAutomaticTimezone"] == "true" {
-		return timezoneSettings["automaticTimezone"], nil
-	}
-	return  timezoneSettings["manualTimezone"], nil
+	return model.GetPreferredTimezone(user.MattermostUser.Timezone), nil
 }
 
 func (m *mscalendar) GetTimezoneByID(mattermostUserID string) (string, error) {
