@@ -15,19 +15,7 @@ type Notification struct {
 	// RenewSubscription() as applicable, with the appropriate user credentials.
 	RecommendRenew bool
 
-	// Set if there is no data pre-filled from processing the webhook. The
-	// handler is to call GetNofiticationData(), with the appropriate user
-	// credentials.
-	IsBare bool
-
-	// ClientState from the webhook. The handler is to validate against its own
-	// persistent secret.
-	ClientState string
-
-	// Remote-specific data: full raw JSON of the webhook, and the decoded
-	// backend-specific struct.
-	WebhookRawData []byte
-	Webhook        interface{}
+	EventID string
 
 	// Notification data
 	Subscription        *Subscription

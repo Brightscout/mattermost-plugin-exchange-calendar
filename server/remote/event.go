@@ -23,6 +23,7 @@ type Event struct {
 	ResponseStatus             *EventResponseStatus `json:"responseStatus,omitempty"`
 	Attendees                  []*Attendee          `json:"attendees,omitempty"`
 	Organizer                  *Attendee            `json:"organizer,omitempty"`
+	TimeZone                   string               `json:"timezone,omitempty"`
 }
 
 type ItemBody struct {

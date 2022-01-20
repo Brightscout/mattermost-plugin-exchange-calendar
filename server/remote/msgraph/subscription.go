@@ -4,42 +4,37 @@
 package msgraph
 
 import (
-	"crypto/rand"
-	"encoding/base64"
+	"fmt"
+	"net/http"
 	"time"
 
+	"github.com/pkg/errors"
+
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/bot"
 )
 
 const subscribeTTL = 48 * time.Hour
 
-func newRandomString() string {
-	b := make([]byte, 96)
-	rand.Read(b)
-	return base64.URLEncoding.EncodeToString(b)
-}
-
-func (c *client) CreateMySubscription(notificationURL string) (*remote.Subscription, error) {
+func (c *client) CreateMySubscription(remoteUserEmail string, notificationURL string) (*remote.Subscription, error) {
 	sub := &remote.Subscription{
-		Resource:           "me/events",
-		ChangeType:         "created,updated,deleted",
-		NotificationURL:    notificationURL,
-		ExpirationDateTime: time.Now().Add(subscribeTTL).Format(time.RFC3339),
-		ClientState:        newRandomString(),
+		WebhookNotificationUrl: fmt.Sprintf("%s/%s/%s", c.conf.MattermostServerBaseURL, c.conf.PluginURLPath, notificationURL),
 	}
-	// TODO: Add subscription API
-	// err := c.rbuilder.Subscriptions().Request().JSONRequest(c.ctx, http.MethodPost, "", sub, sub)
-	// if err != nil {
-	// 	return nil, errors.Wrap(err, "msgraph CreateMySubscription")
-	// }
+
+	path, err := c.GetEndpointURL(remoteUserEmail, config.PathSubscribe)
+	if err != nil {
+		return nil, errors.Wrap(err, "ews Subscribe")
+	}
+
+	_, err = c.CallJSON(http.MethodPost, path, &sub, &sub)
+	if err != nil {
+		return nil, errors.Wrap(err, "ews Subscribe")
+	}
 
 	c.Logger.With(bot.LogContext{
-		"subscriptionID":     sub.ID,
-		"resource":           sub.Resource,
-		"changeType":         sub.ChangeType,
-		"expirationDateTime": sub.ExpirationDateTime,
-	}).Debugf("msgraph: created subscription.")
+		"subscriptionID": sub.ID,
+	}).Debugf("ews: created subscription.")
 
 	return sub, nil
 }

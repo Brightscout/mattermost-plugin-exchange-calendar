@@ -6,12 +6,17 @@ package api
 import (
 	"net/http"
 
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/httputils"
 )
 
 func (api *api) notification(w http.ResponseWriter, req *http.Request) {
-	err := api.NotificationProcessor.Enqueue(
-		api.Env.Remote.HandleWebhook(w, req)...)
+	notification := api.Env.Remote.HandleWebhook(w, req)
+	err := api.NotificationProcessor.Enqueue(&remote.Notification{
+		ChangeType:     notification.ChangeType,
+		SubscriptionID: notification.SubscriptionID,
+		EventID:        notification.EventID,
+	})
 	if err != nil {
 		httputils.WriteInternalServerError(w, err)
 		return

@@ -28,8 +28,7 @@ func (m *mscalendar) CreateMyEventSubscription() (*store.Subscription, error) {
 		return nil, err
 	}
 
-	sub, err := m.client.CreateMySubscription(
-		m.Config.PluginURL + config.FullPathEventNotification)
+	sub, err := m.client.CreateMySubscription(m.actingUser.Remote.Mail, config.FullPathEventNotification)
 	if err != nil {
 		return nil, err
 	}
