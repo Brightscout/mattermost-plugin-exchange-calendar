@@ -208,7 +208,6 @@ func (p *Plugin) OnConfigurationChange() (err error) {
 			e.jobManager = jobs.NewJobManager(p.API, e.Env)
 			e.jobManager.AddJob(jobs.NewStatusSyncJob())
 			e.jobManager.AddJob(jobs.NewDailySummaryJob())
-			e.jobManager.AddJob(jobs.NewRenewJob())
 		}
 	})
 

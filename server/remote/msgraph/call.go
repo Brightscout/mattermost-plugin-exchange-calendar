@@ -111,7 +111,9 @@ func (c *client) GetEndpointURL(email, path string) (string, error) {
 		return "", err
 	}
 	params := url.Values{}
-	params.Add(config.EmailKey, email)
+	if email != "" {
+		params.Add(config.EmailKey, email)
+	}
 	endpointURL.RawQuery = params.Encode()
 
 	return endpointURL.String(), nil

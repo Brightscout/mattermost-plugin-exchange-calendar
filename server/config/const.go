@@ -22,13 +22,15 @@ const (
 	PathDecline             = "/decline"
 	PathTentative           = "/tentative"
 	PathConfirmStatusChange = "/confirm"
-	PathNotification        = "/notification"
+	PathGetNotification     = "/notification"
+	PathNotification        = "/api/notification"
 	PathEvent               = "/api/event"
 	PathCalendar            = "/api/calendar"
 	PathMe                  = "/api/me"
-	PathSubscribe           = "/api/subscribe"
+	PathSubscribe           = "/subscribe"
+	PathUnsubscribe         = "/unsubscribe"
 
-	FullPathEventNotification = PathNotification + PathEvent
+	FullPathEventNotification = PathGetNotification + PathEvent
 	FullPathOAuth2Redirect    = PathOAuth2 + PathComplete
 
 	EventIDKey = "EventID"
