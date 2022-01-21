@@ -12,6 +12,7 @@ import (
 
 type Subscriptions interface {
 	CreateMyEventSubscription() (*store.Subscription, error)
+	DeleteOrphanedSubscription(ID string) error
 	DeleteMyEventSubscription() error
 	LoadMyEventSubscription() (*store.Subscription, error)
 }
@@ -60,9 +61,9 @@ func (m *mscalendar) DeleteMyEventSubscription() error {
 
 	subscriptionID := m.actingUser.Settings.EventSubscriptionID
 
-	err = m.client.DeleteSubscription(subscriptionID)
+	err = m.DeleteOrphanedSubscription(subscriptionID)
 	if err != nil {
-		return errors.WithMessagef(err, "failed to delete subscription %s", subscriptionID)
+		return err
 	}
 
 	err = m.Store.DeleteUserSubscription(m.actingUser.User, subscriptionID)
@@ -70,5 +71,17 @@ func (m *mscalendar) DeleteMyEventSubscription() error {
 		return errors.WithMessagef(err, "failed to delete subscription %s", subscriptionID)
 	}
 
+	return nil
+}
+
+func (m *mscalendar) DeleteOrphanedSubscription(subscriptionID string) error {
+	err := m.Filter(withClient)
+	if err != nil {
+		return err
+	}
+	err = m.client.DeleteSubscription(subscriptionID)
+	if err != nil {
+		return errors.WithMessagef(err, "failed to delete subscription %s", subscriptionID)
+	}
 	return nil
 }
