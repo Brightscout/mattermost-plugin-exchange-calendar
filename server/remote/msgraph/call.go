@@ -65,6 +65,9 @@ func (c *client) call(method, path, contentType string, inBody io.Reader, out in
 		req = req.WithContext(c.ctx)
 	}
 
+	// Add authorization header in API requests
+	req.Header.Add(config.AuthorizationHeaderKey, fmt.Sprintf("Bearer %s", c.conf.ExchangeServerAuthKey))
+
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return nil, err

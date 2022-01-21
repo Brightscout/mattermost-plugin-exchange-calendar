@@ -37,4 +37,6 @@ const (
 
 	CreateCalendarHeading = "Calendar created."
 	DeleteCalendarHeading = "Calendar deleted."
+
+	AuthorizationHeaderKey = "Authorization"
 )

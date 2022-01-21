@@ -86,6 +86,13 @@
                 "type": "text",
                 "help_text": "Enter Base URL of exchange server",
                 "default": ""
+            },
+            {
+                "key": "ExchangeServerAuthKey",
+                "display_name": "Exchange Server Authentication Key:",
+                "type": "generated",
+                "help_text": "Enter Authentication key of exchange server",
+                "default": ""
             }
         ]
     }
