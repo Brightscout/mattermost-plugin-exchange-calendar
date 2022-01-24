@@ -86,7 +86,7 @@ func (m *mscalendar) FindMeetingTimes(user *User, meetingParams *remote.FindMeet
 		return nil, err
 	}
 
-	return m.client.FindMeetingTimes(user.Remote.ID, meetingParams)
+	return m.client.FindMeetingTimes(user.MattermostUser.Email, meetingParams)
 }
 
 func (m *mscalendar) GetCalendars(user *User) ([]*remote.Calendar, error) {

@@ -25,6 +25,7 @@ const (
 	PathNotification        = "/notification/v1"
 	PathEvent               = "/api/event"
 	PathCalendar            = "/api/calendar"
+	PathFindMeetingTimes    = "/suggestions"
 	PathMe                  = "/api/me"
 	PathBatch               = "/api/batch"
 	PathBatchEvent          = PathBatch + "/event"
