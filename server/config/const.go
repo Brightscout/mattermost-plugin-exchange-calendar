@@ -23,9 +23,12 @@ const (
 	PathTentative           = "/tentative"
 	PathConfirmStatusChange = "/confirm"
 	PathNotification        = "/notification/v1"
-	PathEvent               = "/event"
+	PathEvent               = "/api/event"
 	PathCalendar            = "/api/calendar"
+	PathFindMeetingTimes    = "/suggestions"
 	PathMe                  = "/api/me"
+	PathBatch               = "/api/batch"
+	PathBatchEvent          = PathBatch + "/event"
 
 	FullPathEventNotification = PathNotification + PathEvent
 	FullPathOAuth2Redirect    = PathOAuth2 + PathComplete
@@ -35,4 +38,6 @@ const (
 
 	CreateCalendarHeading = "Calendar created."
 	DeleteCalendarHeading = "Calendar deleted."
+
+	AuthorizationHeaderKey = "Authorization"
 )

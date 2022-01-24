@@ -4,65 +4,70 @@
 package msgraph
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 	"time"
 
 	"github.com/pkg/errors"
 
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
 )
 
-type calendarViewResponse struct {
-	Value []*remote.Event  `json:"value,omitempty"`
-	Error *remote.APIError `json:"error,omitempty"`
+type calendarViewSingleRequest struct {
+	ID            string    `json:"id"`
+	StartDateTime time.Time `json:"startDateTime"`
+	EndDateTime   time.Time `json:"endDateTime"`
+}
+
+type calendarViewBatchRequest struct {
+	Requests []*calendarViewSingleRequest `json:"requests"`
 }
 
 type calendarViewSingleResponse struct {
-	ID      string               `json:"id"`
-	Status  int                  `json:"status"`
-	Body    calendarViewResponse `json:"body"`
-	Headers map[string]string    `json:"headers"`
+	ID     string           `json:"id"`
+	Events []*remote.Event  `json:"events"`
+	Error  *remote.APIError `json:"error,omitempty"`
 }
 
 type calendarViewBatchResponse struct {
 	Responses []*calendarViewSingleResponse `json:"responses"`
 }
 
-func (c *client) GetDefaultCalendarView(remoteUserID string, start, end time.Time) ([]*remote.Event, error) {
-	// TODO: Add GetDefaultCalendarView API
-	// paramStr := getQueryParamStringForCalendarView(start, end)
+func (c *client) GetDefaultCalendarView(remoteUserEmail string, start, end time.Time) ([]*remote.Event, error) {
+	var out []*remote.Event
+	url, err := c.GetEndpointURL(config.PathEvent, &remoteUserEmail)
+	if err != nil {
+		return nil, errors.Wrap(err, "ews GetDefaultCalendarView")
+	}
+	url = fmt.Sprintf("%s&%s", url, getQueryParamStringForCalendarView(start, end))
+	_, err = c.CallJSON(http.MethodGet, url, nil, &out)
+	if err != nil {
+		return nil, errors.Wrap(err, "ews GetDefaultCalendarView")
+	}
 
-	res := &calendarViewResponse{}
-	// err := c.rbuilder.Users().ID(remoteUserID).CalendarView().Request().JSONRequest(
-	// c.ctx, http.MethodGet, paramStr, nil, res)
-	// if err != nil {
-	// 	return nil, errors.Wrap(err, "msgraph GetDefaultCalendarView")
-	// }
-
-	return res.Value, nil
+	return out, nil
 }
 
 func (c *client) DoBatchViewCalendarRequests(allParams []*remote.ViewCalendarParams) ([]*remote.ViewCalendarResponse, error) {
-	requests := []*singleRequest{}
+	requests := []*calendarViewSingleRequest{}
 	for _, params := range allParams {
-		u := getCalendarViewURL(params)
-		req := &singleRequest{
-			ID:      params.RemoteUserID,
-			URL:     u,
-			Method:  http.MethodGet,
-			Headers: map[string]string{},
+		req := &calendarViewSingleRequest{
+			ID:            params.RemoteUserID,
+			StartDateTime: params.StartTime,
+			EndDateTime:   params.EndTime,
 		}
 		requests = append(requests, req)
 	}
 
-	batchRequests := prepareBatchRequests(requests)
+	batchRequests := prepareEventBatchRequests(requests)
 	var batchResponses []*calendarViewBatchResponse
 	for _, req := range batchRequests {
 		batchRes := &calendarViewBatchResponse{}
-		err := c.batchRequest(req, batchRes)
+		err := c.GetEventsBatchRequest(req, batchRes)
 		if err != nil {
-			return nil, errors.Wrap(err, "msgraph ViewCalendar batch request")
+			return nil, errors.Wrap(err, "ews ViewCalendar batch request")
 		}
 
 		batchResponses = append(batchResponses, batchRes)
@@ -73,8 +78,8 @@ func (c *client) DoBatchViewCalendarRequests(allParams []*remote.ViewCalendarPar
 		for _, res := range batchRes.Responses {
 			viewCalRes := &remote.ViewCalendarResponse{
 				RemoteUserID: res.ID,
-				Events:       res.Body.Value,
-				Error:        res.Body.Error,
+				Events:       res.Events,
+				Error:        res.Error,
 			}
 			result = append(result, viewCalRes)
 		}
@@ -83,15 +88,46 @@ func (c *client) DoBatchViewCalendarRequests(allParams []*remote.ViewCalendarPar
 	return result, nil
 }
 
-func getCalendarViewURL(params *remote.ViewCalendarParams) string {
-	paramStr := getQueryParamStringForCalendarView(params.StartTime, params.EndTime)
-	return "/Users/" + params.RemoteUserID + "/calendarView" + paramStr
+func prepareEventBatchRequests(requests []*calendarViewSingleRequest) []calendarViewBatchRequest {
+	numOfBatches := len(requests) / maxNumRequestsPerBatch
+	if len(requests) % maxNumRequestsPerBatch != 0 {
+		numOfBatches++
+	}
+
+	result := []calendarViewBatchRequest{}
+
+	for i := 0; i < numOfBatches; i++ {
+		startIdx := i * maxNumRequestsPerBatch
+		endIdx := startIdx + maxNumRequestsPerBatch
+		// In case of last batch endIdx will be equal to length of requests
+		if i == numOfBatches-1 {
+			endIdx = len(requests)
+		}
+
+		slice := requests[startIdx:endIdx]
+		batchReq := calendarViewBatchRequest{Requests: slice}
+		result = append(result, batchReq)
+	}
+
+	return result
+}
+
+func (c *client) GetEventsBatchRequest(req calendarViewBatchRequest, out interface{}) error {
+	url, err := c.GetEndpointURL(config.PathBatchEvent, nil)
+	if err != nil {
+		return errors.Wrap(err, "ews GetEventsBatchRequest")
+	}
+	_, err = c.CallJSON(http.MethodPost, url, req, out)
+	if err != nil {
+		return errors.Wrap(err, "ews GetEventsBatchRequest")
+	}
+
+	return nil
 }
 
 func getQueryParamStringForCalendarView(start, end time.Time) string {
 	q := url.Values{}
 	q.Add("startDateTime", start.Format(time.RFC3339))
 	q.Add("endDateTime", end.Format(time.RFC3339))
-	q.Add("$top", "20")
-	return "?" + q.Encode()
+	return q.Encode()
 }

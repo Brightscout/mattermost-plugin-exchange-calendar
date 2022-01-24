@@ -94,14 +94,9 @@ func (app *oauth2App) CompleteOAuth2(authedUserID string) error {
 		Remote:           me,
 	}
 
-	mailboxSettings, err := client.GetMailboxSettings(me.ID)
-	if err != nil {
-		return err
-	}
-
 	u.Settings.DailySummary = &store.DailySummaryUserSettings{
 		PostTime: "8:00AM",
-		Timezone: mailboxSettings.TimeZone,
+		Timezone: model.GetPreferredTimezone(user.Timezone),
 		Enable:   false,
 	}
 
