@@ -14,8 +14,8 @@ import (
 	"strings"
 
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
 	"github.com/pkg/errors"
-	msgraph "github.com/yaegashi/msgraph.go/v1.0"
 )
 
 func (c *client) CallJSON(method, path string, in, out interface{}) (responseData []byte, err error) {
@@ -65,6 +65,9 @@ func (c *client) call(method, path, contentType string, inBody io.Reader, out in
 		req = req.WithContext(c.ctx)
 	}
 
+	// Add authorization header in API requests
+	req.Header.Add(config.AuthorizationHeaderKey, fmt.Sprintf("Bearer %s", c.conf.ExchangeServerAuthKey))
+
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return nil, err
@@ -94,7 +97,7 @@ func (c *client) call(method, path, contentType string, inBody io.Reader, out in
 		return nil, nil
 	}
 
-	errResp := msgraph.ErrorResponse{Response: resp}
+	errResp := remote.ErrorResponse{}
 	err = json.Unmarshal(responseData, &errResp)
 	if err != nil {
 		return responseData, errors.WithMessagef(err, "status: %s", resp.Status)
@@ -102,17 +105,20 @@ func (c *client) call(method, path, contentType string, inBody io.Reader, out in
 	if err != nil {
 		return responseData, err
 	}
-	return responseData, &errResp
+	return responseData, errors.New(errResp.Message)
 }
 
-func (c *client) GetEndpointURL(email, path string) (string, error) {
+func (c *client) GetEndpointURL(path string, email *string) (string, error) {
 	endpointURL, err := url.Parse(strings.TrimSpace(fmt.Sprintf("%s%s", c.conf.ExchangeServerBaseURL, path)))
 	if err != nil {
 		return "", err
 	}
-	params := url.Values{}
-	params.Add(config.EmailKey, email)
-	endpointURL.RawQuery = params.Encode()
+
+	if email != nil {
+		params := url.Values{}
+		params.Add(config.EmailKey, *email)
+		endpointURL.RawQuery = params.Encode()
+	}
 
 	return endpointURL.String(), nil
 }

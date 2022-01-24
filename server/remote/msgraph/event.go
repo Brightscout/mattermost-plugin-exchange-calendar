@@ -14,7 +14,7 @@ import (
 
 func (c *client) GetEvent(remoteUserEmail, eventID string) (*remote.Event, error) {
 	e := &remote.Event{}
-	url, err := c.GetEndpointURL(remoteUserEmail, fmt.Sprintf("%s/%s", config.PathEvent, eventID))
+	url, err := c.GetEndpointURL(fmt.Sprintf("%s/%s", config.PathEvent, eventID), &remoteUserEmail)
 	if err != nil {
 		return nil, errors.Wrap(err, "ews GetEvent")
 	}
@@ -26,7 +26,7 @@ func (c *client) GetEvent(remoteUserEmail, eventID string) (*remote.Event, error
 }
 
 func (c *client) AcceptEvent(remoteUserEmail, eventID string) error {
-	url, err := c.GetEndpointURL(remoteUserEmail, fmt.Sprintf("%s%s/%s", config.PathEvent, config.PathAccept, eventID))
+	url, err := c.GetEndpointURL(fmt.Sprintf("%s%s/%s", config.PathEvent, config.PathAccept, eventID), &remoteUserEmail)
 	if err != nil {
 		return errors.Wrap(err, "ews AcceptEvent")
 	}
@@ -38,7 +38,7 @@ func (c *client) AcceptEvent(remoteUserEmail, eventID string) error {
 }
 
 func (c *client) DeclineEvent(remoteUserEmail, eventID string) error {
-	url, err := c.GetEndpointURL(remoteUserEmail, fmt.Sprintf("%s%s/%s", config.PathEvent, config.PathDecline, eventID))
+	url, err := c.GetEndpointURL(fmt.Sprintf("%s%s/%s", config.PathEvent, config.PathDecline, eventID), &remoteUserEmail)
 	if err != nil {
 		return errors.Wrap(err, "ews DeclineEvent")
 	}
@@ -50,7 +50,7 @@ func (c *client) DeclineEvent(remoteUserEmail, eventID string) error {
 }
 
 func (c *client) TentativelyAcceptEvent(remoteUserEmail, eventID string) error {
-	url, err := c.GetEndpointURL(remoteUserEmail, fmt.Sprintf("%s%s/%s", config.PathEvent, config.PathTentative, eventID))
+	url, err := c.GetEndpointURL(fmt.Sprintf("%s%s/%s", config.PathEvent, config.PathTentative, eventID), &remoteUserEmail)
 	if err != nil {
 		return errors.Wrap(err, "ews TentativelyAcceptEvent")
 	}
