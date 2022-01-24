@@ -91,7 +91,7 @@
                 "key": "ExchangeServerAuthKey",
                 "display_name": "Exchange Server Authentication Key:",
                 "type": "generated",
-                "help_text": "Enter Authentication key of exchange server",
+                "help_text": "Authentication key set in EWS-server for authenticating API requests",
                 "default": ""
             }
         ]
