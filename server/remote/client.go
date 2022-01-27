@@ -18,14 +18,14 @@ type Client interface {
 	DeclineEvent(remoteUserEmail, eventID string) error
 	DeleteCalendar(remoteUserEmail, calendarID string) (*Calendar, error)
 	DeleteSubscription(subscriptionID string) error
-	FindMeetingTimes(remoteUserID string, meetingParams *FindMeetingTimesParameters) (*MeetingTimeSuggestionResults, error)
+	FindMeetingTimes(remoteUserEmail string, meetingParams *FindMeetingTimesParameters) (*MeetingTimeSuggestionResults, error)
 	GetCalendars(remoteUserEmail string) ([]*Calendar, error)
 	GetDefaultCalendarView(remoteUserEmail string, startTime, endTime time.Time) ([]*Event, error)
 	DoBatchViewCalendarRequests([]*ViewCalendarParams) ([]*ViewCalendarResponse, error)
 	GetEvent(remoteUserEmail, eventID string) (*Event, error)
 	GetMailboxSettings(remoteUserID string) (*MailboxSettings, error)
 	GetMe(remoteUserEmail string) (*User, error)
-	GetNotificationData(remoteUserEmail string, eventId string) (*Notification, error)
+	GetNotificationData(remoteUserEmail string, eventID string, subscriptionID string) (*Notification, error)
 	GetSchedule(requests []*ScheduleUserInfo, startTime, endTime *DateTime, availabilityViewInterval int) ([]*ScheduleInformation, error)
 	TentativelyAcceptEvent(remoteUserEmail, eventID string) error
 	GetSuperuserToken() (string, error)

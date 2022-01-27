@@ -15,11 +15,12 @@ import (
 )
 
 func (c *client) CreateMySubscription(remoteUserEmail string, notificationURL string) (*remote.Subscription, error) {
+	// TODO: Use siteURL field from mattermost config
 	sub := &remote.Subscription{
 		WebhookNotificationUrl: fmt.Sprintf("%s/%s/%s", c.conf.MattermostServerBaseURL, c.conf.PluginURLPath, notificationURL),
 	}
 
-	path, err := c.GetEndpointURL(remoteUserEmail, fmt.Sprintf("%s%s", config.PathNotification, config.PathSubscribe))
+	path, err := c.GetEndpointURL(fmt.Sprintf("%s%s", config.PathNotification, config.PathSubscribe), &remoteUserEmail)
 	if err != nil {
 		return nil, errors.Wrap(err, "ews Subscribe")
 	}
@@ -41,7 +42,7 @@ func (c *client) DeleteSubscription(subscriptionID string) error {
 		ID: subscriptionID,
 	}
 
-	path, err := c.GetEndpointURL("", fmt.Sprintf("%s%s", config.PathNotification, config.PathUnsubscribe))
+	path, err := c.GetEndpointURL(fmt.Sprintf("%s%s", config.PathNotification, config.PathUnsubscribe), nil)
 	if err != nil {
 		return errors.Wrap(err, "ews DeleteSubscription")
 	}

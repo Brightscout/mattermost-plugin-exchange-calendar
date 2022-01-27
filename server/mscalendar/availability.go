@@ -389,7 +389,7 @@ func (m *mscalendar) notifyUpcomingEvents(mattermostUserID string, events []*rem
 func filterBusyEvents(events []*remote.Event) []*remote.Event {
 	result := []*remote.Event{}
 	for _, e := range events {
-		if e.ShowAs == "busy" {
+		if e.ShowAs == "Busy" {
 			result = append(result, e)
 		}
 	}

@@ -15,7 +15,7 @@ import (
 
 func (c *client) DeleteCalendar(remoteUserEmail string, calID string) (*remote.Calendar, error) {
 	calOut := &remote.Calendar{}
-	url, err := c.GetEndpointURL(remoteUserEmail, fmt.Sprintf("%s/%s", config.PathCalendar, calID))
+	url, err := c.GetEndpointURL(fmt.Sprintf("%s/%s", config.PathCalendar, calID), &remoteUserEmail)
 	if err != nil {
 		return nil, errors.Wrap(err, "ews DeleteCalendar")
 	}

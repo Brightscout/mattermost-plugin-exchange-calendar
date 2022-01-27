@@ -15,7 +15,7 @@ import (
 // CreateCalendar creates a calendar
 func (c *client) CreateCalendar(remoteUserEmail string, calIn *remote.Calendar) (*remote.Calendar, error) {
 	calOut := &remote.Calendar{}
-	url, err := c.GetEndpointURL(remoteUserEmail, config.PathCalendar)
+	url, err := c.GetEndpointURL(config.PathCalendar, &remoteUserEmail)
 	if err != nil {
 		return nil, errors.Wrap(err, "ews CreateCalendar")
 	}

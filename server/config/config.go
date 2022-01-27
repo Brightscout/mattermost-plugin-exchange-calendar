@@ -9,6 +9,7 @@ type StoredConfig struct {
 	OAuth2ClientID          string
 	OAuth2ClientSecret      string
 	ExchangeServerBaseURL   string
+	ExchangeServerAuthKey   string
 	MattermostServerBaseURL string
 
 	EnableStatusSync   bool

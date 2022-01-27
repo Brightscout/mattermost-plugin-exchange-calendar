@@ -86,6 +86,9 @@ func (p *Plugin) OnActivate() error {
 	// 	stored.OAuth2ClientSecret == "" {
 	// 	return errors.New("failed to configure: OAuth2 credentials to be set in the config")
 	// }
+	if stored.ExchangeServerBaseURL == "" || stored.ExchangeServerAuthKey == "" {
+		return errors.New("failed to configure: Exchange Server credentials to be set in the config")
+	}
 
 	p.initEnv(&p.env, "")
 	bundlePath, err := p.API.GetBundlePath()
