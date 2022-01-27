@@ -4,17 +4,24 @@
 package msgraph
 
 import (
+	"fmt"
+	"net/http"
+
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
+	"github.com/pkg/errors"
 )
 
 // FindMeetingTimes finds meeting time suggestions for a calendar event
-func (c *client) FindMeetingTimes(remoteUserID string, params *remote.FindMeetingTimesParameters) (*remote.MeetingTimeSuggestionResults, error) {
+func (c *client) FindMeetingTimes(remoteUserEmail string, params *remote.FindMeetingTimesParameters) (*remote.MeetingTimeSuggestionResults, error) {
 	meetingsOut := &remote.MeetingTimeSuggestionResults{}
-	// TODO: Add FindMeetingTimes API
-	// req := c.rbuilder.Users().ID(remoteUserID).FindMeetingTimes(nil).Request()
-	// err := req.JSONRequest(c.ctx, http.MethodPost, "", &params, &meetingsOut)
-	// if err != nil {
-	// 	return nil, errors.Wrap(err, "msgraph FindMeetingTimes")
-	// }
+	url, err := c.GetEndpointURL(remoteUserEmail, fmt.Sprintf("%s%s", config.PathCalendar, config.PathFindMeetingTimes))
+	if err != nil {
+		return nil, errors.Wrap(err, "ews FindMeetingTimes")
+	}
+	_, err = c.CallJSON(http.MethodPost, url, params, &meetingsOut)
+	if err != nil {
+		return nil, errors.Wrap(err, "ews FindMeetingTimes")
+	}
 	return meetingsOut, nil
 }

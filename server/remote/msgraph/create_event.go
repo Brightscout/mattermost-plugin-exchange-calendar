@@ -14,13 +14,13 @@ import (
 // CreateEvent creates a calendar event
 func (c *client) CreateEvent(remoteUserEmail string, in *remote.Event) (*remote.Event, error) {
 	var out = &remote.Event{}
-	url, err := c.GetEndpointURL(remoteUserEmail, config.PathEvent)
+	url, err := c.GetEndpointURL(config.PathEvent, &remoteUserEmail)
 	if err != nil {
-		return nil, errors.Wrap(err, "msgraph CreateEvent")
+		return nil, errors.Wrap(err, "ews CreateEvent")
 	}
 	_, err = c.CallJSON(http.MethodPost, url, in, out)
 	if err != nil {
-		return nil, errors.Wrap(err, "msgraph CreateEvent")
+		return nil, errors.Wrap(err, "ews CreateEvent")
 	}
 	return out, nil
 }
