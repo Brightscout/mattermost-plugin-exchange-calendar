@@ -18,11 +18,12 @@ import (
 const subscribeTTL = 48 * time.Hour
 
 func (c *client) CreateMySubscription(remoteUserEmail string, notificationURL string) (*remote.Subscription, error) {
+	// TODO: Use siteURL field from mattermost config
 	sub := &remote.Subscription{
 		WebhookNotificationUrl: fmt.Sprintf("%s/%s/%s", c.conf.MattermostServerBaseURL, c.conf.PluginURLPath, notificationURL),
 	}
 
-	path, err := c.GetEndpointURL(remoteUserEmail, config.PathSubscribe)
+	path, err := c.GetEndpointURL(config.PathSubscribe, &remoteUserEmail)
 	if err != nil {
 		return nil, errors.Wrap(err, "ews Subscribe")
 	}

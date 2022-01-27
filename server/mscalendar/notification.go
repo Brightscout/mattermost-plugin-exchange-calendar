@@ -127,7 +127,7 @@ func (processor *notificationProcessor) processNotification(n *remote.Notificati
 		return err
 	}
 	client := processor.Remote.MakeClient(context.Background())
-	eventData, err := client.GetNotificationData(creator.Remote.Mail, n.EventID)
+	eventData, err := client.GetNotificationData(creator.Remote.Mail, n.EventID, n.SubscriptionID)
 	if err != nil {
 		return err
 	}
@@ -165,8 +165,6 @@ func (processor *notificationProcessor) newEventSlackAttachment(n *remote.Notifi
 		})
 	}
 
-	fmt.Println("wooh")
-	fmt.Printf("%+v", n.Event)
 	if n.Event.ResponseRequested && !n.Event.IsOrganizer {
 		sa.Actions = NewPostActionForEventResponse(n.Event.ID, n.Event.ResponseStatus.Response, processor.actionURL(config.PathRespond))
 	}
