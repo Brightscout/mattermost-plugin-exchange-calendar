@@ -15,7 +15,7 @@ import (
 // FindMeetingTimes finds meeting time suggestions for a calendar event
 func (c *client) FindMeetingTimes(remoteUserEmail string, params *remote.FindMeetingTimesParameters) (*remote.MeetingTimeSuggestionResults, error) {
 	meetingsOut := &remote.MeetingTimeSuggestionResults{}
-	url, err := c.GetEndpointURL(remoteUserEmail, fmt.Sprintf("%s%s", config.PathCalendar, config.PathFindMeetingTimes))
+	url, err := c.GetEndpointURL(fmt.Sprintf("%s%s", config.PathCalendar, config.PathFindMeetingTimes), &remoteUserEmail)
 	if err != nil {
 		return nil, errors.Wrap(err, "ews FindMeetingTimes")
 	}

@@ -13,7 +13,6 @@ import (
 
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/store"
-	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/oauth2connect"
 )
 
 const BotWelcomeMessage = "Bot user connected to account %s."
@@ -25,11 +24,15 @@ type oauth2App struct {
 	Env
 }
 
-func NewOAuth2App(env Env) oauth2connect.App {
-	return &oauth2App{
-		Env: env,
-	}
+type OAuth2 interface {
+	CompleteOAuth2(mattermostUserID string) error
 }
+
+// func NewOAuth2App(env Env) oauth2connect.App {
+// 	return &oauth2App{
+// 		Env: env,
+// 	}
+// }
 
 func (app *oauth2App) InitOAuth2(mattermostUserID string) (url string, err error) {
 	user, err := app.Store.LoadUser(mattermostUserID)
@@ -47,7 +50,7 @@ func (app *oauth2App) InitOAuth2(mattermostUserID string) (url string, err error
 	return conf.AuthCodeURL(state, oauth2.AccessTypeOffline), nil
 }
 
-func (app *oauth2App) CompleteOAuth2(authedUserID string) error {
+func (m *mscalendar) CompleteOAuth2(authedUserID string) error {
 	if authedUserID == "" {
 		return errors.New("missing user")
 	}
@@ -70,8 +73,8 @@ func (app *oauth2App) CompleteOAuth2(authedUserID string) error {
 	// 	return err
 	// }
 
-	client := app.Remote.MakeClient(ctx)
-	user, userErr := app.PluginAPI.GetMattermostUser(authedUserID)
+	client := m.Remote.MakeClient(ctx)
+	user, userErr := m.PluginAPI.GetMattermostUser(authedUserID)
 	if userErr != nil {
 		return userErr
 	}
@@ -81,15 +84,15 @@ func (app *oauth2App) CompleteOAuth2(authedUserID string) error {
 		return err
 	}
 
-	_, err = app.Store.LoadMattermostUserID(me.ID)
+	_, err = m.Store.LoadMattermostUserID(me.ID)
 	if err == nil {
 		// Couldn't fetch connected MM account. Reject connect attempt.
-		app.Poster.DM(authedUserID, RemoteUserAlreadyConnectedNotFound, config.ApplicationName, me.Mail)
+		m.Poster.DM(authedUserID, RemoteUserAlreadyConnectedNotFound, config.ApplicationName, me.Mail)
 		return fmt.Errorf(RemoteUserAlreadyConnectedNotFound, config.ApplicationName, me.Mail)
 	}
 
 	u := &store.User{
-		PluginVersion:    app.Config.PluginVersion,
+		PluginVersion:    m.Config.PluginVersion,
 		MattermostUserID: authedUserID,
 		Remote:           me,
 	}
@@ -100,17 +103,17 @@ func (app *oauth2App) CompleteOAuth2(authedUserID string) error {
 		Enable:   false,
 	}
 
-	err = app.Store.StoreUser(u)
+	err = m.Store.StoreUser(u)
 	if err != nil {
 		return err
 	}
 
-	err = app.Store.StoreUserInIndex(u)
+	err = m.Store.StoreUserInIndex(u)
 	if err != nil {
 		return err
 	}
 
-	app.Welcomer.AfterSuccessfullyConnect(authedUserID, me.Mail)
+	m.Welcomer.AfterSuccessfullyConnect(authedUserID, me.Mail)
 
 	return nil
 }

@@ -74,17 +74,19 @@ func (bot *mscBot) Welcome(userID string) error {
 
 func (bot *mscBot) AfterSuccessfullyConnect(userID, userLogin string) error {
 	bot.Tracker.TrackUserAuthenticated(userID)
-	postID, err := bot.Store.DeleteUserWelcomePost(userID)
-	if err != nil {
-		bot.Errorf("error deleting user's welcome post id, err=%v", err)
-	}
-	if postID != "" {
-		post := &model.Post{
-			Id: postID,
-		}
-		model.ParseSlackAttachment(post, []*model.SlackAttachment{bot.newConnectedAttachment(userLogin)})
-		bot.UpdatePost(post)
-	}
+	// postID, err := bot.Store.DeleteUserWelcomePost(userID)
+	// if err != nil {
+	// 	bot.Errorf("error deleting user's welcome post id, err=%v", err)
+	// }
+	// if postID != "" {
+	// 	post := &model.Post{
+	// 		Id: postID,
+	// 	}
+	// 	model.(post, []*model.SlackAttachment{bot.newConnectedAttachment(userLogin)})
+	// 	bot.UpdatePost(post)
+	// }
+
+	bot.DMWithAttachments(userID, bot.newConnectedAttachment(userLogin))
 
 	return bot.Start(userID)
 }

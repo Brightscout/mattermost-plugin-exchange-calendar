@@ -30,7 +30,6 @@ import (
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/bot"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/flow"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/httputils"
-	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/oauth2connect"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/pluginapi"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/settingspanel"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/telemetry"
@@ -202,7 +201,7 @@ func (p *Plugin) OnConfigurationChange() (err error) {
 		}
 
 		e.httpHandler = httputils.NewHandler()
-		oauth2connect.Init(e.httpHandler, mscalendar.NewOAuth2App(e.Env))
+		// oauth2connect.Init(e.httpHandler, mscalendar.NewOAuth2App(e.Env))
 		flow.Init(e.httpHandler, welcomeFlow, mscalendarBot)
 		settingspanel.Init(e.httpHandler, e.Dependencies.SettingsPanel)
 		api.Init(e.httpHandler, e.Env, e.notificationProcessor)

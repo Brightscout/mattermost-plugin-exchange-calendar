@@ -23,6 +23,7 @@ type MSCalendar interface {
 	Welcomer
 	Settings
 	DailySummary
+	OAuth2
 }
 
 // Dependencies contains all API dependencies

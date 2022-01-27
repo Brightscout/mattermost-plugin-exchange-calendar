@@ -24,7 +24,7 @@ func (c *Command) connect(parameters ...string) (string, bool, error) {
 
 	out := ""
 
-	err = c.MSCalendar.Welcome(c.Args.UserId)
+	err = c.MSCalendar.CompleteOAuth2(c.Args.UserId)
 	if err != nil {
 		out = ConnectErrorMessage + err.Error()
 	}
