@@ -27,8 +27,6 @@ type Client interface {
 	GetMe(remoteUserEmail string) (*User, error)
 	GetNotificationData(remoteUserEmail string, eventID string, subscriptionID string) (*Notification, error)
 	GetSchedule(requests []*ScheduleUserInfo, startTime, endTime *DateTime, availabilityViewInterval int) ([]*ScheduleInformation, error)
-	ListSubscriptions() ([]*Subscription, error)
-	RenewSubscription(subscriptionID string) (*Subscription, error)
 	TentativelyAcceptEvent(remoteUserEmail, eventID string) error
 	GetSuperuserToken() (string, error)
 }

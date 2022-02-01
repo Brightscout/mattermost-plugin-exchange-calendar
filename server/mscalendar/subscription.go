@@ -4,21 +4,16 @@
 package mscalendar
 
 import (
-	"strings"
-
 	"github.com/pkg/errors"
 
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
-	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/store"
 )
 
 type Subscriptions interface {
 	CreateMyEventSubscription() (*store.Subscription, error)
-	RenewMyEventSubscription() (*store.Subscription, error)
 	DeleteOrphanedSubscription(ID string) error
 	DeleteMyEventSubscription() error
-	ListRemoteSubscriptions() ([]*remote.Subscription, error)
 	LoadMyEventSubscription() (*store.Subscription, error)
 }
 
@@ -58,55 +53,6 @@ func (m *mscalendar) LoadMyEventSubscription() (*store.Subscription, error) {
 	return storedSub, err
 }
 
-func (m *mscalendar) ListRemoteSubscriptions() ([]*remote.Subscription, error) {
-	err := m.Filter(withClient)
-	if err != nil {
-		return nil, err
-	}
-	subs, err := m.client.ListSubscriptions()
-	if err != nil {
-		return nil, err
-	}
-	return subs, nil
-}
-
-func (m *mscalendar) RenewMyEventSubscription() (*store.Subscription, error) {
-	err := m.Filter(withClient)
-	if err != nil {
-		return nil, err
-	}
-
-	subscriptionID := m.actingUser.Settings.EventSubscriptionID
-	if subscriptionID == "" {
-		return nil, nil
-	}
-	renewed, err := m.client.RenewSubscription(subscriptionID)
-	if err != nil {
-		if strings.Contains(err.Error(), "The object was not found") {
-			err = m.Store.DeleteUserSubscription(m.actingUser.User, subscriptionID)
-			if err != nil {
-				return nil, err
-			}
-
-			m.Logger.Infof("Subscription %s for Mattermost user %s has expired. Creating a new subscription now.", subscriptionID, m.actingUser.MattermostUserID)
-			return m.CreateMyEventSubscription()
-		}
-		return nil, err
-	}
-
-	storedSub, err := m.Store.LoadSubscription(m.actingUser.Settings.EventSubscriptionID)
-	if err != nil {
-		return nil, err
-	}
-	storedSub.Remote = renewed
-
-	err = m.Store.StoreUserSubscription(m.actingUser.User, storedSub)
-	if err != nil {
-		return nil, err
-	}
-	return storedSub, err
-}
-
 func (m *mscalendar) DeleteMyEventSubscription() error {
 	err := m.Filter(withActingUserExpanded)
 	if err != nil {
@@ -115,15 +61,16 @@ func (m *mscalendar) DeleteMyEventSubscription() error {
 
 	subscriptionID := m.actingUser.Settings.EventSubscriptionID
 
+	err = m.DeleteOrphanedSubscription(subscriptionID)
+	if err != nil {
+		return err
+	}
+
 	err = m.Store.DeleteUserSubscription(m.actingUser.User, subscriptionID)
 	if err != nil {
 		return errors.WithMessagef(err, "failed to delete subscription %s", subscriptionID)
 	}
 
-	err = m.DeleteOrphanedSubscription(subscriptionID)
-	if err != nil {
-		return err
-	}
 	return nil
 }
 
