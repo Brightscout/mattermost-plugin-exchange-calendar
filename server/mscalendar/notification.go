@@ -10,12 +10,10 @@ import (
 	"time"
 
 	"github.com/mattermost/mattermost-server/v5/model"
-	"github.com/pkg/errors"
 
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/mscalendar/views"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
-	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/store"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/bot"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/fields"
 )
@@ -47,8 +45,6 @@ const (
 	ResponseNo    = "declined"
 	ResponseNone  = "notResponded"
 )
-
-var importantNotificationChanges []string = []string{FieldSubject, FieldWhen}
 
 var notificationFieldOrder []string = []string{
 	FieldWhen,
@@ -130,92 +126,16 @@ func (processor *notificationProcessor) processNotification(n *remote.Notificati
 	if err != nil {
 		return err
 	}
-	if sub.Remote.ID != creator.Settings.EventSubscriptionID {
-		return errors.New("subscription is orphaned")
-	}
-	if sub.Remote.ClientState != "" && sub.Remote.ClientState != n.ClientState {
-		return errors.New("unauthorized webhook")
-	}
-
-	n.Subscription = sub.Remote
-	n.SubscriptionCreator = creator.Remote
-
 	client := processor.Remote.MakeClient(context.Background())
-
-	if n.RecommendRenew {
-		var renewed *remote.Subscription
-		renewed, err = client.RenewSubscription(n.SubscriptionID)
-		if err != nil {
-			return err
-		}
-
-		storedSub := &store.Subscription{
-			Remote:              renewed,
-			MattermostCreatorID: creator.MattermostUserID,
-			PluginVersion:       processor.Config.PluginVersion,
-		}
-		err = processor.Store.StoreUserSubscription(creator, storedSub)
-		if err != nil {
-			return err
-		}
-		processor.Logger.With(bot.LogContext{
-			"MattermostUserID": creator.MattermostUserID,
-			"SubscriptionID":   n.SubscriptionID,
-		}).Debugf("webhook notification: renewed user subscription.")
-	}
-
-	if n.IsBare {
-		n, err = client.GetNotificationData(n)
-		if err != nil {
-			return err
-		}
-	}
-
-	var sa *model.SlackAttachment
-	prior, err := processor.Store.LoadUserEvent(creator.MattermostUserID, n.Event.ICalUID)
-	if err != nil && err != store.ErrNotFound {
-		return err
-	}
-
-	mailSettings, err := client.GetMailboxSettings(sub.Remote.CreatorID)
+	eventData, err := client.GetNotificationData(creator.Remote.Mail, n.EventID, n.SubscriptionID)
 	if err != nil {
 		return err
 	}
-	timezone := mailSettings.TimeZone
-
-	if prior != nil {
-		var changed bool
-		changed, sa = processor.updatedEventSlackAttachment(n, prior.Remote, timezone)
-		if !changed {
-			processor.Logger.With(bot.LogContext{
-				"MattermostUserID": creator.MattermostUserID,
-				"SubscriptionID":   n.SubscriptionID,
-				"ChangeType":       n.ChangeType,
-				"EventID":          n.Event.ID,
-				"EventICalUID":     n.Event.ICalUID,
-			}).Debugf("webhook notification: no changes detected in event.")
-			return nil
-		}
-	} else {
-		sa = processor.newEventSlackAttachment(n, timezone)
-		prior = &store.Event{}
-	}
-
+	sa := processor.newEventSlackAttachment(eventData)
 	_, err = processor.Poster.DMWithAttachments(creator.MattermostUserID, sa)
 	if err != nil {
 		return err
 	}
-
-	prior.Remote = n.Event
-	err = processor.Store.StoreUserEvent(creator.MattermostUserID, prior)
-	if err != nil {
-		return err
-	}
-
-	processor.Logger.With(bot.LogContext{
-		"MattermostUserID": creator.MattermostUserID,
-		"SubscriptionID":   n.SubscriptionID,
-	}).Debugf("Notified: %s.", sa.Title)
 
 	return nil
 }
@@ -223,22 +143,18 @@ func (processor *notificationProcessor) processNotification(n *remote.Notificati
 func (processor *notificationProcessor) newSlackAttachment(n *remote.Notification) *model.SlackAttachment {
 	title := views.EnsureSubject(n.Event.Subject)
 	titleLink := n.Event.Weblink
-	text := n.Event.BodyPreview
 	return &model.SlackAttachment{
 		AuthorName: n.Event.Organizer.EmailAddress.Name,
 		AuthorLink: "mailto:" + n.Event.Organizer.EmailAddress.Address,
 		TitleLink:  titleLink,
 		Title:      title,
-		Text:       text,
-		Fallback:   fmt.Sprintf("[%s](%s): %s", title, titleLink, text),
+		Fallback:   fmt.Sprintf("[%s](%s)", title, titleLink),
 	}
 }
 
-func (processor *notificationProcessor) newEventSlackAttachment(n *remote.Notification, timezone string) *model.SlackAttachment {
+func (processor *notificationProcessor) newEventSlackAttachment(n *remote.Notification) *model.SlackAttachment {
 	sa := processor.newSlackAttachment(n)
-	sa.Title = "(new) " + sa.Title
-
-	fields := eventToFields(n.Event, timezone)
+	fields := eventToFields(n.Event)
 	for _, k := range notificationFieldOrder {
 		v := fields[k]
 
@@ -255,77 +171,78 @@ func (processor *notificationProcessor) newEventSlackAttachment(n *remote.Notifi
 	return sa
 }
 
-func (processor *notificationProcessor) updatedEventSlackAttachment(n *remote.Notification, prior *remote.Event, timezone string) (bool, *model.SlackAttachment) {
-	sa := processor.newSlackAttachment(n)
-	sa.Title = "(updated) " + sa.Title
+// TODO: remove if not required after completing the entire flow of subscription and notifications
+// func (processor *notificationProcessor) updatedEventSlackAttachment(n *remote.Notification, prior *remote.Event, timezone string) (bool, *model.SlackAttachment) {
+// 	sa := processor.newSlackAttachment(n)
+// 	sa.Title = "(updated) " + sa.Title
 
-	newFields := eventToFields(n.Event, timezone)
-	priorFields := eventToFields(prior, timezone)
-	changed, added, updated, deleted := fields.Diff(priorFields, newFields)
-	if !changed {
-		return false, nil
-	}
+// 	newFields := eventToFields(n.Event, timezone)
+// 	priorFields := eventToFields(prior, timezone)
+// 	changed, added, updated, deleted := fields.Diff(priorFields, newFields)
+// 	if !changed {
+// 		return false, nil
+// 	}
 
-	allChanges := append(added, updated...)
-	allChanges = append(allChanges, deleted...)
+// 	allChanges := append(added, updated...)
+// 	allChanges = append(allChanges, deleted...)
 
-	hasImportantChanges := false
-	for _, k := range allChanges {
-		if isImportantChange(k) {
-			hasImportantChanges = true
-			break
-		}
-	}
+// 	hasImportantChanges := false
+// 	for _, k := range allChanges {
+// 		if isImportantChange(k) {
+// 			hasImportantChanges = true
+// 			break
+// 		}
+// 	}
 
-	if !hasImportantChanges {
-		return false, nil
-	}
+// 	if !hasImportantChanges {
+// 		return false, nil
+// 	}
 
-	for _, k := range added {
-		if !isImportantChange(k) {
-			continue
-		}
-		sa.Fields = append(sa.Fields, &model.SlackAttachmentField{
-			Title: k,
-			Value: strings.Join(newFields[k].Strings(), ", "),
-			Short: true,
-		})
-	}
-	for _, k := range updated {
-		if !isImportantChange(k) {
-			continue
-		}
-		sa.Fields = append(sa.Fields, &model.SlackAttachmentField{
-			Title: k,
-			Value: fmt.Sprintf("~~%s~~ \u2192 %s", strings.Join(priorFields[k].Strings(), ", "), strings.Join(newFields[k].Strings(), ", ")),
-			Short: true,
-		})
-	}
-	for _, k := range deleted {
-		if !isImportantChange(k) {
-			continue
-		}
-		sa.Fields = append(sa.Fields, &model.SlackAttachmentField{
-			Title: k,
-			Value: fmt.Sprintf("~~%s~~", strings.Join(priorFields[k].Strings(), ", ")),
-			Short: true,
-		})
-	}
+// 	for _, k := range added {
+// 		if !isImportantChange(k) {
+// 			continue
+// 		}
+// 		sa.Fields = append(sa.Fields, &model.SlackAttachmentField{
+// 			Title: k,
+// 			Value: strings.Join(newFields[k].Strings(), ", "),
+// 			Short: true,
+// 		})
+// 	}
+// 	for _, k := range updated {
+// 		if !isImportantChange(k) {
+// 			continue
+// 		}
+// 		sa.Fields = append(sa.Fields, &model.SlackAttachmentField{
+// 			Title: k,
+// 			Value: fmt.Sprintf("~~%s~~ \u2192 %s", strings.Join(priorFields[k].Strings(), ", "), strings.Join(newFields[k].Strings(), ", ")),
+// 			Short: true,
+// 		})
+// 	}
+// 	for _, k := range deleted {
+// 		if !isImportantChange(k) {
+// 			continue
+// 		}
+// 		sa.Fields = append(sa.Fields, &model.SlackAttachmentField{
+// 			Title: k,
+// 			Value: fmt.Sprintf("~~%s~~", strings.Join(priorFields[k].Strings(), ", ")),
+// 			Short: true,
+// 		})
+// 	}
 
-	if n.Event.ResponseRequested && !n.Event.IsOrganizer && !n.Event.IsCancelled {
-		sa.Actions = NewPostActionForEventResponse(n.Event.ID, n.Event.ResponseStatus.Response, processor.actionURL(config.PathRespond))
-	}
-	return true, sa
-}
+// 	if n.Event.ResponseRequested && !n.Event.IsOrganizer && !n.Event.IsCancelled {
+// 		sa.Actions = NewPostActionForEventResponse(n.Event.ID, n.Event.ResponseStatus.Response, processor.actionURL(config.PathRespond))
+// 	}
+// 	return true, sa
+// }
 
-func isImportantChange(fieldName string) bool {
-	for _, ic := range importantNotificationChanges {
-		if ic == fieldName {
-			return true
-		}
-	}
-	return false
-}
+// func isImportantChange(fieldName string) bool {
+// 	for _, ic := range importantNotificationChanges {
+// 		if ic == fieldName {
+// 			return true
+// 		}
+// 	}
+// 	return false
+// }
 
 func (processor *notificationProcessor) actionURL(action string) string {
 	return fmt.Sprintf("%s%s%s", processor.Config.PluginURLPath, config.PathPostAction, action)
@@ -361,14 +278,14 @@ func NewPostActionForEventResponse(eventID, response, url string) []*model.PostA
 	return []*model.PostAction{pa}
 }
 
-func eventToFields(e *remote.Event, timezone string) fields.Fields {
+func eventToFields(e *remote.Event) fields.Fields {
 	date := func(dtStart, dtEnd *remote.DateTime) (time.Time, time.Time, string) {
 		if dtStart == nil || dtEnd == nil {
 			return time.Time{}, time.Time{}, "n/a"
 		}
 
-		dtStart = dtStart.In(timezone)
-		dtEnd = dtEnd.In(timezone)
+		dtStart = dtStart.In(e.TimeZone)
+		dtEnd = dtEnd.In(e.TimeZone)
 		tStart := dtStart.Time()
 		tEnd := dtEnd.Time()
 		startFormat := "Monday, January 02"

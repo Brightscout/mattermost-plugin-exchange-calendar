@@ -88,6 +88,13 @@
                 "default": ""
             },
             {
+                "key": "MattermostServerBaseURL",
+                "display_name": "Mattermost Server Base URL:",
+                "type": "text",
+                "help_text": "Enter Base URL of mattermost server",
+                "default": ""
+            },
+            {
                 "key": "ExchangeServerAuthKey",
                 "display_name": "Exchange Server Authentication Key:",
                 "type": "generated",
