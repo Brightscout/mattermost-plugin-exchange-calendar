@@ -33,6 +33,7 @@ const (
 	PathBatch               = "/api/batch"
 	PathBatchEvent          = PathBatch + "/event"
 
+	// TODO: Change path from notification/api/event to /api/notification/event
 	FullPathEventNotification = PathGetNotification + PathEvent
 	FullPathOAuth2Redirect    = PathOAuth2 + PathComplete
 
