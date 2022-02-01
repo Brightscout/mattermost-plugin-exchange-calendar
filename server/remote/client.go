@@ -25,7 +25,7 @@ type Client interface {
 	GetEvent(remoteUserEmail, eventID string) (*Event, error)
 	GetMailboxSettings(remoteUserID string) (*MailboxSettings, error)
 	GetMe(remoteUserEmail string) (*User, error)
-	GetNotificationData(remoteUserEmail string, eventID string, subscriptionID string) (*Notification, error)
+	GetNotificationData(remoteUserEmail, eventID, subscriptionID string) (*Notification, error)
 	GetSchedule(requests []*ScheduleUserInfo, startTime, endTime *DateTime, availabilityViewInterval int) ([]*ScheduleInformation, error)
 	TentativelyAcceptEvent(remoteUserEmail, eventID string) error
 	GetSuperuserToken() (string, error)
