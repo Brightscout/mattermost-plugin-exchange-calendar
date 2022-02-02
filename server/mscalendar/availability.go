@@ -232,7 +232,7 @@ func (m *mscalendar) setStatusFromCalendarView(user *store.User, status *model.S
 			if status.Manual {
 				user.LastStatus = currentStatus
 			}
-			m.Store.StoreUser(user)
+			_ = m.Store.StoreUser(user)
 			err = m.Store.StoreUserActiveEvents(user.MattermostUserID, remoteHashes)
 			if err != nil {
 				return "", err
