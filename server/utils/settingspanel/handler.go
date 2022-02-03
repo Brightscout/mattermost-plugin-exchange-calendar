@@ -69,5 +69,5 @@ func (sh *handler) handleAction(w http.ResponseWriter, r *http.Request) {
 		response.Update = post
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(response.ToJson())
+	_, _ = w.Write(response.ToJson())
 }

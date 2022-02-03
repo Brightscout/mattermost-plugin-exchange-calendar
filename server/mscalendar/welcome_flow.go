@@ -42,7 +42,7 @@ func (wf *WelcomeFlow) Length() int {
 }
 
 func (wf *WelcomeFlow) StepDone(userID string, step int, value bool) {
-	wf.controller.NextStep(userID, step, value)
+	_ = wf.controller.NextStep(userID, step, value)
 }
 
 func (wf *WelcomeFlow) FlowDone(userID string) {

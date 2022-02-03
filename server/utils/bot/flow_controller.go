@@ -29,7 +29,7 @@ func (bot *bot) NextStep(userID string, from int, value bool) error {
 	skip := bot.flow.Step(step).ShouldSkip(value)
 	step += 1 + skip
 	if step >= bot.flow.Length() {
-		bot.removeFlowStep(userID)
+		_ = bot.removeFlowStep(userID)
 		bot.flow.FlowDone(userID)
 		return nil
 	}
