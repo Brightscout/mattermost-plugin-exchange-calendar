@@ -70,7 +70,7 @@
             {
                 "key": "ExchangeServerAuthKey",
                 "display_name": "Exchange Server Authentication Key:",
-                "type": "generated",
+                "type": "text",
                 "help_text": "Authentication key set in EWS-server for authenticating API requests",
                 "default": ""
             }
