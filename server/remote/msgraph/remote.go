@@ -8,7 +8,6 @@ import (
 	"net/http"
 
 	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/microsoft"
 
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
@@ -69,8 +68,6 @@ func (r *impl) MakeSuperuserClient(ctx context.Context) (remote.Client, error) {
 
 func (r *impl) NewOAuth2Config() *oauth2.Config {
 	return &oauth2.Config{
-		ClientID:     r.conf.OAuth2ClientID,
-		ClientSecret: r.conf.OAuth2ClientSecret,
 		RedirectURL:  r.conf.PluginURL + config.FullPathOAuth2Redirect,
 		Scopes: []string{
 			"offline_access",
@@ -79,6 +76,5 @@ func (r *impl) NewOAuth2Config() *oauth2.Config {
 			"Calendars.ReadWrite.Shared",
 			"MailboxSettings.Read",
 		},
-		Endpoint: microsoft.AzureADEndpoint(r.conf.OAuth2Authority),
 	}
 }
