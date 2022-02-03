@@ -128,7 +128,7 @@ func (api *api) postActionRespond(w http.ResponseWriter, req *http.Request) {
 		postResponse.EphemeralText = "Event has changed since this message. Please change your status directly on MS Calendar."
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(postResponse.ToJson())
+	_, _ = w.Write(postResponse.ToJson())
 }
 
 func prettyOption(option string) string {
@@ -202,7 +202,7 @@ func (api *api) postActionConfirmStatusChange(w http.ResponseWriter, req *http.R
 		if err != nil {
 			utils.SlackAttachmentError(w, "Cannot update user")
 		}
-		api.PluginAPI.UpdateMattermostUserStatus(mattermostUserID, stringChangeTo)
+		_, _ = api.PluginAPI.UpdateMattermostUserStatus(mattermostUserID, stringChangeTo)
 		returnText = fmt.Sprintf("The status has been changed to %s.", stringPrettyChangeTo)
 	}
 
@@ -226,7 +226,7 @@ func (api *api) postActionConfirmStatusChange(w http.ResponseWriter, req *http.R
 
 	response.Update = post
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(response.ToJson())
+	_, _ = w.Write(response.ToJson())
 }
 
 func getEventInfo(ctx map[string]interface{}) (string, error) {
@@ -253,7 +253,10 @@ func getEventInfo(ctx map[string]interface{}) (string, error) {
 		return "", errors.New("cannot find the event start time")
 	}
 	var startTime time.Time
-	json.Unmarshal([]byte(marshalledStartTime), &startTime)
+	err := json.Unmarshal([]byte(marshalledStartTime), &startTime)
+	if err != nil {
+		return "", fmt.Errorf("error occurred while unmarshalling start time. Error: %s", err.Error())
+	}
 
 	return views.RenderEventWillStartLine(subject, weblink, startTime), nil
 }

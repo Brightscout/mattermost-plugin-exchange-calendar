@@ -27,7 +27,7 @@ func (s *pluginStore) StoreUserWelcomePost(mattermostID, postID string) error {
 
 func (s *pluginStore) DeleteUserWelcomePost(mattermostID string) (string, error) {
 	var postID string
-	kvstore.LoadJSON(s.welcomeIndexKV, mattermostID, &postID)
+	_ = kvstore.LoadJSON(s.welcomeIndexKV, mattermostID, &postID)
 	err := s.welcomeIndexKV.Delete(mattermostID)
 	if err != nil {
 		return "", err

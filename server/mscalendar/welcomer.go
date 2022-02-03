@@ -60,14 +60,14 @@ func NewMSCalendarBot(bot bot.Bot, env Env, pluginURL string) Bot {
 }
 
 func (bot *mscBot) Welcome(userID string) error {
-	bot.cleanWelcomePost(userID)
+	_ = bot.cleanWelcomePost(userID)
 
 	postID, err := bot.DMWithAttachments(userID, bot.newConnectAttachment())
 	if err != nil {
 		return err
 	}
 
-	bot.Store.StoreUserWelcomePost(userID, postID)
+	_ = bot.Store.StoreUserWelcomePost(userID, postID)
 
 	return nil
 }
@@ -83,7 +83,7 @@ func (bot *mscBot) AfterSuccessfullyConnect(userID, userLogin string) error {
 			Id: postID,
 		}
 		model.ParseSlackAttachment(post, []*model.SlackAttachment{bot.newConnectedAttachment(userLogin)})
-		bot.UpdatePost(post)
+		_ = bot.UpdatePost(post)
 	}
 
 	return bot.Start(userID)
@@ -105,7 +105,7 @@ func (bot *mscBot) AfterDisconnect(userID string) error {
 
 func (bot *mscBot) WelcomeFlowEnd(userID string) {
 	bot.Tracker.TrackWelcomeFlowCompletion(userID)
-	bot.notifySettings(userID)
+	_ = bot.notifySettings(userID)
 }
 
 func (bot *mscBot) newConnectAttachment() *model.SlackAttachment {

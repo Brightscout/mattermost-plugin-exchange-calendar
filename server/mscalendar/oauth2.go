@@ -84,7 +84,7 @@ func (app *oauth2App) CompleteOAuth2(authedUserID string) error {
 	_, err = app.Store.LoadMattermostUserID(me.ID)
 	if err == nil {
 		// Couldn't fetch connected MM account. Reject connect attempt.
-		app.Poster.DM(authedUserID, RemoteUserAlreadyConnectedNotFound, config.ApplicationName, me.Mail)
+		_, _ = app.Poster.DM(authedUserID, RemoteUserAlreadyConnectedNotFound, config.ApplicationName, me.Mail)
 		return fmt.Errorf(RemoteUserAlreadyConnectedNotFound, config.ApplicationName, me.Mail)
 	}
 
@@ -110,7 +110,7 @@ func (app *oauth2App) CompleteOAuth2(authedUserID string) error {
 		return err
 	}
 
-	app.Welcomer.AfterSuccessfullyConnect(authedUserID, me.Mail)
+	_ = app.Welcomer.AfterSuccessfullyConnect(authedUserID, me.Mail)
 
 	return nil
 }
