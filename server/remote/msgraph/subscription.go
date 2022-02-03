@@ -30,6 +30,8 @@ func (c *client) CreateMySubscription(remoteUserEmail string, notificationURL st
 		return nil, errors.Wrap(err, "ews Subscribe")
 	}
 
+	sub.CreatorID = remoteUserEmail
+
 	c.Logger.With(bot.LogContext{
 		"subscriptionID": sub.ID,
 	}).Debugf("ews: created subscription.")
