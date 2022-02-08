@@ -9,7 +9,6 @@ import (
 
 	"github.com/mattermost/mattermost-server/v5/model"
 	"github.com/pkg/errors"
-	"golang.org/x/oauth2"
 
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/store"
@@ -20,9 +19,9 @@ const BotWelcomeMessage = "Bot user connected to account %s."
 const RemoteUserAlreadyConnected = "%s account `%s` is already mapped to Mattermost account `%s`. Please run `/%s disconnect`, while logged in as the Mattermost account"
 const RemoteUserAlreadyConnectedNotFound = "%s account `%s` is already mapped to a Mattermost account, but the Mattermost user could not be found"
 
-type oauth2App struct {
-	Env
-}
+// type oauth2App struct {
+// 	Env
+// }
 
 type OAuth2 interface {
 	CompleteOAuth2(mattermostUserID string) error
@@ -34,21 +33,21 @@ type OAuth2 interface {
 // 	}
 // }
 
-func (app *oauth2App) InitOAuth2(mattermostUserID string) (url string, err error) {
-	user, err := app.Store.LoadUser(mattermostUserID)
-	if err == nil {
-		return "", fmt.Errorf("user is already connected to %s", user.Remote.Mail)
-	}
+// func (app *oauth2App) InitOAuth2(mattermostUserID string) (url string, err error) {
+// 	user, err := app.Store.LoadUser(mattermostUserID)
+// 	if err == nil {
+// 		return "", fmt.Errorf("user is already connected to %s", user.Remote.Mail)
+// 	}
 
-	conf := app.Remote.NewOAuth2Config()
-	state := fmt.Sprintf("%v_%v", model.NewId()[0:15], mattermostUserID)
-	err = app.Store.StoreOAuth2State(state)
-	if err != nil {
-		return "", err
-	}
+// 	conf := app.Remote.NewOAuth2Config()
+// 	state := fmt.Sprintf("%v_%v", model.NewId()[0:15], mattermostUserID)
+// 	err = app.Store.StoreOAuth2State(state)
+// 	if err != nil {
+// 		return "", err
+// 	}
 
-	return conf.AuthCodeURL(state, oauth2.AccessTypeOffline), nil
-}
+// 	return conf.AuthCodeURL(state, oauth2.AccessTypeOffline), nil
+// }
 
 func (m *mscalendar) CompleteOAuth2(authedUserID string) error {
 	if authedUserID == "" {
