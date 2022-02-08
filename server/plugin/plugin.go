@@ -35,9 +35,9 @@ import (
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/telemetry"
 )
 
-const (
-	licenseErrorMessage = "The %s plugin requires an E20, Professional, or Enterprise license."
-)
+// const (
+// 	licenseErrorMessage = "The %s plugin requires an E20, Professional, or Enterprise license."
+// )
 
 type Env struct {
 	mscalendar.Env
@@ -89,7 +89,7 @@ func (p *Plugin) OnActivate() error {
 		return errors.New("failed to configure: Exchange Server credentials to be set in the config")
 	}
 
-	p.initEnv(&p.env, "")
+	_ = p.initEnv(&p.env, "")
 	bundlePath, err := p.API.GetBundlePath()
 	if err != nil {
 		return errors.Wrap(err, "couldn't get bundle path")
@@ -156,7 +156,7 @@ func (p *Plugin) OnConfigurationChange() (err error) {
 	pluginURL := strings.TrimRight(*mattermostSiteURL, "/") + pluginURLPath
 
 	p.updateEnv(func(e *Env) {
-		p.initEnv(e, pluginURL)
+		_ = p.initEnv(e, pluginURL)
 
 		e.StoredConfig = stored
 		e.Config.MattermostSiteURL = *mattermostSiteURL
@@ -210,7 +210,6 @@ func (p *Plugin) OnConfigurationChange() (err error) {
 			e.jobManager = jobs.NewJobManager(p.API, e.Env)
 			e.jobManager.AddJob(jobs.NewStatusSyncJob())
 			e.jobManager.AddJob(jobs.NewDailySummaryJob())
-			e.jobManager.AddJob(jobs.NewRenewJob())
 		}
 	})
 

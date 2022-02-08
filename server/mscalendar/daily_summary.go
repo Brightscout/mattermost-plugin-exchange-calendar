@@ -159,7 +159,7 @@ func (m *mscalendar) ProcessAllDailySummary(now time.Time) error {
 			m.Logger.Warnf("Error rendering user %s calendar. err=%v", user.MattermostUserID, err)
 		}
 
-		m.Poster.DM(user.MattermostUserID, postStr)
+		_, _ = m.Poster.DM(user.MattermostUserID, postStr)
 		m.Dependencies.Tracker.TrackDailySummarySent(user.MattermostUserID)
 		dsum.LastPostTime = time.Now().Format(time.RFC3339)
 		err = m.Store.StoreUser(user)

@@ -6,7 +6,7 @@
     "support_url": "https://github.com/Brightscout/mattermost-plugin-exchange-mscalendar/issues",
     "release_notes_url": "https://github.com/Brightscout/mattermost-plugin-exchange-mscalendar/releases/tag/v1.1.0",
     "icon_path": "assets/profile.svg",
-    "version": "1.1.0",
+    "version": "1.0.0",
     "min_server_version": "5.24.0",
     "server": {
         "executables": {
@@ -61,26 +61,6 @@
                 "default": false
             },
             {
-                "key": "OAuth2Authority",
-                "display_name": "Azure Directory (tenant) ID:",
-                "type": "text",
-                "help_text": "Directory (tenant) ID."
-            },
-            {
-                "key": "OAuth2ClientId",
-                "display_name": "Azure Application (client) ID:",
-                "type": "text",
-                "help_text": "Microsoft Office Client ID.",
-                "default": ""
-            },
-            {
-                "key": "OAuth2ClientSecret",
-                "display_name": "Microsoft Office Client Secret:",
-                "type": "text",
-                "help_text": "Microsoft Office Client Secret.",
-                "default": ""
-            },
-            {
                 "key": "ExchangeServerBaseURL",
                 "display_name": "Exchange Server Base URL:",
                 "type": "text",
@@ -90,7 +70,7 @@
             {
                 "key": "ExchangeServerAuthKey",
                 "display_name": "Exchange Server Authentication Key:",
-                "type": "generated",
+                "type": "text",
                 "help_text": "Authentication key set in EWS-server for authenticating API requests",
                 "default": ""
             }

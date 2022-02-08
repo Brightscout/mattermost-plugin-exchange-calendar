@@ -14,7 +14,7 @@ type Client interface {
 	CallJSON(method, path string, in, out interface{}) (responseData []byte, err error)
 	CreateCalendar(remoteUserEmail string, calendar *Calendar) (*Calendar, error)
 	CreateEvent(remoteUserEmail string, calendarEvent *Event) (*Event, error)
-	CreateMySubscription(notificationURL string) (*Subscription, error)
+	CreateMySubscription(remoteUserEmail string, notificationURL string) (*Subscription, error)
 	DeclineEvent(remoteUserEmail, eventID string) error
 	DeleteCalendar(remoteUserEmail, calendarID string) (*Calendar, error)
 	DeleteSubscription(subscriptionID string) error
@@ -25,10 +25,8 @@ type Client interface {
 	GetEvent(remoteUserEmail, eventID string) (*Event, error)
 	GetMailboxSettings(remoteUserID string) (*MailboxSettings, error)
 	GetMe(remoteUserEmail string) (*User, error)
-	GetNotificationData(*Notification) (*Notification, error)
+	GetNotificationData(remoteUserEmail, eventID, subscriptionID string) (*Notification, error)
 	GetSchedule(requests []*ScheduleUserInfo, startTime, endTime *DateTime, availabilityViewInterval int) ([]*ScheduleInformation, error)
-	ListSubscriptions() ([]*Subscription, error)
-	RenewSubscription(subscriptionID string) (*Subscription, error)
 	TentativelyAcceptEvent(remoteUserEmail, eventID string) error
 	GetSuperuserToken() (string, error)
 }

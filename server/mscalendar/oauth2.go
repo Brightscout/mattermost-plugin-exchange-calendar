@@ -87,7 +87,7 @@ func (m *mscalendar) CompleteOAuth2(authedUserID string) error {
 	_, err = m.Store.LoadMattermostUserID(me.ID)
 	if err == nil {
 		// Couldn't fetch connected MM account. Reject connect attempt.
-		m.Poster.DM(authedUserID, RemoteUserAlreadyConnectedNotFound, config.ApplicationName, me.Mail)
+		_, _ = m.Poster.DM(authedUserID, RemoteUserAlreadyConnectedNotFound, config.ApplicationName, me.Mail)
 		return fmt.Errorf(RemoteUserAlreadyConnectedNotFound, config.ApplicationName, me.Mail)
 	}
 
@@ -113,7 +113,7 @@ func (m *mscalendar) CompleteOAuth2(authedUserID string) error {
 		return err
 	}
 
-	m.Welcomer.AfterSuccessfullyConnect(authedUserID, me.Mail)
+	_ = m.Welcomer.AfterSuccessfullyConnect(authedUserID, me.Mail)
 
 	return nil
 }
