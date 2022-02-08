@@ -31,4 +31,5 @@ type Client interface {
 	RenewSubscription(subscriptionID string) (*Subscription, error)
 	TentativelyAcceptEvent(remoteUserEmail, eventID string) error
 	GetSuperuserToken() (string, error)
+	GetUsers(users []*string) ([]*UserBatchSingleResponse, error)
 }

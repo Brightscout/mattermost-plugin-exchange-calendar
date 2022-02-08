@@ -22,3 +22,8 @@ type MailboxSettings struct {
 	TimeZone     string       `json:"timeZone"`
 	WorkingHours WorkingHours `json:"workingHours"`
 }
+
+type UserBatchSingleResponse struct {
+	User  *User          `json:"user"`
+	Error *ErrorResponse `json:"error"`
+}

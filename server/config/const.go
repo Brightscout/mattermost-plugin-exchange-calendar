@@ -29,6 +29,7 @@ const (
 	PathMe                  = "/api/me"
 	PathBatch               = "/api/batch"
 	PathBatchEvent          = PathBatch + "/event"
+	PathBatchUser           = PathBatch + "/user"
 
 	FullPathEventNotification = PathNotification + PathEvent
 	FullPathOAuth2Redirect    = PathOAuth2 + PathComplete
@@ -40,4 +41,5 @@ const (
 	DeleteCalendarHeading = "Calendar deleted."
 
 	AuthorizationHeaderKey = "Authorization"
+	UsersCountPerPage = 20
 )
