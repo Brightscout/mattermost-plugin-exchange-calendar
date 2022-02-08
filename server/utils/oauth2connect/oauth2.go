@@ -8,9 +8,9 @@ type App interface {
 	CompleteOAuth2(mattermostUserID string) error
 }
 
-type oa struct {
-	app App
-}
+// type oa struct {
+// 	app App
+// }
 
 // func Init(h *httputils.Handler, app App) {
 // 	oa := &oa{

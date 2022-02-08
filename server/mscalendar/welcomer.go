@@ -86,7 +86,7 @@ func (bot *mscBot) AfterSuccessfullyConnect(userID, userLogin string) error {
 	// 	bot.UpdatePost(post)
 	// }
 
-	bot.DMWithAttachments(userID, bot.newConnectedAttachment(userLogin))
+	_, _ = bot.DMWithAttachments(userID, bot.newConnectedAttachment(userLogin))
 
 	return bot.Start(userID)
 }
