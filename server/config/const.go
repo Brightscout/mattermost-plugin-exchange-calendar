@@ -27,7 +27,7 @@ const (
 	PathEvent               = "/api/event"
 	PathCalendar            = "/api/calendar"
 	PathFindMeetingTimes    = "/suggestions"
-	PathMe                  = "/api/me"
+	PathUser                = "/api/user"
 	PathSubscribe           = "/subscribe"
 	PathUnsubscribe         = "/unsubscribe"
 	PathBatch               = "/api/batch"
