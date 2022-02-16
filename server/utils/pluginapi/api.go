@@ -4,10 +4,12 @@
 package pluginapi
 
 import (
+	"fmt"
 	"strings"
+	"time"
 
-	"github.com/mattermost/mattermost-server/v5/model"
-	"github.com/mattermost/mattermost-server/v5/plugin"
+	"github.com/mattermost/mattermost-server/v6/model"
+	"github.com/mattermost/mattermost-server/v6/plugin"
 
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/store"
 )
@@ -46,6 +48,38 @@ func (a *API) UpdateMattermostUserStatus(mattermostUserID, status string) (*mode
 		return s, err
 	}
 	return s, nil
+}
+
+func (a *API) UpdateMattermostUserCustomStatus(mattermostUserID string, eventEndTime string) error {
+
+	myDate, err := time.Parse("2006-01-02T15:04:05Z", eventEndTime)
+	if err != nil {
+		fmt.Print("inside mydate parsing error")
+		return err
+	}
+	customStatus := &model.CustomStatus{
+		Emoji:     "calendar",
+		Text:      "in a meeting",
+		Duration:  "date_and_time",
+		ExpiresAt: myDate.UTC(),
+	}
+	fmt.Println("customStatus")
+	fmt.Print("custom status=\n", customStatus)
+	fmt.Print("event end time=\n", eventEndTime)
+	//fmt.Print("event end time in utc\n", eventEndTime.Time().UTC())
+	UpdateErr := a.api.UpdateUserCustomStatus(mattermostUserID, customStatus)
+	if UpdateErr != nil {
+		return UpdateErr
+	}
+	return nil
+}
+
+func (a *API) UnsetMattermostUserCustomStatus(mattermostUserID string) error {
+	err:=a.api.RemoveUserCustomStatus(mattermostUserID)
+	if(err!=nil){
+		return err
+	}
+	return nil
 }
 
 // IsSysAdmin returns true if the user is authorized to use the workflow plugin's admin-level APIs/commands.

@@ -8,6 +8,7 @@ const (
 	ReceiveNotificationsDuringMeetingName = "receive_notifications_during_meetings"
 	SubscribePropertyName                 = "subscribe"
 	ReceiveUpcomingEventReminderName      = "receive_reminder"
+	UpdateCustomStatusPropertyName        = "update_custom_status"
 )
 
 func (s *pluginStore) SetProperty(userID, propertyName string, value bool) error {
@@ -26,6 +27,8 @@ func (s *pluginStore) SetProperty(userID, propertyName string, value bool) error
 		user.Settings.ReceiveReminders = value
 	case ReceiveNotificationsDuringMeetingName:
 		user.Settings.ReceiveNotificationsDuringMeeting = value
+	case UpdateCustomStatusPropertyName:
+		user.Settings.UpdateCustomStatus = value
 	default:
 		return fmt.Errorf("property %s not found", propertyName)
 	}

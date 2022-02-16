@@ -43,6 +43,7 @@ type User struct {
 	ActiveEvents      []string `json:"events"`
 	LastStatus        string
 	WelcomeFlowStatus WelcomeFlowStatus `json:"mattermostFlags,omitempty"`
+	CustomLastStatus  string
 }
 
 type Settings struct {
@@ -52,6 +53,7 @@ type Settings struct {
 	ReceiveReminders                  bool
 	ReceiveNotificationsDuringMeeting bool
 	DailySummary                      *DailySummaryUserSettings
+	UpdateCustomStatus                bool
 }
 
 type DailySummaryUserSettings struct {

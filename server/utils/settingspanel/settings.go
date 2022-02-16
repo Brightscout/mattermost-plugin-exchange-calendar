@@ -2,8 +2,9 @@ package settingspanel
 
 import (
 	"errors"
+	"fmt"
 
-	"github.com/mattermost/mattermost-server/v5/model"
+	"github.com/mattermost/mattermost-server/v6/model"
 
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/bot"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/kvstore"
@@ -95,6 +96,7 @@ func (p *panel) Print(userID string) {
 	if err != nil {
 		p.logger.Warnf("could not clean previous setting post. err=%v", err)
 	}
+	fmt.Print("inside Print", p.settingKeys)
 
 	sas := []*model.SlackAttachment{}
 	for _, key := range p.settingKeys {
@@ -122,6 +124,7 @@ func (p *panel) ToPost(userID string) (*model.Post, error) {
 	post := &model.Post{}
 
 	sas := []*model.SlackAttachment{}
+	fmt.Print("inside ToPost", p.settingKeys)
 	for _, key := range p.settingKeys {
 		s := p.settings[key]
 		sa, err := s.GetSlackAttachments(userID, p.pluginURL+p.settingHandler, p.isSettingDisabled(userID, s))

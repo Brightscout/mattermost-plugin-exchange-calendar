@@ -4,12 +4,11 @@
 package bot
 
 import (
-	"github.com/pkg/errors"
-
-	"github.com/mattermost/mattermost-server/v5/model"
-	"github.com/mattermost/mattermost-server/v5/plugin"
-
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/flow"
+	pluginapi "github.com/mattermost/mattermost-plugin-api"
+	"github.com/mattermost/mattermost-server/v6/model"
+	"github.com/mattermost/mattermost-server/v6/plugin"
+	"github.com/pkg/errors"
 )
 
 type Bot interface {
@@ -27,7 +26,7 @@ type Bot interface {
 type bot struct {
 	Config
 	pluginAPI        plugin.API
-	pluginHelpers    plugin.Helpers
+	client           pluginapi.Client
 	mattermostUserID string
 	displayName      string
 	logContext       LogContext
@@ -37,11 +36,11 @@ type bot struct {
 	flowStore flow.Store
 }
 
-func New(api plugin.API, helpers plugin.Helpers, pluginURL string) Bot {
+func New(api plugin.API, client pluginapi.Client, pluginURL string) Bot {
 	return &bot{
-		pluginAPI:     api,
-		pluginHelpers: helpers,
-		pluginURL:     pluginURL,
+		pluginAPI: api,
+		client:    client,
+		pluginURL: pluginURL,
 	}
 }
 
@@ -56,7 +55,7 @@ func (bot *bot) Ensure(stored *model.Bot, iconPath string) error {
 		return nil
 	}
 
-	botUserID, err := bot.pluginHelpers.EnsureBot(stored, plugin.ProfileImagePath(iconPath))
+	botUserID, err := bot.client.Bot.EnsureBot(stored)
 	if err != nil {
 		return errors.Wrap(err, "failed to ensure bot account")
 	}

@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mattermost/mattermost-server/v5/model"
+	"github.com/mattermost/mattermost-server/v6/model"
 
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/mscalendar"
@@ -26,7 +26,7 @@ func (api *api) preprocessAction(w http.ResponseWriter, req *http.Request) (msca
 		return nil, nil, "", "", ""
 	}
 
-	request := model.PostActionIntegrationRequestFromJson(req.Body)
+	request := utils.PostActionIntegrationRequestFromJson(req.Body)
 	if request == nil {
 		utils.SlackAttachmentError(w, "Error: invalid request")
 		return nil, nil, "", "", ""
@@ -128,7 +128,7 @@ func (api *api) postActionRespond(w http.ResponseWriter, req *http.Request) {
 		postResponse.EphemeralText = "Event has changed since this message. Please change your status directly on MS Calendar."
 	}
 	w.Header().Set("Content-Type", "application/json")
-	_, _ = w.Write(postResponse.ToJson())
+	_, _ = w.Write(utils.ResponseToJson(postResponse))
 }
 
 func prettyOption(option string) string {
@@ -154,7 +154,7 @@ func (api *api) postActionConfirmStatusChange(w http.ResponseWriter, req *http.R
 	response := model.PostActionIntegrationResponse{}
 	post := &model.Post{}
 
-	request := model.PostActionIntegrationRequestFromJson(req.Body)
+	request := utils.PostActionIntegrationRequestFromJson(req.Body)
 	if request == nil {
 		utils.SlackAttachmentError(w, "Invalid request.")
 		return
@@ -226,7 +226,91 @@ func (api *api) postActionConfirmStatusChange(w http.ResponseWriter, req *http.R
 
 	response.Update = post
 	w.Header().Set("Content-Type", "application/json")
-	_, _ = w.Write(response.ToJson())
+	_, _ = w.Write(utils.ResponseToJson(response))
+}
+
+func (api *api) postActionConfirmCustomStatusChange(w http.ResponseWriter, req *http.Request) {
+	fmt.Print("inside postActionConfirmCustomStatusChange")
+	mattermostUserID := req.Header.Get("Mattermost-User-ID")
+	if mattermostUserID == "" {
+		utils.SlackAttachmentError(w, "Not authorized.")
+		return
+	}
+
+	response := model.PostActionIntegrationResponse{}
+	post := &model.Post{}
+
+	request := utils.PostActionIntegrationRequestFromJson(req.Body)
+	if request == nil {
+		utils.SlackAttachmentError(w, "Invalid request.")
+	}
+	fmt.Print("inside postActionConfirmCustomStatusChange BEFORE value context")
+	value, ok := request.Context["value"].(bool)
+	if !ok {
+		utils.SlackAttachmentError(w, `No recognizable value for property "value".`)
+		return
+	}
+	setStatus, ok := request.Context["setStatus"].(bool)
+	if !ok {
+		utils.SlackAttachmentError(w, `No recognizable value for property "value".`)
+		return
+	}
+	_, ok = request.Context["hasEvent"].(bool)
+	if !ok {
+		utils.SlackAttachmentError(w, `No recognizable value for property "hasEvent".`)
+		return
+	}
+
+	returnText := "The custom status has not been changed."
+	if(!setStatus){
+		if value {
+			err := api.PluginAPI.UnsetMattermostUserCustomStatus(mattermostUserID)
+			if err != nil {
+				utils.SlackAttachmentError(w, err.Error())
+				return
+			}
+			returnText="The custom status has been deleted"
+		}else{
+			returnText="The custom status has not been deleted"
+		}
+	}else{
+	eventEndTime, ok := request.Context["endTime"].(string)
+	if !ok {
+		utils.SlackAttachmentError(w, `No recognizable value for property "endTime".`)
+		return
+	}
+	fmt.Print("eventEndTime\n", eventEndTime)
+	if value {
+		err := api.PluginAPI.UpdateMattermostUserCustomStatus(mattermostUserID, eventEndTime)
+		if err != nil {
+			utils.SlackAttachmentError(w, err.Error())
+			return
+		}
+		returnText = "The custom status has been changed to In a Meeting."
+	}
+}
+
+	eventInfo, err := getEventInfo(request.Context)
+	if err != nil {
+		utils.SlackAttachmentError(w, err.Error())
+		return
+	}
+
+	if eventInfo != "" {
+		returnText = eventInfo + "\n" + returnText
+	}
+
+	sa := &model.SlackAttachment{
+		Title:    "Custom Status Change",
+		Text:     returnText,
+		Fallback: "Custom Status Change: " + returnText,
+	}
+
+	model.ParseSlackAttachment(post, []*model.SlackAttachment{sa})
+
+	response.Update = post
+	w.Header().Set("Content-Type", "application/json")
+	_, _ = w.Write(utils.ResponseToJson(response))
 }
 
 func getEventInfo(ctx map[string]interface{}) (string, error) {

@@ -14,8 +14,8 @@ import (
 	"text/template"
 
 	pluginapiclient "github.com/mattermost/mattermost-plugin-api"
-	"github.com/mattermost/mattermost-server/v5/model"
-	"github.com/mattermost/mattermost-server/v5/plugin"
+	"github.com/mattermost/mattermost-server/v6/model"
+	"github.com/mattermost/mattermost-server/v6/plugin"
 	"github.com/pkg/errors"
 
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/api"
@@ -74,7 +74,6 @@ func (p *Plugin) OnActivate() error {
 	// if !enterprise.HasEnterpriseFeatures(conf, license) {
 	// 	return errors.Errorf(licenseErrorMessage, config.ApplicationName)
 	// }
-
 	stored := config.StoredConfig{}
 	err := p.API.LoadPluginConfiguration(&stored)
 	if err != nil {
@@ -90,7 +89,7 @@ func (p *Plugin) OnActivate() error {
 		return errors.New("failed to configure: Exchange Server credentials to be set in the config")
 	}
 
-	_ = p.initEnv(&p.env, "")
+	_ = p.initEnv(&p.env, pluginAPIClient, "")
 	bundlePath, err := p.API.GetBundlePath()
 	if err != nil {
 		return errors.Wrap(err, "couldn't get bundle path")
@@ -132,6 +131,7 @@ func (p *Plugin) OnDeactivate() error {
 }
 
 func (p *Plugin) OnConfigurationChange() (err error) {
+	pluginAPIClient := pluginapiclient.NewClient(p.API, p.Driver)
 	defer func() {
 		p.updateEnv(func(e *Env) {
 			e.configError = err
@@ -157,8 +157,7 @@ func (p *Plugin) OnConfigurationChange() (err error) {
 	pluginURL := strings.TrimRight(*mattermostSiteURL, "/") + pluginURLPath
 
 	p.updateEnv(func(e *Env) {
-		_ = p.initEnv(e, pluginURL)
-
+		_ = p.initEnv(e, pluginAPIClient, pluginURL)
 		e.StoredConfig = stored
 		e.Config.MattermostSiteURL = *mattermostSiteURL
 		e.Config.MattermostSiteHostname = mattermostURL.Hostname()
@@ -230,6 +229,7 @@ func (p *Plugin) ExecuteCommand(c *plugin.Context, args *model.CommandArgs) (*mo
 		ChannelID:  args.ChannelId,
 		Config:     env.Config,
 		MSCalendar: mscalendar.New(env.Env, args.UserId),
+		API:        p.API,
 	}
 	out, mustRedirectToDM, err := command.Handle()
 	if err != nil {
@@ -308,11 +308,10 @@ func (p *Plugin) loadTemplates(bundlePath string) error {
 	return nil
 }
 
-func (p *Plugin) initEnv(e *Env, pluginURL string) error {
+func (p *Plugin) initEnv(e *Env, client *pluginapiclient.Client, pluginURL string) error {
 	e.Dependencies.PluginAPI = pluginapi.New(p.API)
-
 	if e.bot == nil {
-		e.bot = bot.New(p.API, p.Helpers, pluginURL)
+		e.bot = bot.New(p.API, *client, pluginURL)
 		err := e.bot.Ensure(
 			&model.Bot{
 				Username:    config.BotUserName,

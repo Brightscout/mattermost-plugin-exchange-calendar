@@ -46,6 +46,13 @@ func NewSettingsPanel(bot bot.Bot, panelStore settingspanel.PanelStore, settingS
 		settingStore,
 	))
 	settings = append(settings, settingspanel.NewBoolSetting(
+		store.UpdateCustomStatusSettingID,
+		"Set Custom Status",
+		"Do you want to update your custom status on Mattermost to 'In a Meeting' when you are in a meeting?",
+		store.UpdateStatusSettingID,
+		settingStore,
+	))
+	settings = append(settings, settingspanel.NewBoolSetting(
 		store.ReceiveRemindersSettingID,
 		"Receive Reminders",
 		"Do you want to receive reminders for upcoming events?",

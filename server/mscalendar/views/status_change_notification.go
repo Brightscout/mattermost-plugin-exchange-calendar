@@ -3,22 +3,23 @@ package views
 import (
 	"encoding/json"
 	"fmt"
-	"net/url"
+	URL "net/url"
 	"time"
 
-	"github.com/mattermost/mattermost-server/v5/model"
+	"github.com/mattermost/mattermost-server/v6/model"
 
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
 )
 
 var prettyStatuses = map[string]string{
-	model.STATUS_ONLINE:  "Online",
-	model.STATUS_AWAY:    "Away",
-	model.STATUS_DND:     "Do Not Disturb",
-	model.STATUS_OFFLINE: "Offline",
+	model.StatusOnline:  "Online",
+	model.StatusAway:    "Away",
+	model.StatusDnd:     "Do Not Disturb",
+	model.StatusOffline: "Offline",
 }
 
 func RenderStatusChangeNotificationView(events []*remote.Event, status, url string) *model.SlackAttachment {
+	fmt.Print("inside RenderStatusChangeNotificationView\n")
 	for _, e := range events {
 		if e.Start.Time().After(time.Now()) {
 			return statusChangeAttachments(e, status, url)
@@ -26,15 +27,25 @@ func RenderStatusChangeNotificationView(events []*remote.Event, status, url stri
 	}
 
 	nEvents := len(events)
-	if nEvents > 0 && status == model.STATUS_DND {
+	if nEvents > 0 && status == model.StatusDnd {
 		return statusChangeAttachments(events[nEvents-1], status, url)
 	}
-
 	return statusChangeAttachments(nil, status, url)
 }
 
+func RenderCustomStatusChangeNotificationView(events []*remote.Event, url string) *model.SlackAttachment {
+	fmt.Print("inside RenderCustomStatusChangeNotificationView Custom\n")
+
+	for _, e := range events {
+		if e.Start.Time().After(time.Now()) {
+			return customstatusChangeAttachments(e, url)
+		}
+	}
+	return customstatusChangeAttachments(nil, url)
+}
+
 func RenderEventWillStartLine(subject, weblink string, startTime time.Time) string {
-	link, _ := url.QueryUnescape(weblink)
+	link, _ := URL.QueryUnescape(weblink)
 	eventString := fmt.Sprintf("Your event [%s](%s) will start soon.", subject, link)
 	if subject == "" {
 		eventString = fmt.Sprintf("[An event with no subject](%s) will start soon.", link)
@@ -106,5 +117,69 @@ func statusChangeAttachments(event *remote.Event, status, url string) *model.Sla
 		Fallback: fmt.Sprintf("%s: %s", title, text),
 	}
 
+	return sa
+}
+
+func customstatusChangeAttachments(event *remote.Event, url string) *model.SlackAttachment {
+	actionYes := &model.PostAction{
+		Name: "Yes",
+		Integration: &model.PostActionIntegration{
+			URL: url,
+			Context: map[string]interface{}{
+				"value": true,
+				"hasEvent": false,
+			},
+		},
+	}
+
+	actionNo := &model.PostAction{
+		Name: "No",
+		Integration: &model.PostActionIntegration{
+			URL: url,
+			Context: map[string]interface{}{
+				"value": false,
+				"hasEvent": false,
+			},
+		},
+	}
+
+	if event != nil {
+		marshalledStart, _ := json.Marshal(event.Start.Time())
+
+		actionYes.Integration.Context["hasEvent"] = true
+		actionYes.Integration.Context["subject"] = event.Subject
+		actionYes.Integration.Context["weblink"] = event.Weblink
+		actionYes.Integration.Context["startTime"] = string(marshalledStart)
+		actionYes.Integration.Context["endTime"] = event.End.String()
+
+		actionNo.Integration.Context["hasEvent"] = true
+		actionNo.Integration.Context["subject"] = event.Subject
+		actionNo.Integration.Context["weblink"] = event.Weblink
+		actionNo.Integration.Context["startTime"] = string(marshalledStart)
+		actionNo.Integration.Context["endTime"] = event.End.String()
+	}
+	title := "Custom Status change"
+	//link, _ := URL.QueryUnescape(event.Weblink)
+	//text := fmt.Sprintf("Your event [%s](%s) will start soon.\n", event.Subject, link)
+	var sa *model.SlackAttachment
+	if(event==nil){
+		actionYes.Integration.Context["setStatus"] = false
+		actionNo.Integration.Context["setStatus"] = false
+		sa = &model.SlackAttachment{
+			Title:    title,
+			Text:     "You have no upcoming events \nDo you want to unset your custom status",
+			Actions:  []*model.PostAction{actionYes, actionNo},
+			Fallback: fmt.Sprintf("%s: %s", title, "Do you want to unset your custom status"),
+		}
+	} else{
+		actionYes.Integration.Context["setStatus"] = true
+		actionNo.Integration.Context["setStatus"] = true
+		sa = &model.SlackAttachment{
+		Title:    title,
+		Text:     "Do you want to change your custom status to In a Meeting",
+		Actions:  []*model.PostAction{actionYes, actionNo},
+		Fallback: fmt.Sprintf("%s: %s", title, "Do you want to change your custom status to In a Meeting"),
+	}
+}
 	return sa
 }

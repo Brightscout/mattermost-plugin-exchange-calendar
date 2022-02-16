@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/mattermost/mattermost-server/v5/model"
+	"github.com/mattermost/mattermost-server/v6/model"
 
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/mscalendar/views"
@@ -18,7 +18,7 @@ import (
 
 const (
 	calendarViewTimeWindowSize      = 10 * time.Minute
-	StatusSyncJobInterval           = 5 * time.Minute
+	StatusSyncJobInterval           = 1 * time.Minute
 	upcomingEventNotificationTime   = 10 * time.Minute
 	upcomingEventNotificationWindow = (StatusSyncJobInterval * 11) / 10 // 110% of the interval
 )
@@ -182,14 +182,23 @@ func (m *mscalendar) setUserStatuses(users []*store.User, calendarViews []*remot
 
 func (m *mscalendar) setStatusFromCalendarView(user *store.User, status *model.Status, res *remote.ViewCalendarResponse) (string, error) {
 	currentStatus := status.Status
-	if currentStatus == model.STATUS_OFFLINE && !user.Settings.GetConfirmation {
+	events := filterBusyEvents(res.Events)
+
+	if user.Settings.UpdateCustomStatus {
+		fmt.Print("inside setStatusFromCalendarView user.Settings.UpdateCustomStatus")
+		err := m.UpdateUserCustomStatus(user, res.Events)
+		if err != nil {
+			return "", err
+		}
+	}
+
+	if currentStatus == model.StatusOffline && !user.Settings.GetConfirmation {
 		return "User offline and does not want status change confirmations. No status change", nil
 	}
 
-	events := filterBusyEvents(res.Events)
-	busyStatus := model.STATUS_DND
+	busyStatus := model.StatusDnd
 	if user.Settings.ReceiveNotificationsDuringMeeting {
-		busyStatus = model.STATUS_AWAY
+		busyStatus = model.StatusAway
 	}
 
 	if len(user.ActiveEvents) == 0 && len(events) == 0 {
@@ -291,16 +300,16 @@ func (m *mscalendar) setStatusFromCalendarView(user *store.User, status *model.S
 // - events: the list of events that are triggering this status change
 // - isFree: whether the user is free or busy, to decide to which status to change
 func (m *mscalendar) setStatusOrAskUser(user *store.User, currentStatus *model.Status, events []*remote.Event, isFree bool) error {
-	toSet := model.STATUS_ONLINE
+	toSet := model.StatusOnline
 	if isFree && user.LastStatus != "" {
 		toSet = user.LastStatus
 		user.LastStatus = ""
 	}
 
 	if !isFree {
-		toSet = model.STATUS_DND
+		toSet = model.StatusDnd
 		if user.Settings.ReceiveNotificationsDuringMeeting {
-			toSet = model.STATUS_AWAY
+			toSet = model.StatusAway
 		}
 		if !user.Settings.GetConfirmation {
 			user.LastStatus = ""
@@ -328,6 +337,60 @@ func (m *mscalendar) setStatusOrAskUser(user *store.User, currentStatus *model.S
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func (m *mscalendar) UpdateUserCustomStatus(user *store.User, events []*remote.Event) error {
+	fmt.Print("inside UpdateUserCustomStatus user.Settings.GetConfirmation\n")
+	flag :=0
+	/*testUser, err := m.PluginAPI.GetMattermostUser(user.MattermostUserID)
+	fmt.Print("testuser=\n",testUser)
+	if(err!=nil){
+		fmt.Print("inside err testuser=\n",testUser)
+		return err
+	}
+	if value, found := testUser.Props["customStatus"]; found { 
+		if(value!=""){
+			flag=0
+		}else {flag=1}	
+   } else {
+		flag=1
+   }*/
+   fmt.Print("custom_status_flag\n",flag)
+   
+   if(user.CustomLastStatus==""){
+	fmt.Print("user last custom status\n",user.CustomLastStatus)
+   }
+   if !user.Settings.GetConfirmation{
+	for _, e := range events {
+			fmt.Print("inside user.Settings.GetConfirmation\n")
+			err := m.PluginAPI.UpdateMattermostUserCustomStatus(user.MattermostUserID, e.End.String())
+			if err != nil {
+				return err
+			}
+			user.CustomLastStatus=""
+	}
+	return nil
+}
+
+	fmt.Print("inside user.Settings.GetConfirmation else part\n")
+	fmt.Print("inside e.Start.Time().After(time.Now()\n")
+
+	 /*checkevent:=false 
+	for _, e := range events {
+		if e.Start.Time().After(time.Now()) {
+			checkevent=true
+		}
+	}
+	fmt.Print("check event flag=\n",checkevent)
+		fmt.Print("inside if !checkevent&&flag==0\n")*/
+	if(user.CustomLastStatus==""){
+	url := fmt.Sprintf("%s%s%s", m.Config.PluginURLPath, config.PathPostAction, "/custom")
+	_, err := m.Poster.DMWithAttachments(user.MattermostUserID, views.RenderCustomStatusChangeNotificationView(events, url))
+	if err != nil {
+		return err
+	}
+}
 	return nil
 }
 

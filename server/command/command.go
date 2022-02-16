@@ -9,8 +9,8 @@ import (
 
 	pluginapilicense "github.com/mattermost/mattermost-plugin-api"
 	"github.com/mattermost/mattermost-plugin-api/experimental/command"
-	"github.com/mattermost/mattermost-server/v5/model"
-	"github.com/mattermost/mattermost-server/v5/plugin"
+	"github.com/mattermost/mattermost-server/v6/model"
+	"github.com/mattermost/mattermost-server/v6/plugin"
 	"github.com/pkg/errors"
 
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
@@ -25,6 +25,7 @@ type Command struct {
 	ChannelID  string
 	Config     *config.Config
 	MSCalendar mscalendar.MSCalendar
+	API        plugin.API
 }
 
 func getNotConnectedText() string {
@@ -43,6 +44,7 @@ var cmds = []*model.AutocompleteData{
 	model.NewAutocompleteData("unsubscribe", "", "Disable notifications for event invitations and updates."),
 	model.NewAutocompleteData("info", "", "Read information about this version of the plugin."),
 	model.NewAutocompleteData("help", "", "Read help text for the commands"),
+	model.NewAutocompleteData("custom", "", "set custom status"),
 }
 
 // Register should be called by the plugin to register all necessary commands
@@ -111,6 +113,8 @@ func (c *Command) Handle() (string, bool, error) {
 		handler = c.requireConnectedUser(c.requireAdminUser(c.debugAvailability))
 	case "settings":
 		handler = c.requireConnectedUser(c.settings)
+	case "custom":
+		handler = c.requireConnectedUser(c.setcustomstatus)
 	}
 	out, mustRedirectToDM, err := handler(parameters...)
 	if err != nil {

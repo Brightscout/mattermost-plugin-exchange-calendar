@@ -90,7 +90,7 @@ func (c *client) DoBatchViewCalendarRequests(allParams []*remote.ViewCalendarPar
 
 func prepareEventBatchRequests(requests []*calendarViewSingleRequest) []calendarViewBatchRequest {
 	numOfBatches := len(requests) / maxNumRequestsPerBatch
-	if len(requests) % maxNumRequestsPerBatch != 0 {
+	if len(requests)%maxNumRequestsPerBatch != 0 {
 		numOfBatches++
 	}
 

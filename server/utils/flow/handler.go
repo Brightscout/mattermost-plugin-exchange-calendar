@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/mattermost/mattermost-server/v5/model"
+	"github.com/mattermost/mattermost-server/v6/model"
 
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/httputils"
@@ -68,7 +68,7 @@ func (fh *fh) handleFlow(w http.ResponseWriter, r *http.Request) {
 	response.Update = &post
 
 	w.Header().Set("Content-Type", "application/json")
-	_, _ = w.Write(response.ToJson())
+	_, _ = w.Write(utils.ResponseToJson(response))
 
 	_ = fh.store.RemovePostID(mattermostUserID, property)
 	fh.flow.StepDone(mattermostUserID, stepNumber, value)
