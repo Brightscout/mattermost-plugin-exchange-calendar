@@ -29,5 +29,5 @@ type Client interface {
 	GetSchedule(requests []*ScheduleUserInfo, startTime, endTime *DateTime, availabilityViewInterval int) ([]*ScheduleInformation, error)
 	TentativelyAcceptEvent(remoteUserEmail, eventID string) error
 	GetSuperuserToken() (string, error)
-	GetUsers(users []*string) ([]*UserBatchSingleResponse, error)
+	GetUsers(emails []*string) ([]*UserBatchSingleResponse, error)
 }

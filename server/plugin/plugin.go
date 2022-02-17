@@ -363,7 +363,7 @@ func (p *Plugin) initEnv(e *Env, pluginURL string) error {
 }
 
 func (p *Plugin) UserHasLoggedIn(c *plugin.Context, user *model.User) {
-	// Auto-Connect the user to ms-calendar after he logged in
+	// Auto-connect the user to ms-calendar after he logs in
 	m := mscalendar.New(p.getEnv().Env, "")
 	_, err := m.GetRemoteUser(user.Id)
 	if err == nil {
