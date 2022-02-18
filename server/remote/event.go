@@ -5,14 +5,14 @@ package remote
 
 type Event struct {
 	ID                         string               `json:"id,omitempty"`
-	ICalUID                    string               `json:"iCalUId,omitempty"`
+	ICalUID                    string               `json:"calUId,omitempty"`
 	Subject                    string               `json:"subject,omitempty"`
 	BodyPreview                string               `json:"bodyPreview,omitempty"`
 	Body                       *ItemBody            `json:"body,omitempty"`
 	Importance                 string               `json:"importance,omitempty"`
 	IsAllDay                   bool                 `json:"isAllDay,omitempty"`
 	IsCancelled                bool                 `json:"isCancelled,omitempty"`
-	IsOrganizer                bool                 `json:"isOrganizer,omitempty"`
+	IsOrganizer                bool                 `json:"isAttendeeOrganizer,omitempty"`
 	ResponseRequested          bool                 `json:"responseRequested,omitempty"`
 	ShowAs                     string               `json:"showAs,omitempty"`
 	Weblink                    string               `json:"weblink,omitempty"`

@@ -14,7 +14,7 @@ import (
 
 func (c *client) GetMe(remoteUserEmail string) (*remote.User, error) {
 	var remoteUser remote.User
-	path, err := c.GetEndpointURL(config.PathMe, &remoteUserEmail)
+	path, err := c.GetEndpointURL(config.PathUser, &remoteUserEmail)
 	if err != nil {
 		return nil, errors.Wrap(err, "ews GetMe")
 	}
