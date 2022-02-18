@@ -5,10 +5,11 @@ package command
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/remote"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/utils"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils"
 )
 
 func (c *Command) findMeetings(parameters ...string) (string, bool, error) {
@@ -37,9 +38,16 @@ func (c *Command) findMeetings(parameters ...string) (string, bool, error) {
 	resp := ""
 	for _, m := range meetings.MeetingTimeSuggestions {
 		if timeZone != "" {
-			m.MeetingTimeSlot.Start = m.MeetingTimeSlot.Start.In(timeZone)
-			m.MeetingTimeSlot.End = m.MeetingTimeSlot.End.In(timeZone)
+			m.MeetingTimeSlot = m.MeetingTimeSlot.In(timeZone)
+			m.MeetingTimeSlot.TimeZone = timeZone
 		}
+	}
+
+	sort.Slice(meetings.MeetingTimeSuggestions, func(i, j int) bool {
+		return meetings.MeetingTimeSuggestions[i].MeetingTimeSlot.Time().Before(meetings.MeetingTimeSuggestions[j].MeetingTimeSlot.Time())
+	})
+
+	for _, m := range meetings.MeetingTimeSuggestions {
 		resp += utils.JSONBlock(renderMeetingTime(m))
 	}
 
@@ -47,7 +55,5 @@ func (c *Command) findMeetings(parameters ...string) (string, bool, error) {
 }
 
 func renderMeetingTime(m *remote.MeetingTimeSuggestion) string {
-	start := m.MeetingTimeSlot.Start.PrettyString()
-	end := m.MeetingTimeSlot.End.PrettyString()
-	return fmt.Sprintf("%s - %s (%s)", start, end, m.MeetingTimeSlot.Start.TimeZone)
+	return fmt.Sprintf("%s (%s)", m.MeetingTimeSlot.PrettyString(), m.MeetingTimeSlot.TimeZone)
 }

@@ -4,9 +4,9 @@
 package api
 
 import (
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/config"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/mscalendar"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/utils/httputils"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/mscalendar"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/httputils"
 )
 
 type api struct {
@@ -23,7 +23,7 @@ func Init(h *httputils.Handler, env mscalendar.Env, notificationProcessor mscale
 	apiRouter := h.Router.PathPrefix(config.PathAPI).Subrouter()
 	apiRouter.HandleFunc("/authorized", api.getAuthorized).Methods("GET")
 
-	notificationRouter := h.Router.PathPrefix(config.PathNotification).Subrouter()
+	notificationRouter := h.Router.PathPrefix(config.PathGetNotification).Subrouter()
 	notificationRouter.HandleFunc(config.PathEvent, api.notification).Methods("POST")
 
 	postActionRouter := h.Router.PathPrefix(config.PathPostAction).Subrouter()

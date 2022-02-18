@@ -23,7 +23,7 @@ func (m *mscalendar) AcceptEvent(user *User, eventID string) error {
 		return err
 	}
 
-	return m.client.AcceptEvent(user.Remote.ID, eventID)
+	return m.client.AcceptEvent(user.MattermostUser.Email, eventID)
 }
 
 func (m *mscalendar) DeclineEvent(user *User, eventID string) error {
@@ -35,7 +35,7 @@ func (m *mscalendar) DeclineEvent(user *User, eventID string) error {
 		return err
 	}
 
-	return m.client.DeclineEvent(user.Remote.ID, eventID)
+	return m.client.DeclineEvent(user.MattermostUser.Email, eventID)
 }
 
 func (m *mscalendar) TentativelyAcceptEvent(user *User, eventID string) error {
@@ -47,7 +47,7 @@ func (m *mscalendar) TentativelyAcceptEvent(user *User, eventID string) error {
 		return err
 	}
 
-	return m.client.TentativelyAcceptEvent(user.Remote.ID, eventID)
+	return m.client.TentativelyAcceptEvent(user.MattermostUser.Email, eventID)
 }
 
 func (m *mscalendar) RespondToEvent(user *User, eventID, response string) error {
@@ -65,11 +65,11 @@ func (m *mscalendar) RespondToEvent(user *User, eventID, response string) error 
 
 	switch response {
 	case OptionYes:
-		return m.client.AcceptEvent(user.Remote.ID, eventID)
+		return m.client.AcceptEvent(user.MattermostUser.Email, eventID)
 	case OptionNo:
-		return m.client.DeclineEvent(user.Remote.ID, eventID)
+		return m.client.DeclineEvent(user.MattermostUser.Email, eventID)
 	case OptionMaybe:
-		return m.client.TentativelyAcceptEvent(user.Remote.ID, eventID)
+		return m.client.TentativelyAcceptEvent(user.MattermostUser.Email, eventID)
 	default:
 		return errors.New(response + " is not a valid response")
 	}

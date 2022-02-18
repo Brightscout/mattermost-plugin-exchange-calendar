@@ -10,8 +10,8 @@ import (
 
 	"github.com/mattermost/mattermost-server/v5/model"
 
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/utils"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/utils/httputils"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/httputils"
 )
 
 type fh struct {
@@ -68,8 +68,8 @@ func (fh *fh) handleFlow(w http.ResponseWriter, r *http.Request) {
 	response.Update = &post
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(response.ToJson())
+	_, _ = w.Write(response.ToJson())
 
-	fh.store.RemovePostID(mattermostUserID, property)
+	_ = fh.store.RemovePostID(mattermostUserID, property)
 	fh.flow.StepDone(mattermostUserID, stepNumber, value)
 }

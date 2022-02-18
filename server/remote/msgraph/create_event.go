@@ -6,17 +6,21 @@ package msgraph
 import (
 	"net/http"
 
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
 	"github.com/pkg/errors"
-
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/remote"
 )
 
 // CreateEvent creates a calendar event
-func (c *client) CreateEvent(remoteUserID string, in *remote.Event) (*remote.Event, error) {
-	var out = remote.Event{}
-	err := c.rbuilder.Users().ID(remoteUserID).Events().Request().JSONRequest(c.ctx, http.MethodPost, "", &in, &out)
+func (c *client) CreateEvent(remoteUserEmail string, in *remote.Event) (*remote.Event, error) {
+	var out = &remote.Event{}
+	url, err := c.GetEndpointURL(config.PathEvent, &remoteUserEmail)
 	if err != nil {
-		return nil, errors.Wrap(err, "msgraph CreateEvent")
+		return nil, errors.Wrap(err, "ews CreateEvent")
 	}
-	return &out, nil
+	_, err = c.CallJSON(http.MethodPost, url, in, out)
+	if err != nil {
+		return nil, errors.Wrap(err, "ews CreateEvent")
+	}
+	return out, nil
 }

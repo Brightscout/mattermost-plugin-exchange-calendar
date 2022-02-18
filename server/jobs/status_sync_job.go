@@ -4,7 +4,7 @@
 package jobs
 
 import (
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/mscalendar"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/mscalendar"
 )
 
 // Unique id for the status sync job

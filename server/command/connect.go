@@ -4,9 +4,10 @@
 package command
 
 import (
+	"errors"
 	"fmt"
 
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/config"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
 )
 
 const (
@@ -22,12 +23,10 @@ func (c *Command) connect(parameters ...string) (string, bool, error) {
 		return fmt.Sprintf(ConnectAlreadyConnectedTemplate, config.ApplicationName, ru.Mail, config.CommandTrigger), false, nil
 	}
 
-	out := ""
-
-	err = c.MSCalendar.Welcome(c.Args.UserId)
+	err = c.MSCalendar.CompleteOAuth2(c.Args.UserId)
 	if err != nil {
-		out = ConnectErrorMessage + err.Error()
+		return "", false, errors.New(ConnectErrorMessage + err.Error())
 	}
 
-	return out, true, nil
+	return "", false, nil
 }

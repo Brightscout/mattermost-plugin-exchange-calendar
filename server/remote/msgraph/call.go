@@ -13,8 +13,9 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
 	"github.com/pkg/errors"
-	msgraph "github.com/yaegashi/msgraph.go/v1.0"
 )
 
 func (c *client) CallJSON(method, path string, in, out interface{}) (responseData []byte, err error) {
@@ -42,7 +43,7 @@ func (c *client) call(method, path, contentType string, inBody io.Reader, out in
 
 	if pathURL.Scheme == "" || pathURL.Host == "" {
 		var baseURL *url.URL
-		baseURL, err = url.Parse(c.rbuilder.URL())
+		baseURL, err = url.Parse(c.conf.ExchangeServerBaseURL)
 		if err != nil {
 			return nil, errors.WithMessage(err, errContext)
 		}
@@ -63,6 +64,9 @@ func (c *client) call(method, path, contentType string, inBody io.Reader, out in
 	if c.ctx != nil {
 		req = req.WithContext(c.ctx)
 	}
+
+	// Add authorization header in API requests
+	req.Header.Add(config.AuthorizationHeaderKey, fmt.Sprintf("Bearer %s", c.conf.ExchangeServerAuthKey))
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
@@ -93,7 +97,7 @@ func (c *client) call(method, path, contentType string, inBody io.Reader, out in
 		return nil, nil
 	}
 
-	errResp := msgraph.ErrorResponse{Response: resp}
+	errResp := remote.ErrorResponse{}
 	err = json.Unmarshal(responseData, &errResp)
 	if err != nil {
 		return responseData, errors.WithMessagef(err, "status: %s", resp.Status)
@@ -101,5 +105,20 @@ func (c *client) call(method, path, contentType string, inBody io.Reader, out in
 	if err != nil {
 		return responseData, err
 	}
-	return responseData, &errResp
+	return responseData, errors.New(errResp.Message)
+}
+
+func (c *client) GetEndpointURL(path string, email *string) (string, error) {
+	endpointURL, err := url.Parse(strings.TrimSpace(fmt.Sprintf("%s%s", c.conf.ExchangeServerBaseURL, path)))
+	if err != nil {
+		return "", err
+	}
+
+	if email != nil {
+		params := url.Values{}
+		params.Add(config.EmailKey, *email)
+		endpointURL.RawQuery = params.Encode()
+	}
+
+	return endpointURL.String(), nil
 }

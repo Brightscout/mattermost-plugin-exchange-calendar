@@ -4,10 +4,9 @@
 package remote
 
 type User struct {
-	ID                string `json:"id"`
-	DisplayName       string `json:"displayName,omitempty"`
-	UserPrincipalName string `json:"userPrincipalName,omitempty"`
-	Mail              string `json:"mail,omitempty"`
+	ID          string `json:"id"`
+	DisplayName string `json:"displayName,omitempty"`
+	Mail        string `json:"mail,omitempty"`
 }
 
 type WorkingHours struct {
@@ -22,4 +21,9 @@ type WorkingHours struct {
 type MailboxSettings struct {
 	TimeZone     string       `json:"timeZone"`
 	WorkingHours WorkingHours `json:"workingHours"`
+}
+
+type UserBatchSingleResponse struct {
+	User  *User          `json:"user"`
+	Error *ErrorResponse `json:"error"`
 }

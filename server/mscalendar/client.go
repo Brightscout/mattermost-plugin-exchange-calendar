@@ -6,7 +6,7 @@ package mscalendar
 import (
 	"context"
 
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/remote"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
 )
 
 type Client interface {
@@ -20,7 +20,7 @@ func (m *mscalendar) MakeClient() (remote.Client, error) {
 		return nil, err
 	}
 
-	return m.Remote.MakeClient(context.Background(), m.actingUser.OAuth2Token), nil
+	return m.Remote.MakeClient(context.Background()), nil
 }
 
 func (m *mscalendar) MakeSuperuserClient() (remote.Client, error) {

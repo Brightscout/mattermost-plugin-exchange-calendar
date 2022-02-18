@@ -1,13 +1,12 @@
 package config
 
-import "github.com/mattermost/mattermost-plugin-mscalendar/server/utils/bot"
+import "github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/bot"
 
 // StoredConfig represents the data stored in and managed with the Mattermost
 // config.
 type StoredConfig struct {
-	OAuth2Authority    string
-	OAuth2ClientID     string
-	OAuth2ClientSecret string
+	ExchangeServerBaseURL string
+	ExchangeServerAuthKey string
 
 	EnableStatusSync   bool
 	EnableDailySummary bool

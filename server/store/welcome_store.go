@@ -1,6 +1,6 @@
 package store
 
-import "github.com/mattermost/mattermost-plugin-mscalendar/server/utils/kvstore"
+import "github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/kvstore"
 
 type WelcomeStore interface {
 	LoadUserWelcomePost(mattermostID string) (string, error)
@@ -27,7 +27,7 @@ func (s *pluginStore) StoreUserWelcomePost(mattermostID, postID string) error {
 
 func (s *pluginStore) DeleteUserWelcomePost(mattermostID string) (string, error) {
 	var postID string
-	kvstore.LoadJSON(s.welcomeIndexKV, mattermostID, &postID)
+	_ = kvstore.LoadJSON(s.welcomeIndexKV, mattermostID, &postID)
 	err := s.welcomeIndexKV.Delete(mattermostID)
 	if err != nil {
 		return "", err

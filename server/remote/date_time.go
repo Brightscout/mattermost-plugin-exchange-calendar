@@ -6,7 +6,7 @@ package remote
 import (
 	"time"
 
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/utils/tz"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/tz"
 )
 
 type EmailAddress struct {
@@ -14,7 +14,7 @@ type EmailAddress struct {
 	Name    string `json:"name,omitempty"`
 }
 type DateTime struct {
-	DateTime string `json:"dateTime"`
+	DateTime string `json:"date"`
 	TimeZone string `json:"timeZone,omitempty"`
 }
 

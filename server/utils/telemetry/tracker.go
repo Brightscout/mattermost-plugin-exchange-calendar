@@ -1,6 +1,6 @@
 package telemetry
 
-import "github.com/mattermost/mattermost-plugin-mscalendar/server/utils/bot"
+import "github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/bot"
 
 type Tracker interface {
 	Track(event string, properties map[string]interface{})
