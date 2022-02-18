@@ -37,11 +37,11 @@ $ make dist
 
 ## Installation
 
-### Uploading from a Github release
+### Using a Github release
 1. Go to the [releases page of this GitHub repository](https://github.com/Brightscout/mattermost-plugin-exchange-mscalendar/releases) and download the latest release for your Mattermost server.
 2. Upload this file in the Mattermost **System Console > Plugins > Management** page to install the plugin. To learn more about how to upload a plugin, [see the documentation](https://docs.mattermost.com/administration/plugins.html#plugin-uploads).
 
-### Uploading a local build
+### Using a local build
 - Uploading an existing build present in the `dist` folder
 Upload the zip file of the build present in the `dist` folder in the Mattermost **System Console > Plugins > Management** page to install the plugin. To learn more about how to upload a plugin, [see the documentation](https://docs.mattermost.com/administration/plugins.html#plugin-uploads).
 
