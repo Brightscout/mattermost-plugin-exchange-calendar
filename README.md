@@ -25,7 +25,7 @@ Make sure you have the following components installed:
 
   - Go - v1.16 - [Getting Started](https://golang.org/doc/install)
 
-    **Note:** If you have installed Go to a custom location, make sure the `$GOROOT` variable is set properly. Refer [Installing to a custom location](https://golang.org/doc/install#install).
+**Note:** If you have installed Go to a custom location, make sure the `$GOROOT` variable is set properly. Refer [Installing to a custom location](https://golang.org/doc/install#install).
 
 ## Building the plugin
 Run the below command in the plugin repo to prepare a compiled, distributable plugin zip:
