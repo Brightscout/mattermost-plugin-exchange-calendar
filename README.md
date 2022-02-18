@@ -53,7 +53,9 @@ Upload the zip file of the build present in the `dist` folder in the Mattermost 
 	- **Exchange Server Base URL**: Base URL of the Exchange server.
 
 	<img src="https://user-images.githubusercontent.com/72438220/154667268-16b5cfbd-9250-4117-80a1-d6e460d8e898.png" />
+
     
+
 	- **Exchange Server Authentication Key**: Authentication key set in EWS-server for authenticating API requests.
 	You can click on the `Regenerate` button to generate a new key and make sure to add this key on the `EWS` server configuration to authenticate all the API calls made to the EWS server by this Mattermost plugin.
 
