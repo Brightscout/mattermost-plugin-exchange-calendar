@@ -32,6 +32,7 @@ const (
 	PathUnsubscribe         = "/unsubscribe"
 	PathBatch               = "/api/batch"
 	PathBatchEvent          = PathBatch + "/event"
+	PathBatchUser           = PathBatch + "/user"
 
 	// TODO: Change path from notification/api/event to /api/notification/event
 	FullPathEventNotification = PathGetNotification + PathEvent
@@ -44,4 +45,5 @@ const (
 	DeleteCalendarHeading = "Calendar deleted."
 
 	AuthorizationHeaderKey = "Authorization"
+	UsersCountPerPage = 20
 )

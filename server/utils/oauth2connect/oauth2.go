@@ -3,25 +3,21 @@
 
 package oauth2connect
 
-import (
-	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/httputils"
-)
-
 type App interface {
 	InitOAuth2(mattermostUserID string) (string, error)
 	CompleteOAuth2(mattermostUserID string) error
 }
 
-type oa struct {
-	app App
-}
+// type oa struct {
+// 	app App
+// }
 
-func Init(h *httputils.Handler, app App) {
-	oa := &oa{
-		app: app,
-	}
+// func Init(h *httputils.Handler, app App) {
+// 	oa := &oa{
+// 		app: app,
+// 	}
 
-	oauth2Router := h.Router.PathPrefix("/oauth2").Subrouter()
-	oauth2Router.HandleFunc("/connect", oa.oauth2Connect).Methods("GET")
-	oauth2Router.HandleFunc("/complete", oa.oauth2Complete).Methods("GET")
-}
+// 	oauth2Router := h.Router.PathPrefix("/oauth2").Subrouter()
+// 	oauth2Router.HandleFunc("/connect", oa.oauth2Connect).Methods("GET")
+// 	oauth2Router.HandleFunc("/complete", oa.oauth2Complete).Methods("GET")
+// }
