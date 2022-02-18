@@ -51,7 +51,6 @@ Upload the zip file of the build present in the `dist` folder in the Mattermost 
 
 - On the Microsoft Calendar plugin configuration page you need to add data for the following fields
 	- **Exchange Server Base URL**: Base URL of the Exchange server.
-    
     <img src="https://user-images.githubusercontent.com/72438220/154667268-16b5cfbd-9250-4117-80a1-d6e460d8e898.png" />
 
 	- **Exchange Server Authentication Key**: Authentication key set in EWS-server for authenticating API requests.
