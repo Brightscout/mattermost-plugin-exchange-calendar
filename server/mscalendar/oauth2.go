@@ -11,6 +11,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/store"
 )
 
@@ -20,7 +21,9 @@ const RemoteUserAlreadyConnected = "%s account `%s` is already mapped to Matterm
 const RemoteUserAlreadyConnectedNotFound = "%s account `%s` is already mapped to a Mattermost account, but the Mattermost user could not be found"
 
 type OAuth2 interface {
+	CompleteOAuth2ForUsers(users []*model.User) error
 	CompleteOAuth2(mattermostUserID string) error
+	CompleteUserConnect(authedUserID string, timzone model.StringMap, me *remote.User) error
 }
 
 // func NewOAuth2App(env Env) oauth2connect.App {
@@ -44,6 +47,46 @@ type OAuth2 interface {
 
 // 	return conf.AuthCodeURL(state, oauth2.AccessTypeOffline), nil
 // }
+
+func (m *mscalendar) CompleteOAuth2ForUsers(users []*model.User) error {
+	var emails []*string
+	emailUserMap := make(map[string]*model.User)
+	for _, user := range users {
+		_, err := m.GetRemoteUser(user.Id)
+		if err == nil {
+			// User already connected to ms-calendar
+			continue
+		}
+		emails = append(emails, &user.Email)
+		emailUserMap[user.Email] = user
+	}
+
+	if len(emails) == 0 {
+		return nil
+	}
+
+	ctx := context.Background()
+	client := m.Remote.MakeClient(ctx)
+	usersDetails, err := client.GetUsers(emails)
+	if err != nil {
+		return err
+	}
+
+	for _, userDetails := range usersDetails {
+		if userDetails.Error != nil {
+			m.Logger.Warnf("Error while fetching user with email %s. err=%s", userDetails.User.Mail, userDetails.Error.Message)
+			continue
+		}
+		user := emailUserMap[userDetails.User.Mail]
+		err := m.CompleteUserConnect(user.Id, user.Timezone, userDetails.User)
+		if err != nil {
+			m.Logger.Warnf("Error connecting user with email %s. err=%s", user.Email, err.Error())
+			continue
+		}
+	}
+
+	return nil
+}
 
 func (m *mscalendar) CompleteOAuth2(authedUserID string) error {
 	if authedUserID == "" {
@@ -79,7 +122,11 @@ func (m *mscalendar) CompleteOAuth2(authedUserID string) error {
 		return err
 	}
 
-	_, err = m.Store.LoadMattermostUserID(me.ID)
+	return m.CompleteUserConnect(authedUserID, user.Timezone, me)
+}
+
+func (m *mscalendar) CompleteUserConnect(authedUserID string, timezone model.StringMap, me *remote.User) error {
+	_, err := m.Store.LoadMattermostUserID(me.ID)
 	if err == nil {
 		// Couldn't fetch connected MM account. Reject connect attempt.
 		_, _ = m.Poster.DM(authedUserID, RemoteUserAlreadyConnectedNotFound, config.ApplicationName, me.Mail)
@@ -94,7 +141,7 @@ func (m *mscalendar) CompleteOAuth2(authedUserID string) error {
 
 	u.Settings.DailySummary = &store.DailySummaryUserSettings{
 		PostTime: "8:00AM",
-		Timezone: model.GetPreferredTimezone(user.Timezone),
+		Timezone: model.GetPreferredTimezone(timezone),
 		Enable:   false,
 	}
 

@@ -109,7 +109,42 @@ func (p *Plugin) OnActivate() error {
 		p.env.bot.Errorf("Cannot create telemetry client. err=%v", err)
 	}
 
+	// Auto-connect all the users present on server
+	p.ConnectUsers()
+
 	return nil
+}
+
+func (p *Plugin) ConnectUsers() {
+	teams, err := p.API.GetTeams()
+	if err != nil {
+		p.API.LogError(fmt.Sprintf("error occurred while fetching teams. Error: %s", err.Error()))
+		return
+	}
+	m := mscalendar.New(p.getEnv().Env, "")
+	for _, team := range teams {
+		teamStats, err := p.API.GetTeamStats(team.Id)
+		if err != nil {
+			p.API.LogError(fmt.Sprintf("error occurred while fetching team stats of team %s. Error: %s", team.Name, err.Error()))
+			continue
+		}
+		totalPages := int(teamStats.TotalMemberCount) / config.UsersCountPerPage
+		if int(teamStats.TotalMemberCount) % config.UsersCountPerPage != 0 {
+			totalPages++;
+		}
+		for page := 0; page < totalPages; page++ {
+			users, err := p.API.GetUsersInTeam(team.Id, page, config.UsersCountPerPage)
+			if err != nil {
+				p.API.LogError(fmt.Sprintf("error occurred while fetching users of team %s. Error: %s", team.Name, err.Error()))
+				continue
+			}
+			connectErr := m.CompleteOAuth2ForUsers(users)
+			if connectErr != nil {
+				p.API.LogError(fmt.Sprintf("error occurred while connecting users of team %s. Error: %s", team.Name, connectErr.Error()))
+				continue
+			}
+		}
+	}
 }
 
 func (p *Plugin) OnDeactivate() error {
@@ -325,4 +360,19 @@ func (p *Plugin) initEnv(e *Env, pluginURL string) error {
 	}
 
 	return nil
+}
+
+func (p *Plugin) UserHasLoggedIn(c *plugin.Context, user *model.User) {
+	// Auto-connect the user to ms-calendar after he logs in
+	m := mscalendar.New(p.getEnv().Env, "")
+	_, err := m.GetRemoteUser(user.Id)
+	if err == nil {
+		// If user is already connected do nothing
+		return
+	}
+
+	err = m.CompleteOAuth2(user.Id)
+	if err != nil {
+		p.API.LogError(fmt.Sprintf("error occurred while connecting user to mscalendar with email: %s. Error: %s", user.Email, err.Error()))
+	}
 }
