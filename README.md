@@ -5,7 +5,7 @@
 1. [Overview](#overview)
 2. [Features](#features)
 3. [Setup](#setup)
-4. [Building the plugin](#buildingThePlugin)
+4. [Building the plugin](#building-the-plugin)
 5. [Installation](#installation)
 6. [Configuration](#configuration)
 7. [Development](#development)
@@ -46,7 +46,7 @@ Upload the zip file of the build present in the `dist` folder in the Mattermost 
 
 ## Configuration
 - Go to the Microsoft Calendar plugin configuration page on Mattermost as **System Console > Plugins > Microsoft Calendar**
-<img src="https://user-images.githubusercontent.com/72438220/154666704-7f8c0162-4295-4c07-a528-8cf62b598afd.png" />
+    <img src="https://user-images.githubusercontent.com/72438220/154666704-7f8c0162-4295-4c07-a528-8cf62b598afd.png" />
 
 - On the Microsoft Calendar plugin configuration page you need to add data for the following fields
 	- **Exchange Server Base URL**: Base URL of the Exchange server.
