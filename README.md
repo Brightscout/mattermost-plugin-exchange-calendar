@@ -2,13 +2,28 @@
 
 ## Table of Contents
 
-1. [Overview](#overview)
-2. [Features](#features)
-3. [Setup](#setup)
-4. [Building the plugin](#building-the-plugin)
-5. [Installation](#installation)
-6. [Configuration](#configuration)
-7. [Development](#development)
+1. [License](#license)
+2. [Overview](#overview)
+3. [Features](#features)
+4. [Setup](#setup)
+5. [Building the plugin](#building-the-plugin)
+6. [Installation](#installation)
+7. [Configuration](#configuration)
+8. [Development](#development)
+
+## License
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
 ## Overview
 
@@ -18,6 +33,8 @@ This plugin supports a two-way integration between Mattermost and Microsoft Outl
 
 - Daily summary of calendar events.
 - Automatic user status synchronization into Mattermost.
+- Create calendar events from Mattermost.
+- Get new calendar events notification on Mattermost.
 - Accept or decline calendar event invites from Mattermost.
 
 ## Setup
