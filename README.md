@@ -60,12 +60,12 @@ Upload the zip file of the build present in the `dist` folder in the Mattermost 
     ![image](https://user-images.githubusercontent.com/72438220/154666704-7f8c0162-4295-4c07-a528-8cf62b598afd.png)
 
 - On the Microsoft Calendar plugin configuration page, you need to add data for the following fields:
-	- **Exchange Server Base URL**: Base URL of the Exchange server.
-    ![image](https://user-images.githubusercontent.com/72438220/154667268-16b5cfbd-9250-4117-80a1-d6e460d8e898.png)
+	- **Exchange EWS Proxy Server URL**: Base URL of the Exchange EWS Proxy Server.
+    ![image](https://user-images.githubusercontent.com/72438220/155143980-2a20fe84-6c38-4205-89ba-c36244d50bdb.png)
 
-	- **Exchange Server Authentication Key**: Authentication key used by mattermost-plugin-exchange-ews-proxy for authenticating API requests.
+	- **Exchange EWS Proxy Server Authentication Key**: Authentication key used by mattermost-plugin-exchange-ews-proxy for authenticating API requests.
 	You can click on the `Regenerate` button to generate a new key and make sure to add this key on the mattermost-plugin-exchange-ews-proxy `.env` file to authenticate all the API calls made to the EWS server by this Mattermost plugin.
-	![image](https://user-images.githubusercontent.com/72438220/154667750-62deda36-3ecd-48b4-80b5-b36774fce3fc.png)
+	![image](https://user-images.githubusercontent.com/72438220/155144336-2f98f3b4-553c-4827-9e1c-747775004fa3.png)
 
 ## Development
 
