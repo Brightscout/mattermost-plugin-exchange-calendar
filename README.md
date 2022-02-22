@@ -32,9 +32,10 @@ This plugin supports a two-way integration between Mattermost and Microsoft Outl
 ## Setup
 Make sure you have the following components installed:
 
-  - Go - v1.16 - [Getting Started](https://golang.org/doc/install)
+ - Go - v1.16 - [Getting Started](https://golang.org/doc/install)
+    > **Note:** If you have installed Go to a custom location, make sure the `$GOROOT` variable is set properly. Refer [Installing to a custom location](https://golang.org/doc/install#install).
 
-**Note:** If you have installed Go to a custom location, make sure the `$GOROOT` variable is set properly. Refer [Installing to a custom location](https://golang.org/doc/install#install).
+ - Make
 
 ## Building the plugin
 Run the below command in the plugin repo to prepare a compiled, distributable plugin zip:
@@ -51,7 +52,6 @@ $ make dist
 2. Upload this file in the Mattermost **System Console > Plugins > Management** page to install the plugin. To learn more about how to upload a plugin, [see the documentation](https://docs.mattermost.com/administration/plugins.html#plugin-uploads).
 
 ### Using a local build
-- Uploading an existing build present in the `dist` folder
 Upload the zip file of the build present in the `dist` folder in the Mattermost **System Console > Plugins > Management** page to install the plugin. To learn more about how to upload a plugin, [see the documentation](https://docs.mattermost.com/administration/plugins.html#plugin-uploads).
 
 ## Configuration
