@@ -61,15 +61,15 @@
                 "default": false
             },
             {
-                "key": "ExchangeServerBaseURL",
-                "display_name": "Exchange Server Base URL:",
+                "key": "ExchangeEwsProxyServerBaseURL",
+                "display_name": "Exchange EWS Proxy Server URL:",
                 "type": "text",
-                "help_text": "Enter Base URL of exchange server",
+                "help_text": "Enter Base URL of the exchange EWS proxy server",
                 "default": ""
             },
             {
-                "key": "ExchangeServerAuthKey",
-                "display_name": "Exchange Server Authentication Key:",
+                "key": "ExchangeEwsProxyServerAuthKey",
+                "display_name": "Exchange EWS Proxy Server Authentication Key:",
                 "type": "text",
                 "help_text": "Authentication key set in EWS-server for authenticating API requests",
                 "default": ""
