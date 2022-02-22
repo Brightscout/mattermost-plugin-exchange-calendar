@@ -152,7 +152,7 @@ dist:	apply server webapp bundle
 ## and otherwise falls back to trying to copy the plugin to a sibling mattermost-server directory.
 .PHONY: deploy
 deploy: dist
-	./build/bin/deploy $(PLUGIN_ID) dist/$(BUNDLE_NAME)
+	./build/bin/deploy deploy $(PLUGIN_ID) dist/$(BUNDLE_NAME)
 
 .PHONY: debug-deploy
 debug-deploy: debug-dist deploy
@@ -188,6 +188,41 @@ else
 	cd $(MM_UTILITIES_DIR) && npm install && npm run babel && node mmjstool/build/index.js i18n extract-webapp --webapp-dir $(PWD)/webapp
 endif
 endif
+
+## Setup dlv for attaching, identifying the plugin PID for other targets.
+.PHONY: setup-attach
+setup-attach:
+	$(eval PLUGIN_PID := $(shell ps aux | grep "plugins/${PLUGIN_ID}" | grep -v "grep" | awk -F " " '{print $$2}'))
+	$(eval NUM_PID := $(shell echo -n ${PLUGIN_PID} | wc -w))
+
+	@if [ ${NUM_PID} -gt 2 ]; then \
+		echo "** There is more than 1 plugin process running. Run 'make kill reset' to restart just one."; \
+		exit 1; \
+	fi
+
+## Detach dlv from an existing plugin instance, if previously attached.
+.PHONY: detach
+detach: setup-attach
+	@DELVE_PID=$(shell ps aux | grep "dlv attach ${PLUGIN_PID}" | grep -v "grep" | awk -F " " '{print $$2}') && \
+	if [ "$$DELVE_PID" -gt 0 ] > /dev/null 2>&1 ; then \
+		echo "Located existing delve process running with PID: $$DELVE_PID. Killing." ; \
+		kill -9 $$DELVE_PID ; \
+	fi
+
+## Disable the plugin.
+.PHONY: disable
+disable: detach
+	./build/bin/deploy disable $(PLUGIN_ID)
+
+## Enable the plugin.
+.PHONY: enable
+enable:
+	./build/bin/deploy enable $(PLUGIN_ID)
+
+## Reset the plugin, effectively disabling and re-enabling it on the server.
+.PHONY: reset
+reset: detach
+	./build/bin/deploy reset $(PLUGIN_ID)
 
 ## Clean removes all build artifacts.
 .PHONY: clean
