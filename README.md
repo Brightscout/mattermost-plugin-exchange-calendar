@@ -13,28 +13,20 @@
 
 ## License
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+See the [LICENSE](./LICENSE) file for license rights and limitations.
 
 ## Overview
 
-This plugin supports a two-way integration between Mattermost and Microsoft Outlook Calendar. You can follow the instructions to [install](#installation) and [configure](#configuration) the plugin.
+This plugin supports a two-way integration between Mattermost and Microsoft Outlook Calendar. For a stable production release, please download the latest version from the Plugin Marketplace and you can follow the instructions to [install](#installation) and [configure](#configuration) the plugin.
+
+**Note:** This plugin supports only on-prem Microsoft Exchange server and not the online Microsoft server.
 
 ## Features
 
 - Daily summary of calendar events.
 - Automatic user status synchronization into Mattermost.
 - Create calendar events from Mattermost.
-- Get new calendar events notification on Mattermost.
+- Get notifications for new calendar events on Mattermost.
 - Accept or decline calendar event invites from Mattermost.
 
 ## Setup
@@ -63,17 +55,17 @@ $ make dist
 Upload the zip file of the build present in the `dist` folder in the Mattermost **System Console > Plugins > Management** page to install the plugin. To learn more about how to upload a plugin, [see the documentation](https://docs.mattermost.com/administration/plugins.html#plugin-uploads).
 
 ## Configuration
-- Go to the Microsoft Calendar plugin configuration page on Mattermost as **System Console > Plugins > Microsoft Calendar**
+- Go to the Microsoft Calendar plugin configuration page on Mattermost as **System Console > Plugins > Microsoft Calendar**.
 
-    <img src="https://user-images.githubusercontent.com/72438220/154666704-7f8c0162-4295-4c07-a528-8cf62b598afd.png" />
+    ![image](https://user-images.githubusercontent.com/72438220/154666704-7f8c0162-4295-4c07-a528-8cf62b598afd.png)
 
-- On the Microsoft Calendar plugin configuration page you need to add data for the following fields
+- On the Microsoft Calendar plugin configuration page, you need to add data for the following fields:
 	- **Exchange Server Base URL**: Base URL of the Exchange server.
-    <img src="https://user-images.githubusercontent.com/72438220/154667268-16b5cfbd-9250-4117-80a1-d6e460d8e898.png" />
+    ![image](https://user-images.githubusercontent.com/72438220/154667268-16b5cfbd-9250-4117-80a1-d6e460d8e898.png)
 
-	- **Exchange Server Authentication Key**: Authentication key set in EWS-server for authenticating API requests.
-	You can click on the `Regenerate` button to generate a new key and make sure to add this key on the `EWS` server configuration to authenticate all the API calls made to the EWS server by this Mattermost plugin.
-	<img src="https://user-images.githubusercontent.com/72438220/154667750-62deda36-3ecd-48b4-80b5-b36774fce3fc.png" />
+	- **Exchange Server Authentication Key**: Authentication key used by mattermost-plugin-exchange-ews-proxy for authenticating API requests.
+	You can click on the `Regenerate` button to generate a new key and make sure to add this key on the mattermost-plugin-exchange-ews-proxy `.env` file to authenticate all the API calls made to the EWS server by this Mattermost plugin.
+	![image](https://user-images.githubusercontent.com/72438220/154667750-62deda36-3ecd-48b4-80b5-b36774fce3fc.png)
 
 ## Development
 
