@@ -62,6 +62,15 @@ func parseCreateArgs(args []string) (*remote.Event, error) {
 		return nil, err
 	}
 
+	help, err := createFlagSet.GetBool("help")
+	if err != nil {
+		return nil, err
+	}
+
+	if help {
+		return nil, errors.New(getCreateEventFlagSet().FlagUsages())
+	}
+
 	// check for required flags
 	requiredFlags := []string{"test-subject"}
 	flags := make(map[string]bool)
@@ -73,15 +82,6 @@ func parseCreateArgs(args []string) (*remote.Event, error) {
 		if !flags[req] {
 			return nil, fmt.Errorf("missing required flag: `--%s` ", req)
 		}
-	}
-
-	help, err := createFlagSet.GetBool("help")
-	if err != nil {
-		return nil, err
-	}
-
-	if help {
-		return nil, errors.New(getCreateEventFlagSet().FlagUsages())
 	}
 
 	subject, err := createFlagSet.GetString("test-subject")
