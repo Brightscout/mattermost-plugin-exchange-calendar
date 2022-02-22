@@ -9,10 +9,10 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/mscalendar/views"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/remote"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/store"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/utils/tz"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/mscalendar/views"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/store"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/tz"
 )
 
 const dailySummaryTimeWindow = time.Minute * 2
@@ -159,7 +159,7 @@ func (m *mscalendar) ProcessAllDailySummary(now time.Time) error {
 			m.Logger.Warnf("Error rendering user %s calendar. err=%v", user.MattermostUserID, err)
 		}
 
-		m.Poster.DM(user.MattermostUserID, postStr)
+		_, _ = m.Poster.DM(user.MattermostUserID, postStr)
 		m.Dependencies.Tracker.TrackDailySummarySent(user.MattermostUserID)
 		dsum.LastPostTime = time.Now().Format(time.RFC3339)
 		err = m.Store.StoreUser(user)

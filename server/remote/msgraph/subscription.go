@@ -4,89 +4,57 @@
 package msgraph
 
 import (
-	"crypto/rand"
-	"encoding/base64"
+	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/pkg/errors"
 
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/remote"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/utils/bot"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/bot"
 )
 
-const subscribeTTL = 48 * time.Hour
-
-func newRandomString() string {
-	b := make([]byte, 96)
-	rand.Read(b)
-	return base64.URLEncoding.EncodeToString(b)
-}
-
-func (c *client) CreateMySubscription(notificationURL string) (*remote.Subscription, error) {
+func (c *client) CreateMySubscription(remoteUserEmail string, notificationURL string) (*remote.Subscription, error) {
 	sub := &remote.Subscription{
-		Resource:           "me/events",
-		ChangeType:         "created,updated,deleted",
-		NotificationURL:    notificationURL,
-		ExpirationDateTime: time.Now().Add(subscribeTTL).Format(time.RFC3339),
-		ClientState:        newRandomString(),
+		WebhookNotificationUrl: fmt.Sprintf("%s%s%s", c.conf.MattermostSiteURL, c.conf.PluginURLPath, notificationURL),
 	}
-	err := c.rbuilder.Subscriptions().Request().JSONRequest(c.ctx, http.MethodPost, "", sub, sub)
+
+	path, err := c.GetEndpointURL(fmt.Sprintf("%s%s", config.PathNotification, config.PathSubscribe), &remoteUserEmail)
 	if err != nil {
-		return nil, errors.Wrap(err, "msgraph CreateMySubscription")
+		return nil, errors.Wrap(err, "ews Subscribe")
 	}
+
+	_, err = c.CallJSON(http.MethodPost, path, &sub, &sub)
+	if err != nil {
+		return nil, errors.Wrap(err, "ews Subscribe")
+	}
+
+	sub.CreatorID = remoteUserEmail
 
 	c.Logger.With(bot.LogContext{
-		"subscriptionID":     sub.ID,
-		"resource":           sub.Resource,
-		"changeType":         sub.ChangeType,
-		"expirationDateTime": sub.ExpirationDateTime,
-	}).Debugf("msgraph: created subscription.")
+		"subscriptionID": sub.ID,
+	}).Debugf("ews: created subscription.")
 
 	return sub, nil
 }
 
 func (c *client) DeleteSubscription(subscriptionID string) error {
-	err := c.rbuilder.Subscriptions().ID(subscriptionID).Request().Delete(c.ctx)
+	sub := &remote.Subscription{
+		ID: subscriptionID,
+	}
+
+	path, err := c.GetEndpointURL(fmt.Sprintf("%s%s", config.PathNotification, config.PathUnsubscribe), nil)
 	if err != nil {
-		return errors.Wrap(err, "msgraph DeleteSubscription")
+		return errors.Wrap(err, "ews DeleteSubscription")
+	}
+	_, err = c.CallJSON(http.MethodPost, path, &sub, nil)
+	if err != nil {
+		return errors.Wrap(err, "ews DeleteSubscription")
 	}
 
 	c.Logger.With(bot.LogContext{
 		"subscriptionID": subscriptionID,
-	}).Debugf("msgraph: deleted subscription.")
+	}).Debugf("ews: deleted subscription.")
 
 	return nil
-}
-
-func (c *client) RenewSubscription(subscriptionID string) (*remote.Subscription, error) {
-	expires := time.Now().Add(subscribeTTL)
-	v := struct {
-		ExpirationDateTime string `json:"expirationDateTime"`
-	}{
-		expires.Format(time.RFC3339),
-	}
-	sub := remote.Subscription{}
-	err := c.rbuilder.Subscriptions().ID(subscriptionID).Request().JSONRequest(c.ctx, http.MethodPatch, "", v, &sub)
-	if err != nil {
-		return nil, errors.Wrap(err, "msgraph RenewSubscription")
-	}
-
-	c.Logger.With(bot.LogContext{
-		"subscriptionID":     subscriptionID,
-		"expirationDateTime": expires.Format(time.RFC3339),
-	}).Debugf("msgraph: renewed subscription.")
-
-	return &sub, nil
-}
-
-func (c *client) ListSubscriptions() ([]*remote.Subscription, error) {
-	var v struct {
-		Value []*remote.Subscription `json:"value"`
-	}
-	err := c.rbuilder.Subscriptions().Request().JSONRequest(c.ctx, http.MethodGet, "", nil, &v)
-	if err != nil {
-		return nil, errors.Wrap(err, "msgraph ListSubscriptions")
-	}
-	return v.Value, nil
 }

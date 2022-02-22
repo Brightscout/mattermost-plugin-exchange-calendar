@@ -22,11 +22,28 @@ const (
 	PathDecline             = "/decline"
 	PathTentative           = "/tentative"
 	PathConfirmStatusChange = "/confirm"
-	PathNotification        = "/notification/v1"
-	PathEvent               = "/event"
+	PathGetNotification     = "/notification"
+	PathNotification        = "/api/notification"
+	PathEvent               = "/api/event"
+	PathCalendar            = "/api/calendar"
+	PathFindMeetingTimes    = "/suggestions"
+	PathUser                = "/api/user"
+	PathSubscribe           = "/subscribe"
+	PathUnsubscribe         = "/unsubscribe"
+	PathBatch               = "/api/batch"
+	PathBatchEvent          = PathBatch + "/event"
+	PathBatchUser           = PathBatch + "/user"
 
-	FullPathEventNotification = PathNotification + PathEvent
+	// TODO: Change path from notification/api/event to /api/notification/event
+	FullPathEventNotification = PathGetNotification + PathEvent
 	FullPathOAuth2Redirect    = PathOAuth2 + PathComplete
 
 	EventIDKey = "EventID"
+	EmailKey   = "email"
+
+	CreateCalendarHeading = "Calendar created."
+	DeleteCalendarHeading = "Calendar deleted."
+
+	AuthorizationHeaderKey = "Authorization"
+	UsersCountPerPage = 20
 )

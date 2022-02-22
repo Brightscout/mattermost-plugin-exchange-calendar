@@ -9,8 +9,8 @@ import (
 	"github.com/pkg/errors"
 	flag "github.com/spf13/pflag"
 
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/remote"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/utils"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils"
 )
 
 func getCreateEventFlagSet() *flag.FlagSet {
@@ -18,12 +18,12 @@ func getCreateEventFlagSet() *flag.FlagSet {
 	flagSet.Bool("help", false, "show help")
 	flagSet.String("test-subject", "", "Subject of the event (no spaces for now)")
 	flagSet.String("test-body", "", "Body of the event (no spaces for now)")
-	flagSet.StringSlice("test-location", nil, "Location of the event <displayName,street,city,state,postalcode,country> (comma separated; no spaces)")
+	flagSet.String("test-location", "", "Location of the event (no spaces for now)")
 	flagSet.String("starttime", time.Now().Format(time.RFC3339), "Start time for the event")
 	flagSet.Bool("allday", false, "Set as all day event (starttime/endtime must be set to midnight on different days - 2019-12-19T00:00:00-00:00)")
 	flagSet.Int("reminder", 15, "Reminder (in minutes)")
 	flagSet.String("endtime", time.Now().Add(time.Hour).Format(time.RFC3339), "End time for the event")
-	flagSet.StringSlice("attendees", nil, "A comma separated list of Mattermost UserIDs")
+	flagSet.StringSlice("attendees", nil, "A comma separated list of Mattermost User Emails")
 
 	return flagSet
 }
@@ -33,12 +33,7 @@ func (c *Command) createEvent(parameters ...string) (string, bool, error) {
 		return getCreateEventFlagSet().FlagUsages(), false, nil
 	}
 
-	tz, err := c.MSCalendar.GetTimezone(c.user())
-	if err != nil {
-		return "", false, nil
-	}
-
-	event, err := parseCreateArgs(parameters, tz)
+	event, err := parseCreateArgs(parameters)
 	if err != nil {
 		return err.Error(), false, nil
 	}
@@ -49,12 +44,7 @@ func (c *Command) createEvent(parameters ...string) (string, bool, error) {
 		return "", false, err
 	}
 
-	mattermostUserIDs, err := createFlagSet.GetStringSlice("attendees")
-	if err != nil {
-		return "", false, err
-	}
-
-	calEvent, err := c.MSCalendar.CreateEvent(c.user(), event, mattermostUserIDs)
+	calEvent, err := c.MSCalendar.CreateEvent(c.user(), event)
 	if err != nil {
 		return "", false, err
 	}
@@ -63,7 +53,7 @@ func (c *Command) createEvent(parameters ...string) (string, bool, error) {
 	return resp, false, nil
 }
 
-func parseCreateArgs(args []string, timeZone string) (*remote.Event, error) {
+func parseCreateArgs(args []string) (*remote.Event, error) {
 	event := &remote.Event{}
 
 	createFlagSet := getCreateEventFlagSet()
@@ -125,7 +115,6 @@ func parseCreateArgs(args []string, timeZone string) (*remote.Event, error) {
 	}
 	event.Start = &remote.DateTime{
 		DateTime: startTime,
-		TimeZone: timeZone,
 	}
 
 	endTime, err := createFlagSet.GetString("endtime")
@@ -137,7 +126,22 @@ func parseCreateArgs(args []string, timeZone string) (*remote.Event, error) {
 	}
 	event.End = &remote.DateTime{
 		DateTime: endTime,
-		TimeZone: timeZone,
+	}
+
+	mattermostUserEmails, err := createFlagSet.GetStringSlice("attendees")
+	if err != nil {
+		return nil, err
+	}
+	if len(mattermostUserEmails) != 0 {
+		attendees := make([]*remote.Attendee, len(mattermostUserEmails))
+		for idx, email := range mattermostUserEmails {
+			attendees[idx] = &remote.Attendee{
+				EmailAddress: &remote.EmailAddress{
+					Address: email,
+				},
+			}
+		}
+		event.Attendees = attendees
 	}
 
 	allday, err := createFlagSet.GetBool("allday")
@@ -155,25 +159,12 @@ func parseCreateArgs(args []string, timeZone string) (*remote.Event, error) {
 	}
 	event.ReminderMinutesBeforeStart = reminder
 
-	location, err := createFlagSet.GetStringSlice("test-location")
+	location, err := createFlagSet.GetString("test-location")
 	if err != nil {
 		return nil, err
 	}
 	if len(location) != 0 {
-		if len(location) != 6 {
-			return nil, errors.New("test-location flag requires 6 parameters, including a comma for empty values")
-		}
-		event.Location = &remote.Location{
-			LocationType: "default",
-			DisplayName:  location[0],
-			Address: &remote.Address{
-				Street:          location[1],
-				City:            location[2],
-				State:           location[3],
-				PostalCode:      location[4],
-				CountryOrRegion: location[5],
-			},
-		}
+		event.Location = location
 	}
 
 	return event, nil

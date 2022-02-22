@@ -1,6 +1,6 @@
 package tracker
 
-import "github.com/mattermost/mattermost-plugin-mscalendar/server/utils/telemetry"
+import "github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/telemetry"
 
 const (
 	welcomeFlowCompletionEvent = "welcomeFlowCompletion"

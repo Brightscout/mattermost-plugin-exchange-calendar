@@ -10,8 +10,8 @@ import (
 	"github.com/mattermost/mattermost-server/v5/model"
 	"github.com/pkg/errors"
 
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/remote"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/store"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/store"
 )
 
 type Users interface {
@@ -82,17 +82,13 @@ func (m *mscalendar) ExpandMattermostUser(user *User) error {
 func (m *mscalendar) GetTimezone(user *User) (string, error) {
 	err := m.Filter(
 		withClient,
-		withRemoteUser(user),
+		withUserExpanded(user),
 	)
 	if err != nil {
 		return "", err
 	}
 
-	settings, err := m.client.GetMailboxSettings(user.Remote.ID)
-	if err != nil {
-		return "", err
-	}
-	return settings.TimeZone, nil
+	return model.GetPreferredTimezone(user.MattermostUser.Timezone), nil
 }
 
 func (m *mscalendar) GetTimezoneByID(mattermostUserID string) (string, error) {
@@ -116,7 +112,7 @@ func (user *User) Markdown() string {
 }
 
 func (m *mscalendar) DisconnectUser(mattermostUserID string) error {
-	m.AfterDisconnect(mattermostUserID)
+	_ = m.AfterDisconnect(mattermostUserID)
 	err := m.Filter(
 		withClient,
 	)

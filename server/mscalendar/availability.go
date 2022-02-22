@@ -9,11 +9,11 @@ import (
 
 	"github.com/mattermost/mattermost-server/v5/model"
 
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/config"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/mscalendar/views"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/remote"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/store"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/utils"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/mscalendar/views"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/store"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils"
 )
 
 const (
@@ -232,7 +232,7 @@ func (m *mscalendar) setStatusFromCalendarView(user *store.User, status *model.S
 			if status.Manual {
 				user.LastStatus = currentStatus
 			}
-			m.Store.StoreUser(user)
+			_ = m.Store.StoreUser(user)
 			err = m.Store.StoreUserActiveEvents(user.MattermostUserID, remoteHashes)
 			if err != nil {
 				return "", err
@@ -389,7 +389,7 @@ func (m *mscalendar) notifyUpcomingEvents(mattermostUserID string, events []*rem
 func filterBusyEvents(events []*remote.Event) []*remote.Event {
 	result := []*remote.Event{}
 	for _, e := range events {
-		if e.ShowAs == "busy" {
+		if e.ShowAs == "Busy" {
 			result = append(result, e)
 		}
 	}

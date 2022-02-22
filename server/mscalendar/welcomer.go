@@ -5,10 +5,10 @@ import (
 
 	"github.com/mattermost/mattermost-server/v5/model"
 
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/config"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/store"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/utils/bot"
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/utils/flow"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/store"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/bot"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/flow"
 )
 
 type Welcomer interface {
@@ -60,31 +60,33 @@ func NewMSCalendarBot(bot bot.Bot, env Env, pluginURL string) Bot {
 }
 
 func (bot *mscBot) Welcome(userID string) error {
-	bot.cleanWelcomePost(userID)
+	_ = bot.cleanWelcomePost(userID)
 
 	postID, err := bot.DMWithAttachments(userID, bot.newConnectAttachment())
 	if err != nil {
 		return err
 	}
 
-	bot.Store.StoreUserWelcomePost(userID, postID)
+	_ = bot.Store.StoreUserWelcomePost(userID, postID)
 
 	return nil
 }
 
 func (bot *mscBot) AfterSuccessfullyConnect(userID, userLogin string) error {
 	bot.Tracker.TrackUserAuthenticated(userID)
-	postID, err := bot.Store.DeleteUserWelcomePost(userID)
-	if err != nil {
-		bot.Errorf("error deleting user's welcome post id, err=%v", err)
-	}
-	if postID != "" {
-		post := &model.Post{
-			Id: postID,
-		}
-		model.ParseSlackAttachment(post, []*model.SlackAttachment{bot.newConnectedAttachment(userLogin)})
-		bot.UpdatePost(post)
-	}
+	// postID, err := bot.Store.DeleteUserWelcomePost(userID)
+	// if err != nil {
+	// 	bot.Errorf("error deleting user's welcome post id, err=%v", err)
+	// }
+	// if postID != "" {
+	// 	post := &model.Post{
+	// 		Id: postID,
+	// 	}
+	// 	model.(post, []*model.SlackAttachment{bot.newConnectedAttachment(userLogin)})
+	// 	bot.UpdatePost(post)
+	// }
+
+	_, _ = bot.DMWithAttachments(userID, bot.newConnectedAttachment(userLogin))
 
 	return bot.Start(userID)
 }
@@ -105,7 +107,7 @@ func (bot *mscBot) AfterDisconnect(userID string) error {
 
 func (bot *mscBot) WelcomeFlowEnd(userID string) {
 	bot.Tracker.TrackWelcomeFlowCompletion(userID)
-	bot.notifySettings(userID)
+	_ = bot.notifySettings(userID)
 }
 
 func (bot *mscBot) newConnectAttachment() *model.SlackAttachment {

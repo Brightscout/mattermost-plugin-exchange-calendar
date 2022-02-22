@@ -4,16 +4,25 @@
 package msgraph
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
+	"net/http"
 
-	"github.com/mattermost/mattermost-plugin-mscalendar/server/utils/bot"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/bot"
+	"github.com/pkg/errors"
 )
 
-func (c *client) DeleteCalendar(remoteUserID string, calID string) error {
-	err := c.rbuilder.Users().ID(remoteUserID).Calendars().ID(calID).Request().Delete(c.ctx)
+func (c *client) DeleteCalendar(remoteUserEmail string, calID string) (*remote.Calendar, error) {
+	calOut := &remote.Calendar{}
+	url, err := c.GetEndpointURL(fmt.Sprintf("%s/%s", config.PathCalendar, calID), &remoteUserEmail)
 	if err != nil {
-		return errors.Wrap(err, "msgraph DeleteCalendar")
+		return nil, errors.Wrap(err, "ews DeleteCalendar")
 	}
-	c.Logger.With(bot.LogContext{}).Infof("msgraph: DeleteCalendar deleted calendar `%v`.", calID)
-	return nil
+	_, err = c.CallJSON(http.MethodDelete, url, nil, calOut)
+	if err != nil {
+		return nil, errors.Wrap(err, "ews DeleteCalendar")
+	}
+	c.Logger.With(bot.LogContext{}).Infof("ews: DeleteCalendar deleted calendar `%v`.", calID)
+	return calOut, nil
 }
