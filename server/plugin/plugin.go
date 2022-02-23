@@ -85,7 +85,7 @@ func (p *Plugin) OnActivate() error {
 	// 	stored.OAuth2ClientSecret == "" {
 	// 	return errors.New("failed to configure: OAuth2 credentials to be set in the config")
 	// }
-	if stored.ExchangeServerBaseURL == "" || stored.ExchangeServerAuthKey == "" {
+	if stored.ExchangeEwsProxyServerBaseURL == "" || stored.ExchangeEwsProxyServerAuthKey == "" {
 		return errors.New("failed to configure: Exchange Server credentials to be set in the config")
 	}
 
@@ -129,8 +129,8 @@ func (p *Plugin) ConnectUsers() {
 			continue
 		}
 		totalPages := int(teamStats.TotalMemberCount) / config.UsersCountPerPage
-		if int(teamStats.TotalMemberCount) % config.UsersCountPerPage != 0 {
-			totalPages++;
+		if int(teamStats.TotalMemberCount)%config.UsersCountPerPage != 0 {
+			totalPages++
 		}
 		for page := 0; page < totalPages; page++ {
 			users, err := p.API.GetUsersInTeam(team.Id, page, config.UsersCountPerPage)
