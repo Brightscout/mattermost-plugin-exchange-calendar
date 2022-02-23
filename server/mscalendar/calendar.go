@@ -6,6 +6,7 @@ package mscalendar
 import (
 	"time"
 
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
 )
 
@@ -85,6 +86,14 @@ func (m *mscalendar) FindMeetingTimes(user *User, meetingParams *remote.FindMeet
 	if err != nil {
 		return nil, err
 	}
+	// Add organizer
+	orgranizer := remote.Attendee{
+		Type: config.Organizer,
+		EmailAddress: &remote.EmailAddress{
+			Address: user.MattermostUser.Email,
+		},
+	}
+	meetingParams.Attendees = append(meetingParams.Attendees, orgranizer)
 
 	return m.client.FindMeetingTimes(user.MattermostUser.Email, meetingParams)
 }

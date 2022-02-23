@@ -9,7 +9,7 @@ const (
 	BotDescription = "Created by the Microsoft Calendar Plugin."
 
 	ApplicationName    = "Microsoft Calendar"
-	Repository         = "mattermost-plugin-mscalendar"
+	Repository         = "mattermost-plugin-exchange-mscalendar"
 	CommandTrigger     = "mscalendar"
 	TelemetryShortName = "mscalendar"
 
@@ -45,5 +45,9 @@ const (
 	DeleteCalendarHeading = "Calendar deleted."
 
 	AuthorizationHeaderKey = "Authorization"
-	UsersCountPerPage = 20
+	UsersCountPerPage      = 20
+
+	Organizer = "organizer"
+	Required  = "required"
+	Optional  = "optional"
 )
