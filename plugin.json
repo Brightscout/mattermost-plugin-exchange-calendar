@@ -1,10 +1,8 @@
 {
-    "id": "com.mattermost.exchange-mscalendar",
-    "name": "Microsoft Calendar",
-    "description": "Microsoft Calendar Integration",
-    "homepage_url": "https://mattermost.gitbook.io/plugin-mscalendar",
-    "support_url": "https://github.com/Brightscout/mattermost-plugin-exchange-mscalendar/issues",
-    "release_notes_url": "https://github.com/Brightscout/mattermost-plugin-exchange-mscalendar/releases/tag/v1.1.0",
+    "id": "com.mattermost.exchange-calendar",
+    "name": "Microsoft Exchange Calendar",
+    "description": "Microsoft Exchange Calendar Integration",
+    "support_url": "https://github.com/Brightscout/mattermost-plugin-exchange-calendar/issues",
     "icon_path": "assets/profile.svg",
     "version": "1.0.0",
     "min_server_version": "5.24.0",
@@ -61,17 +59,17 @@
                 "default": false
             },
             {
-                "key": "ExchangeEwsProxyServerBaseURL",
-                "display_name": "Exchange EWS Proxy Server URL:",
+                "key": "EWSProxyServerBaseURL",
+                "display_name": "EWS Proxy Server URL:",
                 "type": "text",
-                "help_text": "Enter Base URL of the exchange EWS proxy server",
+                "help_text": "Enter Base URL of the EWS proxy server",
                 "default": ""
             },
             {
-                "key": "ExchangeEwsProxyServerAuthKey",
-                "display_name": "Exchange EWS Proxy Server Authentication Key:",
+                "key": "EWSProxyServerAuthKey",
+                "display_name": "EWS Proxy Server Authentication Key:",
                 "type": "text",
-                "help_text": "Authentication key set in EWS-server for authenticating API requests",
+                "help_text": "Key set in EWS proxy server used to authenticate API requests",
                 "default": ""
             }
         ]
