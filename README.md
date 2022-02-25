@@ -64,7 +64,7 @@ Upload the zip file of the build present in the `dist` folder in the Mattermost 
     ![image](https://user-images.githubusercontent.com/72438220/155143980-2a20fe84-6c38-4205-89ba-c36244d50bdb.png)
 
 	- **Exchange EWS Proxy Server Authentication Key**: Authentication key used by mattermost-plugin-exchange-ews-proxy for authenticating API requests.
-	You can click on the `Regenerate` button to generate a new key and make sure to add this key on the mattermost-plugin-exchange-ews-proxy `.env` file to authenticate all the API calls made to the EWS server by this Mattermost plugin.
+	You can click on the `Regenerate` button to generate a new key and make sure to add this key in the mattermost-plugin-exchange-ews-proxy `.env` file to authenticate all the API calls made to the EWS server by this Mattermost plugin.
 	![image](https://user-images.githubusercontent.com/72438220/155144336-2f98f3b4-553c-4827-9e1c-747775004fa3.png)
 
 ## Development

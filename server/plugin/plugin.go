@@ -129,7 +129,7 @@ func (p *Plugin) ConnectUsers() {
 			continue
 		}
 		totalPages := int(teamStats.TotalMemberCount) / config.UsersCountPerPage
-		if int(teamStats.TotalMemberCount)%config.UsersCountPerPage != 0 {
+		if int(teamStats.TotalMemberCount) % config.UsersCountPerPage != 0 {
 			totalPages++
 		}
 		for page := 0; page < totalPages; page++ {
