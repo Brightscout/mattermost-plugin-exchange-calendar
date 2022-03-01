@@ -85,7 +85,7 @@ func (p *Plugin) OnActivate() error {
 	// 	stored.OAuth2ClientSecret == "" {
 	// 	return errors.New("failed to configure: OAuth2 credentials to be set in the config")
 	// }
-	if stored.ExchangeEwsProxyServerBaseURL == "" || stored.ExchangeEwsProxyServerAuthKey == "" {
+	if stored.EWSProxyServerBaseURL == "" || stored.EWSProxyServerAuthKey == "" {
 		return errors.New("failed to configure: Exchange Server credentials to be set in the config")
 	}
 

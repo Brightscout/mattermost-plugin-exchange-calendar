@@ -68,7 +68,7 @@
             {
                 "key": "EWSProxyServerAuthKey",
                 "display_name": "EWS Proxy Server Authentication Key:",
-                "type": "text",
+                "type": "generated",
                 "help_text": "Key set in EWS proxy server used to authenticate API requests",
                 "default": ""
             }
