@@ -6,6 +6,6 @@ var manifest = struct {
 	ID      string
 	Version string
 }{
-	ID:      "com.mattermost.exchange-mscalendar",
+	ID:      "com.mattermost.exchange-calendar",
 	Version: "1.0.0",
 }
