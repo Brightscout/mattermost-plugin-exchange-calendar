@@ -131,6 +131,12 @@ func (processor *notificationProcessor) processNotification(n *remote.Notificati
 	if err != nil {
 		return err
 	}
+	user, userErr := processor.Env.PluginAPI.GetMattermostUser(sub.MattermostCreatorID)
+	if userErr != nil {
+		return userErr
+	}
+	// Setting user local timezone
+	eventData.Event.TimeZone = model.GetPreferredTimezone(user.Timezone)
 	sa := processor.newEventSlackAttachment(eventData)
 	_, err = processor.Poster.DMWithAttachments(creator.MattermostUserID, sa)
 	if err != nil {
