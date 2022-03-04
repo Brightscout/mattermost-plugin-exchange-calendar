@@ -131,7 +131,11 @@ func (processor *notificationProcessor) processNotification(n *remote.Notificati
 	if err != nil {
 		return err
 	}
-	sa := processor.newEventSlackAttachment(eventData)
+	user, userErr := processor.Env.PluginAPI.GetMattermostUser(sub.MattermostCreatorID)
+	if userErr != nil {
+		return userErr
+	}
+	sa := processor.newEventSlackAttachment(eventData, model.GetPreferredTimezone(user.Timezone))
 	_, err = processor.Poster.DMWithAttachments(creator.MattermostUserID, sa)
 	if err != nil {
 		return err
@@ -152,9 +156,9 @@ func (processor *notificationProcessor) newSlackAttachment(n *remote.Notificatio
 	}
 }
 
-func (processor *notificationProcessor) newEventSlackAttachment(n *remote.Notification) *model.SlackAttachment {
+func (processor *notificationProcessor) newEventSlackAttachment(n *remote.Notification, timezone string) *model.SlackAttachment {
 	sa := processor.newSlackAttachment(n)
-	fields := eventToFields(n.Event)
+	fields := eventToFields(n.Event, timezone)
 	for _, k := range notificationFieldOrder {
 		v := fields[k]
 
@@ -278,14 +282,14 @@ func NewPostActionForEventResponse(eventID, response, url string) []*model.PostA
 	return []*model.PostAction{pa}
 }
 
-func eventToFields(e *remote.Event) fields.Fields {
+func eventToFields(e *remote.Event, timezone string) fields.Fields {
 	date := func(dtStart, dtEnd *remote.DateTime) (time.Time, time.Time, string) {
 		if dtStart == nil || dtEnd == nil {
 			return time.Time{}, time.Time{}, "n/a"
 		}
 
-		dtStart = dtStart.In(e.TimeZone)
-		dtEnd = dtEnd.In(e.TimeZone)
+		dtStart = dtStart.In(timezone)
+		dtEnd = dtEnd.In(timezone)
 		tStart := dtStart.Time()
 		tEnd := dtEnd.Time()
 		startFormat := "Monday, January 02"

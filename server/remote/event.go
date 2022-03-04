@@ -12,7 +12,7 @@ type Event struct {
 	Importance                 string               `json:"importance,omitempty"`
 	IsAllDay                   bool                 `json:"isAllDay,omitempty"`
 	IsCancelled                bool                 `json:"isCancelled,omitempty"`
-	IsOrganizer                bool                 `json:"isAttendeeOrganizer,omitempty"`
+	IsOrganizer                bool                 `json:"attendeeOrganizer,omitempty"`
 	ResponseRequested          bool                 `json:"responseRequested,omitempty"`
 	ShowAs                     string               `json:"showAs,omitempty"`
 	Weblink                    string               `json:"weblink,omitempty"`

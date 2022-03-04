@@ -11,12 +11,13 @@ import (
 
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/bot"
 )
 
 func (c *client) GetNotificationData(remoteUserEmail, eventID, subscriptionID string) (*remote.Notification, error) {
 	event := &remote.Event{}
-	path, err := c.GetEndpointURL(fmt.Sprintf("%s/%s", config.PathEvent, eventID), &remoteUserEmail)
+	path, err := c.GetEndpointURL(fmt.Sprintf("%s/%s", config.PathEvent, utils.EncodeString(eventID)), &remoteUserEmail)
 	if err != nil {
 		return nil, errors.Wrap(err, "ews GetNotificationData")
 	}
