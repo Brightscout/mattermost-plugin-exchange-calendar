@@ -9,12 +9,13 @@ import (
 
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils"
 	"github.com/pkg/errors"
 )
 
 func (c *client) GetEvent(remoteUserEmail, eventID string) (*remote.Event, error) {
 	e := &remote.Event{}
-	url, err := c.GetEndpointURL(fmt.Sprintf("%s/%s", config.PathEvent, eventID), &remoteUserEmail)
+	url, err := c.GetEndpointURL(fmt.Sprintf("%s/%s", config.PathEvent, utils.EncodeString(eventID)), &remoteUserEmail)
 	if err != nil {
 		return nil, errors.Wrap(err, "ews GetEvent")
 	}
@@ -26,11 +27,11 @@ func (c *client) GetEvent(remoteUserEmail, eventID string) (*remote.Event, error
 }
 
 func (c *client) AcceptEvent(remoteUserEmail, eventID string) error {
-	url, err := c.GetEndpointURL(fmt.Sprintf("%s%s/%s", config.PathEvent, config.PathAccept, eventID), &remoteUserEmail)
+	url, err := c.GetEndpointURL(fmt.Sprintf("%s/%s%s", config.PathEvent, utils.EncodeString(eventID), config.PathAccept), &remoteUserEmail)
 	if err != nil {
 		return errors.Wrap(err, "ews AcceptEvent")
 	}
-	_, err = c.CallJSON(http.MethodGet, url, nil, nil)
+	_, err = c.CallJSON(http.MethodPost, url, nil, nil)
 	if err != nil {
 		return errors.Wrap(err, "ews AcceptEvent")
 	}
@@ -38,11 +39,11 @@ func (c *client) AcceptEvent(remoteUserEmail, eventID string) error {
 }
 
 func (c *client) DeclineEvent(remoteUserEmail, eventID string) error {
-	url, err := c.GetEndpointURL(fmt.Sprintf("%s%s/%s", config.PathEvent, config.PathDecline, eventID), &remoteUserEmail)
+	url, err := c.GetEndpointURL(fmt.Sprintf("%s/%s%s", config.PathEvent, utils.EncodeString(eventID), config.PathDecline), &remoteUserEmail)
 	if err != nil {
 		return errors.Wrap(err, "ews DeclineEvent")
 	}
-	_, err = c.CallJSON(http.MethodGet, url, nil, nil)
+	_, err = c.CallJSON(http.MethodPost, url, nil, nil)
 	if err != nil {
 		return errors.Wrap(err, "ews DeclineEvent")
 	}
@@ -50,11 +51,11 @@ func (c *client) DeclineEvent(remoteUserEmail, eventID string) error {
 }
 
 func (c *client) TentativelyAcceptEvent(remoteUserEmail, eventID string) error {
-	url, err := c.GetEndpointURL(fmt.Sprintf("%s%s/%s", config.PathEvent, config.PathTentative, eventID), &remoteUserEmail)
+	url, err := c.GetEndpointURL(fmt.Sprintf("%s/%s%s", config.PathEvent, utils.EncodeString(eventID), config.PathTentative), &remoteUserEmail)
 	if err != nil {
 		return errors.Wrap(err, "ews TentativelyAcceptEvent")
 	}
-	_, err = c.CallJSON(http.MethodGet, url, nil, nil)
+	_, err = c.CallJSON(http.MethodPost, url, nil, nil)
 	if err != nil {
 		return errors.Wrap(err, "ews TentativelyAcceptEvent")
 	}
