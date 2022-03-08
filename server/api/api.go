@@ -26,6 +26,9 @@ func Init(h *httputils.Handler, env mscalendar.Env, notificationProcessor mscale
 	notificationRouter := h.Router.PathPrefix(config.PathGetNotification).Subrouter()
 	notificationRouter.HandleFunc(config.PathEvent, api.notification).Methods("POST")
 
+	syncActionRouter := h.Router.PathPrefix(config.PathSync).Subrouter()
+	syncActionRouter.HandleFunc(config.PathSubscribe, api.syncActionSubscription).Methods("GET")
+
 	postActionRouter := h.Router.PathPrefix(config.PathPostAction).Subrouter()
 	postActionRouter.HandleFunc(config.PathAccept, api.postActionAccept).Methods("POST")
 	postActionRouter.HandleFunc(config.PathDecline, api.postActionDecline).Methods("POST")
