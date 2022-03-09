@@ -14,6 +14,7 @@ import (
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/mscalendar/views"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/store"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/bot"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/fields"
 )
@@ -102,7 +103,7 @@ func (processor *notificationProcessor) work() {
 		select {
 		case n := <-processor.queue:
 			err := processor.processNotification(n)
-			if err != nil {
+			if err != nil && err != store.ErrNotFound {
 				processor.Logger.With(bot.LogContext{
 					"subscriptionID": n.SubscriptionID,
 				}).Infof("webhook notification: failed: `%v`.", err)

@@ -44,19 +44,6 @@ func (c *client) CreateMySubscription(remoteUserEmail string, notificationURL st
 }
 
 func (c *client) DeleteSubscription(remoteUserEmail, subscriptionID string) error {
-	sub := &remote.Subscription{
-		ID: subscriptionID,
-	}
-
-	path, err := c.GetEndpointURL(fmt.Sprintf("%s%s", config.PathNotification, config.PathUnsubscribe), &remoteUserEmail)
-	if err != nil {
-		return errors.Wrap(err, "ews DeleteSubscription")
-	}
-	_, err = c.CallJSON(http.MethodPost, path, &sub, nil)
-	if err != nil {
-		return errors.Wrap(err, "ews DeleteSubscription")
-	}
-
 	c.Logger.With(bot.LogContext{
 		"subscriptionID": subscriptionID,
 	}).Debugf("ews: deleted subscription.")

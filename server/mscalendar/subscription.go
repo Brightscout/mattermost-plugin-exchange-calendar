@@ -17,6 +17,7 @@ type Subscriptions interface {
 	DeleteMyEventSubscription() error
 	LoadMyEventSubscription() (*store.Subscription, error)
 	SyncUserSubscriptions() error
+	GetSubscritpionByID(subscriptionID string) (*store.Subscription, error)
 }
 
 func (m *mscalendar) CreateMyEventSubscription() (*store.Subscription, error) {
@@ -78,6 +79,14 @@ func (m *mscalendar) DeleteMyEventSubscription() error {
 	}
 
 	return nil
+}
+
+func (m *mscalendar) GetSubscritpionByID(subscriptionID string) (*store.Subscription, error) {
+	storedSub, err := m.Store.LoadSubscription(subscriptionID)
+	if err != nil {
+		return nil, err
+	}
+	return storedSub, err
 }
 
 func (m *mscalendar) DeleteOrphanedSubscription(subscriptionID string) error {
