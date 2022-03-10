@@ -112,7 +112,7 @@ func (m *mscalendar) SyncUserSubscriptions() error {
 		return nil
 	}
 
-	// Delete previous subscriptions
+	// Delete previous subscriptions for all users from subscriptionIndex store
 	err = m.Store.DeleteSubscriptionIndex()
 	if err != nil {
 		return err
@@ -124,10 +124,20 @@ func (m *mscalendar) SyncUserSubscriptions() error {
 	}
 	// Create new subscription for users and store it
 	var requests []remote.SubscriptionBatchSingleRequest
-	emailMattermostUserIDMap := make(map[string]string)
+	emailUserMap := make(map[string]*store.User)
 	for _, sub := range subscriptionIndex {
+		user, err := m.Store.LoadUser(sub.MattermostCreatorID)
 		if err != nil {
-			return err
+			m.Logger.Warnf("Error occurred while fetching user from store with id %s. err=%s", sub.MattermostCreatorID, err.Error())
+			continue
+		}
+		// Deleting previous subscription for this user from subscription store
+		err = m.Store.DeleteUserSubscription(user, sub.SubscriptionID)
+		if err != nil {
+			if err != store.ErrNotFound {
+				m.Logger.Warnf("failed to delete subscription %s. err=%s", sub.SubscriptionID, err.Error())
+			}
+			continue
 		}
 		request := remote.SubscriptionBatchSingleRequest{
 			Email: sub.Email,
@@ -136,7 +146,7 @@ func (m *mscalendar) SyncUserSubscriptions() error {
 			},
 		}
 		requests = append(requests, request)
-		emailMattermostUserIDMap[sub.Email] = sub.MattermostCreatorID
+		emailUserMap[sub.Email] = user
 	}
 	responses, err := m.client.DoBatchSubscriptionRequests(requests)
 	if err != nil {
@@ -147,21 +157,16 @@ func (m *mscalendar) SyncUserSubscriptions() error {
 			m.Logger.Warnf("Error occurred while subscribing user with email %s. err=%s", response.Email, response.Error.Message)
 			continue
 		}
-		mattermostCreatorID, exists := emailMattermostUserIDMap[response.Email]
+		user, exists := emailUserMap[response.Email]
 		if !exists {
-			m.Logger.Warnf("Error occurred while fetching mattermostUserID for user with email %s. err=%s", response.Email, response.Error.Message)
+			m.Logger.Warnf("Error occurred while fetching user with email %s. err=%s", response.Email, response.Error.Message)
 			continue
 		}
 		response.Subscription.CreatorID = response.Email
 		storedSub := &store.Subscription{
 			Remote:              response.Subscription,
-			MattermostCreatorID: mattermostCreatorID,
+			MattermostCreatorID: user.MattermostUserID,
 			PluginVersion:       m.Config.PluginVersion,
-		}
-		user, err := m.Store.LoadUser(mattermostCreatorID)
-		if err != nil {
-			m.Logger.Warnf("Error occurred while fetching user from store with id %s. err=%s", mattermostCreatorID, err.Error())
-			continue
 		}
 		err = m.Store.StoreUserSubscription(user, storedSub)
 		if err != nil {
