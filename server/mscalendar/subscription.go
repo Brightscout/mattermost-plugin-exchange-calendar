@@ -4,6 +4,8 @@
 package mscalendar
 
 import (
+	"fmt"
+
 	"github.com/pkg/errors"
 
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
@@ -110,12 +112,6 @@ func (m *mscalendar) SyncUserSubscriptions() error {
 	totalSubscribedUsers := len(subscriptionIndex)
 	if totalSubscribedUsers == 0 {
 		return nil
-	}
-
-	// Delete previous subscriptions for all users from subscriptionIndex store
-	err = m.Store.DeleteSubscriptionIndex()
-	if err != nil {
-		return err
 	}
 
 	err = m.Filter(withSuperuserClient)
