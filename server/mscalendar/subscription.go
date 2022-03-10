@@ -4,8 +4,6 @@
 package mscalendar
 
 import (
-	"fmt"
-
 	"github.com/pkg/errors"
 
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
