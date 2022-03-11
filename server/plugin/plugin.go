@@ -110,7 +110,7 @@ func (p *Plugin) OnActivate() error {
 	}
 
 	// Auto-connect all the users present on server
-	p.ConnectUsers()
+	go p.ConnectUsers()
 
 	return nil
 }
