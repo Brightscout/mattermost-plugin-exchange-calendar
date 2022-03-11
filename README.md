@@ -1,107 +1,136 @@
-# Mattermost Microsoft Calendar Plugin
-
-[![Build Status](https://img.shields.io/circleci/project/github/Brightscout/mattermost-plugin-exchange-mscalendar/master.svg)](https://circleci.com/gh/Brightscout/mattermost-plugin-exchange-mscalendar)
-[![Code Coverage](https://img.shields.io/codecov/c/github/Brightscout/mattermost-plugin-exchange-mscalendar/master.svg)](https://codecov.io/gh/Brightscout/mattermost-plugin-exchange-mscalendar)
-[![Release](https://img.shields.io/github/v/release/Brightscout/mattermost-plugin-exchange-mscalendar)](https://github.com/Brightscout/mattermost-plugin-exchange-mscalendar/releases/latest)
-[![HW](https://img.shields.io/github/issues/Brightscout/mattermost-plugin-exchange-mscalendar/Up%20For%20Grabs?color=dark%20green&label=Help%20Wanted)](https://github.com/Brightscout/mattermost-plugin-exchange-mscalendar/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3A%22Up+For+Grabs%22+label%3A%22Help+Wanted%22)
-
-**Maintainer:** [@mickmister](https://github.com/mickmister)
-**Co-Maintainer:** [@larkox](https://github.com/larkox)
-
-## Help Wanted tickets can be found [here](https://github.com/Brightscout/mattermost-plugin-exchange-mscalendar/issues?utf8=%E2%9C%93&q=is%3Aopen+label%3A%22up+for+grabs%22+label%3A%22help+wanted%22+sort%3Aupdated-desc).
+# Mattermost Plugin Exchange Calendar
 
 ## Table of Contents
 
-1. [License](#license)
-2. [Overview](#overview)
-3. [Features](#features)
-4. [Configuration](#configuration)
+- [License](#license)
+- [Overview](#overview)
+- [Features](#features)
+- [Setup](#setup)
+- [Building the plugin](#building-the-plugin)
+- [Installation](#installation)
+  - [Using a Github release](#using-a-github-release)
+  - [Using a local build](#using-a-local-build)
+- [Configuration](#configuration)
+- [Development](#development)
+  - [Deploying with Local Mode](#deploying-with-local-mode)
+  - [Deploying with credentials](#deploying-with-credentials)
 
 ## License
 
-This repository is licensed under the [Mattermost Source Available License](LICENSE), and requires a valid Mattermost E20, Professional, or Enterprise license. See our [documentation](https://docs.mattermost.com/about/frequently-asked-questions.html#mattermost-source-available-license) to learn more. If you are contributing to the project, please enable [ServiceSettings.EnableDeveloper](https://docs.mattermost.com/configure/configuration-settings.html#enable-developer-mode) in your server's config. The plugin will not start and show an error message in your server logs, if you are the missing the Enterprise License.
+See the [LICENSE](./LICENSE) file for license rights and limitations.
 
 ## Overview
 
-This plugin supports a two-way integration between Mattermost and Microsoft Outlook Calendar. For a stable production release, please download the latest version from the Plugin Marketplace and follow [these instructions](#configuration) to install and configure the plugin.
+This plugin supports a two-way integration between Mattermost and a Microsoft Exchange Calendar. For a stable production release, please download the latest version from the Plugin Marketplace and you can follow the instructions to [install](#installation) and [configure](#configuration) the plugin.
+
+**Note:** This plugin only supports the integration with on-premise Microsoft Exchange Server 2016+. For Azure/Office365 support please see [Mattermost Microsoft Calendar Plugin](https://github.com/mattermost/mattermost-plugin-mscalendar).
 
 ## Features
 
 - Daily summary of calendar events.
 - Automatic user status synchronization into Mattermost.
+- Create calendar events from Mattermost.
+- Get notifications for new calendar events on Mattermost.
 - Accept or decline calendar event invites from Mattermost.
+
+## Setup
+
+Make sure you have the following components installed:
+
+- Go - v1.16 - [Getting Started](https://golang.org/doc/install)
+    > **Note:** If you have installed Go to a custom location, make sure the `$GOROOT` variable is set properly. Refer [Installing to a custom location](https://golang.org/doc/install#install).
+
+- Make
+
+## Building the plugin
+
+Run the following command in the plugin repo to prepare a compiled, distributable plugin zip:
+
+```bash
+make dist
+```
+
+**Note**: After a successful build, a `.tar.gz` file in `/dist` folder will be created which can be uploaded to Mattermost.
+
+## Installation
+
+### Using a Github release
+
+1. Go to the [releases page of this GitHub repository](https://github.com/Brightscout/mattermost-plugin-exchange-calendar/releases) and download the latest release for your Mattermost server.
+2. Upload this file in the Mattermost **System Console > Plugins > Management** page to install the plugin. To learn more about how to upload a plugin, [see the documentation](https://docs.mattermost.com/administration/plugins.html#plugin-uploads).
+
+### Using a local build
+
+Upload the zip file created during the build and found in the `dist` folder using the Mattermost **System Console > Plugins > Management** page to install the plugin. To learn more about how to upload a plugin, [see the documentation](https://docs.mattermost.com/administration/plugins.html#plugin-uploads).
 
 ## Configuration
 
-### Step 1: Create Mattermost App in Azure
+- Go to the Microsoft Calendar plugin configuration page on Mattermost as **System Console > Plugins > Microsoft Exchange Calendar**.
 
-1. Sign into [portal.azure.com](https://portal.azure.com) using an admin Azure account.
-2. Navigate to [App Registrations](https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps)
-3. Click **New registration** at the top of the page.
+    ![image](https://user-images.githubusercontent.com/72438220/154666704-7f8c0162-4295-4c07-a528-8cf62b598afd.png)
 
-<img width="500" src="https://user-images.githubusercontent.com/6913320/76347903-be67f580-62dd-11ea-829e-236dd45865a8.png"/>
+- On the Microsoft Exchange Calendar plugin configuration page, you need to enter data for the following fields:
+  - **EWS Proxy Server URL**: The base URL of the EWS Proxy Server.
+    ![image](https://user-images.githubusercontent.com/85667960/155668473-22ca1177-1c3c-42bf-9c85-69bf0780adf8.png)
 
-4. Then fill out the form with the following values:
+  - **EWS Proxy Server Authentication Key**: The authentication key used by the [mattermost-plugin-exchange-ews-proxy](https://github.com/Brightscout/mattermost-plugin-exchange-ews-proxy) for authenticating API requests from this plugin.
+ You can click on the `Regenerate` button to generate a new key. Ensure that the key is set in the mattermost-plugin-exchange-ews-proxy `.env` file so that the proxy can authenticate all the API calls made by this Mattermost plugin.
+ ![image](https://user-images.githubusercontent.com/85667960/155668567-14dc2dd6-1d05-46af-923a-d2b39ce03c76.png)
 
-- Name: `Mattermost MS Calendar Plugin`
-- Supported account types: Default value (Single tenant)
-- Redirect URI: `https://(MM_SITE_URL)/plugins/com.mattermost.mscalendar/oauth2/complete`
+## Development
 
-Replace `(MM_SITE_URL)` with your Mattermost server's Site URL. Select **Register** to submit the form.
+To avoid having to manually install your plugin, build and deploy your plugin using one of the following options.
 
-<img width="700" src="https://user-images.githubusercontent.com/6913320/76348298-55cd4880-62de-11ea-8e0e-4ace3a8f8fcb.png"/>
+### Deploying with Local Mode
 
-5. Navigate to **Certificates & secrets** in the left pane.
+If your Mattermost server is running locally, you can enable [local mode](https://docs.mattermost.com/administration/mmctl-cli-tool.html#local-mode) to streamline deploying your plugin. Edit your server configuration as follows:
 
-<img width="500" src="https://user-images.githubusercontent.com/6913320/76348833-3d116280-62df-11ea-8b13-d39a0a2f2024.png"/>
+```json
+{
+    "ServiceSettings": {
+        ...
+        "EnableLocalMode": true,
+        "LocalModeSocketLocation": "/var/tmp/mattermost_local.socket"
+    }
+}
+```
 
-6. Click **New client secret**. Then click **Add**, and copy the new secret on the bottom right corner of the screen. We'll use this value later in the Mattermost admin console.
+and then deploy your plugin:
 
-<img width="500" src="https://user-images.githubusercontent.com/6913320/76349025-9da09f80-62df-11ea-8c8f-0b39cad4597e.png"/>
+```bash
+make deploy
+```
 
-7. Navigate to **API permissions** in the left pane.
+You may also customize the Unix socket path:
 
-<img width="500" src="https://user-images.githubusercontent.com/6913320/76349582-a9d92c80-62e0-11ea-9414-5efd12c09b3f.png"/>
+```bash
+export MM_LOCALSOCKETPATH=/var/tmp/alternate_local.socket
+make deploy
+```
 
-8. Click **Add a permission**, then **Microsoft Graph** in the right pane.
+If developing a plugin with a web app, watch for changes and deploy those automatically:
 
-<img width="500" src="https://user-images.githubusercontent.com/6913320/76350226-c2961200-62e1-11ea-9080-19a9b75c2aee.png"/>
+```bash
+export MM_SERVICESETTINGS_SITEURL=http://localhost:8065
+export MM_ADMIN_TOKEN=j44acwd8obn78cdcx7koid4jkr
+make watch
+```
 
-9. Click **Delegated permissions**, and scroll down to select the following permissions:
+### Deploying with credentials
 
-- `Calendars.ReadWrite`
-- `Calendars.ReadWrite.Shared`
-- `MailboxSettings.Read`
+Alternatively, you can authenticate with the server's API with credentials:
 
-<img width="500" src="https://user-images.githubusercontent.com/6913320/76350551-5a93fb80-62e2-11ea-8eb3-812735691af9.png"/>
+```bash
+export MM_SERVICESETTINGS_SITEURL=http://localhost:8065
+export MM_ADMIN_USERNAME=admin
+export MM_ADMIN_PASSWORD=password
+make deploy
+```
 
-10. Click **Add permissions** to submit the form.
+or with a [personal access token](https://docs.mattermost.com/developer/personal-access-tokens.html):
 
-11. Next, add application permissions via **Add a permission > Microsoft Graph > Application permissions**.
-
-12. Select the following permissions:
-
-- `Calendars.Read`
-- `MailboxSettings.Read`
-- `User.ReadAll`
-
-13. Click **Add permissions** to submit the form.
-
-<img width="500" src="https://user-images.githubusercontent.com/6913320/80412303-abb07c80-889b-11ea-9640-7c2f264c790f.png"/>
-
-14. Click **Grant admin consent for...** to grant the permissions for the application.
-
-You're all set for configuration inside of Azure.
-
-### Step 2: Configure Plugin Settings
-
-1. Copy the `Client ID` and `Tenant ID` from the Azure portal.
-
-<img width="500" src="https://user-images.githubusercontent.com/6913320/76779336-9109c480-6781-11ea-8cde-4b79e5b2f3cd.png"/>
-
-2. Navigate to **System Console > PLUGINS (BETA) > Microsoft Calendar**. Fill in the following fields:
-
-- `Admin User IDs` - List of user IDs to manage the plugin.
-- `tenantID` - Copy from Azure App.
-- `clientID` - Copy from Azure App.
-- `Client Secret` - Copy from Azure App (Generated in **Certificates & secrets**, earlier in these instructions).
+```bash
+export MM_SERVICESETTINGS_SITEURL=http://localhost:8065
+export MM_ADMIN_TOKEN=j44acwd8obn78cdcx7koid4jkr
+make deploy
+```

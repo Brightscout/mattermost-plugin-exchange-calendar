@@ -68,7 +68,7 @@ func (r *impl) MakeSuperuserClient(ctx context.Context) (remote.Client, error) {
 
 func (r *impl) NewOAuth2Config() *oauth2.Config {
 	return &oauth2.Config{
-		RedirectURL: r.conf.PluginURL + config.FullPathOAuth2Redirect,
+		RedirectURL:  r.conf.PluginURL + config.FullPathOAuth2Redirect,
 		Scopes: []string{
 			"offline_access",
 			"User.Read",

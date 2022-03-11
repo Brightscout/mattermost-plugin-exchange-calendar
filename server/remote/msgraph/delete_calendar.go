@@ -9,13 +9,14 @@ import (
 
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/bot"
 	"github.com/pkg/errors"
 )
 
 func (c *client) DeleteCalendar(remoteUserEmail string, calID string) (*remote.Calendar, error) {
 	calOut := &remote.Calendar{}
-	url, err := c.GetEndpointURL(fmt.Sprintf("%s/%s", config.PathCalendar, calID), &remoteUserEmail)
+	url, err := c.GetEndpointURL(fmt.Sprintf("%s/%s", config.PathCalendar, utils.EncodeString(calID)), &remoteUserEmail)
 	if err != nil {
 		return nil, errors.Wrap(err, "ews DeleteCalendar")
 	}

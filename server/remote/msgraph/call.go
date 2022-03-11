@@ -43,7 +43,7 @@ func (c *client) call(method, path, contentType string, inBody io.Reader, out in
 
 	if pathURL.Scheme == "" || pathURL.Host == "" {
 		var baseURL *url.URL
-		baseURL, err = url.Parse(c.conf.ExchangeServerBaseURL)
+		baseURL, err = url.Parse(c.conf.EWSProxyServerBaseURL)
 		if err != nil {
 			return nil, errors.WithMessage(err, errContext)
 		}
@@ -66,7 +66,7 @@ func (c *client) call(method, path, contentType string, inBody io.Reader, out in
 	}
 
 	// Add authorization header in API requests
-	req.Header.Add(config.AuthorizationHeaderKey, fmt.Sprintf("Bearer %s", c.conf.ExchangeServerAuthKey))
+	req.Header.Add(config.AuthorizationHeaderKey, fmt.Sprintf("Bearer %s", c.conf.EWSProxyServerAuthKey))
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
@@ -109,7 +109,7 @@ func (c *client) call(method, path, contentType string, inBody io.Reader, out in
 }
 
 func (c *client) GetEndpointURL(path string, email *string) (string, error) {
-	endpointURL, err := url.Parse(strings.TrimSpace(fmt.Sprintf("%s%s", c.conf.ExchangeServerBaseURL, path)))
+	endpointURL, err := url.Parse(strings.TrimSpace(fmt.Sprintf("%s%s", c.conf.EWSProxyServerBaseURL, path)))
 	if err != nil {
 		return "", err
 	}

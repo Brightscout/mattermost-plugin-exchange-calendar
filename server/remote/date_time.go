@@ -14,7 +14,7 @@ type EmailAddress struct {
 	Name    string `json:"name,omitempty"`
 }
 type DateTime struct {
-	DateTime string `json:"dateTime"`
+	DateTime string `json:"date"`
 	TimeZone string `json:"timeZone,omitempty"`
 }
 

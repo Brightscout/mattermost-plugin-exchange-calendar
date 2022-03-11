@@ -5,8 +5,8 @@ import "github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/util
 // StoredConfig represents the data stored in and managed with the Mattermost
 // config.
 type StoredConfig struct {
-	ExchangeServerBaseURL string
-	ExchangeServerAuthKey string
+	EWSProxyServerBaseURL string
+	EWSProxyServerAuthKey string
 
 	EnableStatusSync   bool
 	EnableDailySummary bool

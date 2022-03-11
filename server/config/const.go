@@ -9,7 +9,7 @@ const (
 	BotDescription = "Created by the Microsoft Calendar Plugin."
 
 	ApplicationName    = "Microsoft Calendar"
-	Repository         = "mattermost-plugin-mscalendar"
+	Repository         = "mattermost-plugin-exchange-mscalendar"
 	CommandTrigger     = "mscalendar"
 	TelemetryShortName = "mscalendar"
 
@@ -27,11 +27,12 @@ const (
 	PathEvent               = "/api/event"
 	PathCalendar            = "/api/calendar"
 	PathFindMeetingTimes    = "/suggestions"
-	PathMe                  = "/api/me"
+	PathUser                = "/api/user"
 	PathSubscribe           = "/subscribe"
 	PathUnsubscribe         = "/unsubscribe"
 	PathBatch               = "/api/batch"
 	PathBatchEvent          = PathBatch + "/event"
+	PathBatchUser           = PathBatch + "/user"
 
 	// TODO: Change path from notification/api/event to /api/notification/event
 	FullPathEventNotification = PathGetNotification + PathEvent
@@ -44,4 +45,9 @@ const (
 	DeleteCalendarHeading = "Calendar deleted."
 
 	AuthorizationHeaderKey = "Authorization"
+	UsersCountPerPage      = 20
+
+	Organizer = "organizer"
+	Required  = "required"
+	Optional  = "optional"
 )
