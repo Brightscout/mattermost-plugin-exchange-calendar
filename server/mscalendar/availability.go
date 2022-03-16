@@ -18,8 +18,7 @@ import (
 
 const (
 	calendarViewTimeWindowSize = 10 * time.Minute
-	// TODO: Change StatusSyncJobInterval to 5 mins
-	StatusSyncJobInterval           = 1 * time.Minute
+	StatusSyncJobInterval           = 5 * time.Minute
 	upcomingEventNotificationTime   = 10 * time.Minute
 	upcomingEventNotificationWindow = (StatusSyncJobInterval * 11) / 10 // 110% of the interval
 )
