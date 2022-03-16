@@ -44,7 +44,6 @@ var cmds = []*model.AutocompleteData{
 	model.NewAutocompleteData("unsubscribe", "", "Disable notifications for event invitations and updates."),
 	model.NewAutocompleteData("info", "", "Read information about this version of the plugin."),
 	model.NewAutocompleteData("help", "", "Read help text for the commands"),
-	model.NewAutocompleteData("custom", "", "set custom status"),
 }
 
 // Register should be called by the plugin to register all necessary commands
@@ -113,8 +112,6 @@ func (c *Command) Handle() (string, bool, error) {
 		handler = c.requireConnectedUser(c.requireAdminUser(c.debugAvailability))
 	case "settings":
 		handler = c.requireConnectedUser(c.settings)
-	case "custom":
-		handler = c.requireConnectedUser(c.setcustomstatus)
 	}
 	out, mustRedirectToDM, err := handler(parameters...)
 	if err != nil {

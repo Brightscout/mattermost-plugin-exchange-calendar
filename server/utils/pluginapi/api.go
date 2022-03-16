@@ -4,9 +4,8 @@
 package pluginapi
 
 import (
-	"fmt"
+	"encoding/json"
 	"strings"
-	"time"
 
 	"github.com/mattermost/mattermost-server/v6/model"
 	"github.com/mattermost/mattermost-server/v6/plugin"
@@ -50,33 +49,17 @@ func (a *API) UpdateMattermostUserStatus(mattermostUserID, status string) (*mode
 	return s, nil
 }
 
-func (a *API) UpdateMattermostUserCustomStatus(mattermostUserID string, eventEndTime string) error {
-
-	myDate, err := time.Parse("2006-01-02T15:04:05Z", eventEndTime)
+func (a *API) UpdateMattermostUserCustomStatus(mattermostUserID string, customStatus *model.CustomStatus) error {
+	err := a.api.UpdateUserCustomStatus(mattermostUserID, customStatus)
 	if err != nil {
-		fmt.Print("inside mydate parsing error")
 		return err
-	}
-	customStatus := &model.CustomStatus{
-		Emoji:     "calendar",
-		Text:      "in a meeting",
-		Duration:  "date_and_time",
-		ExpiresAt: myDate.UTC(),
-	}
-	fmt.Println("customStatus")
-	fmt.Print("custom status=\n", customStatus)
-	fmt.Print("event end time=\n", eventEndTime)
-	//fmt.Print("event end time in utc\n", eventEndTime.Time().UTC())
-	UpdateErr := a.api.UpdateUserCustomStatus(mattermostUserID, customStatus)
-	if UpdateErr != nil {
-		return UpdateErr
 	}
 	return nil
 }
 
-func (a *API) UnsetMattermostUserCustomStatus(mattermostUserID string) error {
-	err:=a.api.RemoveUserCustomStatus(mattermostUserID)
-	if(err!=nil){
+func (a *API) RemoveMattermostUserCustomStatus(mattermostUserID string) error {
+	err := a.api.RemoveUserCustomStatus(mattermostUserID)
+	if err != nil {
 		return err
 	}
 	return nil
@@ -139,4 +122,22 @@ func (a *API) GetPost(postID string) (*model.Post, error) {
 		return nil, appErr
 	}
 	return p, nil
+}
+
+func (a *API) GetMattermostUserCustomStatus(mattermostUserID string) (*model.CustomStatus, error) {
+	user, appErr := a.GetMattermostUser(mattermostUserID)
+	if appErr != nil {
+		return nil, appErr
+	}
+	if user.Props[model.UserPropsKeyCustomStatus] == "" {
+		// No custom status is set by user
+		return nil, nil
+	}
+
+	var customStatus model.CustomStatus
+	err := json.Unmarshal([]byte(user.Props[model.UserPropsKeyCustomStatus]), &customStatus)
+	if err != nil {
+		return nil, err
+	}
+	return &customStatus, nil
 }

@@ -46,9 +46,10 @@ type PluginAPI interface {
 	GetMattermostUserStatusesByIds(mattermostUserIDs []string) ([]*model.Status, error)
 	IsSysAdmin(mattermostUserID string) (bool, error)
 	UpdateMattermostUserStatus(mattermostUserID, status string) (*model.Status, error)
-	UpdateMattermostUserCustomStatus(mattermostUserID string, eventEndTime string) error
-	UnsetMattermostUserCustomStatus(mattermostUserID string) error
+	UpdateMattermostUserCustomStatus(mattermostUserID string, customStatus *model.CustomStatus) error
+	RemoveMattermostUserCustomStatus(mattermostUserID string) error
 	GetPost(postID string) (*model.Post, error)
+	GetMattermostUserCustomStatus(mattermostUserID string) (*model.CustomStatus, error)
 }
 
 type Env struct {

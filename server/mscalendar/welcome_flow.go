@@ -59,7 +59,7 @@ func (wf *WelcomeFlow) makeSteps() {
 		FalseButtonMessage:   "No - Don't update my status",
 		TrueResponseMessage:  ":thumbsup: Got it! We'll automatically update your status in Mattermost.",
 		FalseResponseMessage: ":thumbsup: Got it! We won't update your status in Mattermost.",
-		FalseSkip:            3,
+		FalseSkip:            2,
 	}, &flow.SimpleStep{
 		Title:                "Confirm status change",
 		Message:              "Do you want to receive confirmations before we update your status for each event?",
@@ -77,14 +77,6 @@ func (wf *WelcomeFlow) makeSteps() {
 		TrueResponseMessage:  "Great, your status will be set to Away.",
 		FalseResponseMessage: "Great, your status will be set to Do not Disturb.",
 	}, &flow.SimpleStep{
-		Title:                "Custom Status during meetings",
-		Message:              "Do you want to set your custom status to `In A Meeting` while you are in a meeting?",
-		PropertyName:         store.UpdateCustomStatusPropertyName,
-		TrueButtonMessage:    "Yes",
-		FalseButtonMessage:   "No",
-		TrueResponseMessage:  "Great, your custom status will be set to `In A Meeting`.",
-		FalseResponseMessage: "Great, your custom status will not be set",
-	}, &flow.SimpleStep{
 		Title:                "Subscribe to events",
 		Message:              "Do you want to receive notifications when you are invited to an event?",
 		PropertyName:         store.SubscribePropertyName,
@@ -100,6 +92,10 @@ func (wf *WelcomeFlow) makeSteps() {
 		FalseButtonMessage:   "No - Do not notify me of upcoming events",
 		TrueResponseMessage:  "Great, you will receive a message before your meetings.",
 		FalseResponseMessage: "Great, you will not receive any notification for upcoming events.",
+	}, &flow.EmptyStep{
+		Title:   "Daily Summary",
+		Message: "Remember that you can set-up a daily summary by typing `/mscalendar summary time 8:00AM`.",
 	})
+
 	wf.steps = steps
 }
