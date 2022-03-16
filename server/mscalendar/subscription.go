@@ -17,7 +17,7 @@ type Subscriptions interface {
 	DeleteMyEventSubscription() error
 	LoadMyEventSubscription() (*store.Subscription, error)
 	SyncUserSubscriptions() error
-	GetSubscritpionByID(subscriptionID string) (*store.Subscription, error)
+	GetSubscriptionByID(subscriptionID string) (*store.Subscription, error)
 }
 
 func (m *mscalendar) CreateMyEventSubscription() (*store.Subscription, error) {
@@ -81,7 +81,7 @@ func (m *mscalendar) DeleteMyEventSubscription() error {
 	return nil
 }
 
-func (m *mscalendar) GetSubscritpionByID(subscriptionID string) (*store.Subscription, error) {
+func (m *mscalendar) GetSubscriptionByID(subscriptionID string) (*store.Subscription, error) {
 	storedSub, err := m.Store.LoadSubscription(subscriptionID)
 	if err != nil {
 		return nil, err
@@ -128,9 +128,7 @@ func (m *mscalendar) SyncUserSubscriptions() error {
 		// Deleting previous subscription for this user from subscription store
 		err = m.Store.DeleteUserSubscription(user, sub.SubscriptionID)
 		if err != nil {
-			if err != store.ErrNotFound {
-				m.Logger.Warnf("failed to delete subscription %s. err=%s", sub.SubscriptionID, err.Error())
-			}
+			m.Logger.Warnf("failed to delete subscription %s. err=%s", sub.SubscriptionID, err.Error())
 			continue
 		}
 		request := remote.SubscriptionBatchSingleRequest{

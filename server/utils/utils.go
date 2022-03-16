@@ -8,10 +8,10 @@ func EncodeString(str string) string {
 
 func DecodeString(str string) (string, error) {
 	data, err := base64.StdEncoding.DecodeString(str)
-    if err != nil {
-        return "", err
-    }
-    return string(data), nil
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
 }
 
 func GetTotalNumberOfBatches(total int, maxNumRequestsPerBatch int) int {

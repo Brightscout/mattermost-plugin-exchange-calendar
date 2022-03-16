@@ -161,6 +161,7 @@ func (s *pluginStore) StoreUserSubscriptionInIndex(user *User, subscription *Sub
 
 		for i, s := range subscriptionIndex {
 			if s.MattermostCreatorID == subscription.MattermostCreatorID && s.SubscriptionID == subscription.Remote.ID {
+				// Removing old subscription of user and adding the new subscription in array
 				result := append(subscriptionIndex[:i], newSub)
 				return append(result, subscriptionIndex[i+1:]...), nil
 			}
@@ -174,6 +175,7 @@ func (s *pluginStore) DeleteUserSubscriptionFromIndex(subscriptionID string) err
 	return s.ModifySubscriptionIndex(func(subscriptionIndex SubscriptionIndex) (SubscriptionIndex, error) {
 		for i, s := range subscriptionIndex {
 			if s.SubscriptionID == subscriptionID {
+				// Removing subscription data of user from array
 				return append(subscriptionIndex[:i], subscriptionIndex[i+1:]...), nil
 			}
 		}

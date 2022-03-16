@@ -21,7 +21,7 @@ func (api *api) syncActionSubscription(w http.ResponseWriter, req *http.Request)
 	}()
 }
 
-func (api *api) getSubscritpionByID(w http.ResponseWriter, req *http.Request) {
+func (api *api) getSubscriptionByID(w http.ResponseWriter, req *http.Request) {
 	params := mux.Vars(req)
 	subscriptionID := params["subscriptionID"]
 	decodedID, err := utils.DecodeString(subscriptionID)
@@ -29,7 +29,7 @@ func (api *api) getSubscritpionByID(w http.ResponseWriter, req *http.Request) {
 		httputils.WriteInternalServerError(w, err)
 		return
 	}
-	_, err = mscalendar.New(api.Env, "").GetSubscritpionByID(decodedID)
+	_, err = mscalendar.New(api.Env, "").GetSubscriptionByID(decodedID)
 	isSubscribed := true
 	if err != nil {
 		if err != store.ErrNotFound {
