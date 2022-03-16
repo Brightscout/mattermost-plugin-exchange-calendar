@@ -9,8 +9,8 @@ import (
 
 	pluginapilicense "github.com/mattermost/mattermost-plugin-api"
 	"github.com/mattermost/mattermost-plugin-api/experimental/command"
-	"github.com/mattermost/mattermost-server/v5/model"
-	"github.com/mattermost/mattermost-server/v5/plugin"
+	"github.com/mattermost/mattermost-server/v6/model"
+	"github.com/mattermost/mattermost-server/v6/plugin"
 	"github.com/pkg/errors"
 
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
@@ -25,6 +25,7 @@ type Command struct {
 	ChannelID  string
 	Config     *config.Config
 	MSCalendar mscalendar.MSCalendar
+	API        plugin.API
 }
 
 func getNotConnectedText() string {

@@ -4,7 +4,7 @@
 package mscalendar
 
 import (
-	"github.com/mattermost/mattermost-server/v5/model"
+	"github.com/mattermost/mattermost-server/v6/model"
 
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
@@ -46,7 +46,10 @@ type PluginAPI interface {
 	GetMattermostUserStatusesByIds(mattermostUserIDs []string) ([]*model.Status, error)
 	IsSysAdmin(mattermostUserID string) (bool, error)
 	UpdateMattermostUserStatus(mattermostUserID, status string) (*model.Status, error)
+	UpdateMattermostUserCustomStatus(mattermostUserID string, customStatus *model.CustomStatus) error
+	RemoveMattermostUserCustomStatus(mattermostUserID string) error
 	GetPost(postID string) (*model.Post, error)
+	GetMattermostUserCustomStatus(mattermostUserID string) (*model.CustomStatus, error)
 }
 
 type Env struct {

@@ -3,7 +3,7 @@ package settingspanel
 import (
 	"net/http"
 
-	"github.com/mattermost/mattermost-server/v5/model"
+	"github.com/mattermost/mattermost-server/v6/model"
 
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/httputils"
@@ -35,7 +35,7 @@ func (sh *handler) handleAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	request := model.PostActionIntegrationRequestFromJson(r.Body)
+	request := utils.PostActionIntegrationRequestFromJson(r.Body)
 	if request == nil {
 		utils.SlackAttachmentError(w, "Error: invalid request")
 		return
@@ -69,5 +69,5 @@ func (sh *handler) handleAction(w http.ResponseWriter, r *http.Request) {
 		response.Update = post
 	}
 	w.Header().Set("Content-Type", "application/json")
-	_, _ = w.Write(response.ToJson())
+	_, _ = w.Write(utils.ResponseToJson(response))
 }
