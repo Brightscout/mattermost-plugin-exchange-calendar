@@ -5,31 +5,30 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/mattermost/mattermost-server/v5/model"
+	"github.com/mattermost/mattermost-server/v6/model"
 
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
 )
 
 var prettyStatuses = map[string]string{
-	model.STATUS_ONLINE:  "Online",
-	model.STATUS_AWAY:    "Away",
-	model.STATUS_DND:     "Do Not Disturb",
-	model.STATUS_OFFLINE: "Offline",
+	model.StatusOnline:  "Online",
+	model.StatusAway:    "Away",
+	model.StatusDnd:     "Do Not Disturb",
+	model.StatusOffline: "Offline",
 }
 
-func RenderStatusChangeNotificationView(events []*remote.Event, status, url string) *model.SlackAttachment {
+func RenderStatusChangeNotificationView(events []*remote.Event, status string, customStatus *model.CustomStatus, url string) *model.SlackAttachment {
 	for _, e := range events {
 		if e.Start.Time().After(time.Now()) {
-			return statusChangeAttachments(e, status, url)
+			return statusChangeAttachments(e, status, customStatus, url)
 		}
 	}
 
 	nEvents := len(events)
-	if nEvents > 0 && status == model.STATUS_DND {
-		return statusChangeAttachments(events[nEvents-1], status, url)
+	if nEvents > 0 && status == model.StatusDnd {
+		return statusChangeAttachments(events[nEvents-1], status, customStatus, url)
 	}
-
-	return statusChangeAttachments(nil, status, url)
+	return statusChangeAttachments(nil, status, customStatus, url)
 }
 
 func RenderEventWillStartLine(subject, weblink string, startTime time.Time) string {
@@ -57,16 +56,17 @@ func renderScheduleItem(event *remote.Event, status string) string {
 	return resp
 }
 
-func statusChangeAttachments(event *remote.Event, status, url string) *model.SlackAttachment {
+func statusChangeAttachments(event *remote.Event, status string, customStatus *model.CustomStatus, url string) *model.SlackAttachment {
 	actionYes := &model.PostAction{
 		Name: "Yes",
 		Integration: &model.PostActionIntegration{
 			URL: url,
 			Context: map[string]interface{}{
-				"value":            true,
-				"change_to":        status,
-				"pretty_change_to": prettyStatuses[status],
-				"hasEvent":         false,
+				"value":              true,
+				"change_to":          status,
+				"pretty_change_to":   prettyStatuses[status],
+				"hasEvent":           false,
+				"removeCustomStatus": true,
 			},
 		},
 	}
@@ -80,6 +80,14 @@ func statusChangeAttachments(event *remote.Event, status, url string) *model.Sla
 				"hasEvent": false,
 			},
 		},
+	}
+
+	if customStatus != nil {
+		actionYes.Integration.Context["removeCustomStatus"] = false
+		actionYes.Integration.Context["customStatusText"] = customStatus.Text
+		actionYes.Integration.Context["customStatusEmoji"] = customStatus.Emoji
+		actionYes.Integration.Context["customStatusExpiresAt"] = customStatus.ExpiresAt.String()
+		actionYes.Integration.Context["customStatusDuration"] = customStatus.Duration
 	}
 
 	if event != nil {

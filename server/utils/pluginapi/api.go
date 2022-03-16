@@ -4,10 +4,11 @@
 package pluginapi
 
 import (
+	"encoding/json"
 	"strings"
 
-	"github.com/mattermost/mattermost-server/v5/model"
-	"github.com/mattermost/mattermost-server/v5/plugin"
+	"github.com/mattermost/mattermost-server/v6/model"
+	"github.com/mattermost/mattermost-server/v6/plugin"
 
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/store"
 )
@@ -46,6 +47,22 @@ func (a *API) UpdateMattermostUserStatus(mattermostUserID, status string) (*mode
 		return s, err
 	}
 	return s, nil
+}
+
+func (a *API) UpdateMattermostUserCustomStatus(mattermostUserID string, customStatus *model.CustomStatus) error {
+	err := a.api.UpdateUserCustomStatus(mattermostUserID, customStatus)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *API) RemoveMattermostUserCustomStatus(mattermostUserID string) error {
+	err := a.api.RemoveUserCustomStatus(mattermostUserID)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // IsSysAdmin returns true if the user is authorized to use the workflow plugin's admin-level APIs/commands.
@@ -105,4 +122,22 @@ func (a *API) GetPost(postID string) (*model.Post, error) {
 		return nil, appErr
 	}
 	return p, nil
+}
+
+func (a *API) GetMattermostUserCustomStatus(mattermostUserID string) (*model.CustomStatus, error) {
+	user, appErr := a.GetMattermostUser(mattermostUserID)
+	if appErr != nil {
+		return nil, appErr
+	}
+	if user.Props[model.UserPropsKeyCustomStatus] == "" {
+		// No custom status is set by user
+		return nil, nil
+	}
+
+	var customStatus model.CustomStatus
+	err := json.Unmarshal([]byte(user.Props[model.UserPropsKeyCustomStatus]), &customStatus)
+	if err != nil {
+		return nil, err
+	}
+	return &customStatus, nil
 }

@@ -6,7 +6,7 @@ package store
 import (
 	"time"
 
-	"github.com/mattermost/mattermost-server/v5/plugin"
+	"github.com/mattermost/mattermost-server/v6/plugin"
 
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/tracker"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/bot"

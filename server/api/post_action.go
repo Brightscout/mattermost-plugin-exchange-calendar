@@ -11,11 +11,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mattermost/mattermost-server/v5/model"
+	"github.com/mattermost/mattermost-server/v6/model"
 
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/mscalendar"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/mscalendar/views"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/store"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils"
 )
 
@@ -26,7 +27,7 @@ func (api *api) preprocessAction(w http.ResponseWriter, req *http.Request) (msca
 		return nil, nil, "", "", ""
 	}
 
-	request := model.PostActionIntegrationRequestFromJson(req.Body)
+	request := utils.PostActionIntegrationRequestFromJson(req.Body)
 	if request == nil {
 		utils.SlackAttachmentError(w, "Error: invalid request")
 		return nil, nil, "", "", ""
@@ -128,7 +129,7 @@ func (api *api) postActionRespond(w http.ResponseWriter, req *http.Request) {
 		postResponse.EphemeralText = "Event has changed since this message. Please change your status directly on MS Calendar."
 	}
 	w.Header().Set("Content-Type", "application/json")
-	_, _ = w.Write(postResponse.ToJson())
+	_, _ = w.Write(utils.ResponseToJson(postResponse))
 }
 
 func prettyOption(option string) string {
@@ -154,7 +155,7 @@ func (api *api) postActionConfirmStatusChange(w http.ResponseWriter, req *http.R
 	response := model.PostActionIntegrationResponse{}
 	post := &model.Post{}
 
-	request := model.PostActionIntegrationRequestFromJson(req.Body)
+	request := utils.PostActionIntegrationRequestFromJson(req.Body)
 	if request == nil {
 		utils.SlackAttachmentError(w, "Invalid request.")
 		return
@@ -198,6 +199,9 @@ func (api *api) postActionConfirmStatusChange(w http.ResponseWriter, req *http.R
 			user.LastStatus = status.Status
 		}
 
+		// Handle custom status change for user
+		api.handleCustomStatusChange(w, request, user)
+
 		err = api.Store.StoreUser(user)
 		if err != nil {
 			utils.SlackAttachmentError(w, "Cannot update user")
@@ -226,7 +230,7 @@ func (api *api) postActionConfirmStatusChange(w http.ResponseWriter, req *http.R
 
 	response.Update = post
 	w.Header().Set("Content-Type", "application/json")
-	_, _ = w.Write(response.ToJson())
+	_, _ = w.Write(utils.ResponseToJson(response))
 }
 
 func getEventInfo(ctx map[string]interface{}) (string, error) {
@@ -271,4 +275,62 @@ func isNotFoundError(err error) bool {
 
 func isCanceledError(err error) bool {
 	return strings.Contains(err.Error(), "You can't respond to a meeting that's been canceled.")
+}
+
+func (api *api) handleCustomStatusChange(w http.ResponseWriter, request *model.PostActionIntegrationRequest, user *store.User) {
+	currentCustomStatus, err := api.PluginAPI.GetMattermostUserCustomStatus(user.MattermostUserID)
+	if err != nil {
+		utils.SlackAttachmentError(w, "Cannot get user custom status.")
+		api.Logger.Debugf("cannot get user custom status, err=%s", err)
+		return
+	}
+
+	removeCustomStatus, ok := request.Context["removeCustomStatus"]
+	if !ok {
+		utils.SlackAttachmentError(w, `No recognizable value for property "removeCustomStatus".`)
+		return
+	}
+	if removeCustomStatus.(bool) {
+		if currentCustomStatus != nil && currentCustomStatus.Text == config.CustomStatusText {
+			_ = api.PluginAPI.RemoveMattermostUserCustomStatus(user.MattermostUserID)
+		}
+		return
+	}
+	customStatusText, ok := request.Context["customStatusText"]
+	if !ok {
+		utils.SlackAttachmentError(w, `No recognizable value for property "customStatusText".`)
+		return
+	}
+	customStatusEmoji, ok := request.Context["customStatusEmoji"]
+	if !ok {
+		utils.SlackAttachmentError(w, `No recognizable value for property "customStatusEmoji".`)
+		return
+	}
+	customStatusExpiresAt, ok := request.Context["customStatusExpiresAt"]
+	if !ok {
+		utils.SlackAttachmentError(w, `No recognizable value for property "customStatusExpiresAt".`)
+		return
+	}
+	customStatusParsedExpiresAt, err := time.Parse("2006-01-02 15:04:05 -0700 MST", customStatusExpiresAt.(string))
+	if err != nil {
+		utils.SlackAttachmentError(w, `error while parsing custom status expiresAt value".`)
+		return
+	}
+	customStatusDuration, ok := request.Context["customStatusDuration"]
+	if !ok {
+		utils.SlackAttachmentError(w, `No recognizable value for property "customStatusDuration".`)
+		return
+	}
+
+	user.LastCustomStatus = nil
+	if currentCustomStatus != nil && currentCustomStatus.Text != config.CustomStatusText {
+		user.LastCustomStatus = currentCustomStatus
+	}
+	customStatus := &model.CustomStatus{
+		Text:      customStatusText.(string),
+		Emoji:     customStatusEmoji.(string),
+		Duration:  customStatusDuration.(string),
+		ExpiresAt: customStatusParsedExpiresAt,
+	}
+	_ = api.PluginAPI.UpdateMattermostUserCustomStatus(user.MattermostUserID, customStatus)
 }

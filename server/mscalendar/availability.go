@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/mattermost/mattermost-server/v5/model"
+	"github.com/mattermost/mattermost-server/v6/model"
 
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/mscalendar/views"
@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	calendarViewTimeWindowSize      = 10 * time.Minute
+	calendarViewTimeWindowSize = 10 * time.Minute
 	StatusSyncJobInterval           = 5 * time.Minute
 	upcomingEventNotificationTime   = 10 * time.Minute
 	upcomingEventNotificationWindow = (StatusSyncJobInterval * 11) / 10 // 110% of the interval
@@ -182,18 +182,23 @@ func (m *mscalendar) setUserStatuses(users []*store.User, calendarViews []*remot
 
 func (m *mscalendar) setStatusFromCalendarView(user *store.User, status *model.Status, res *remote.ViewCalendarResponse) (string, error) {
 	currentStatus := status.Status
-	if currentStatus == model.STATUS_OFFLINE && !user.Settings.GetConfirmation {
+	if currentStatus == model.StatusOffline && !user.Settings.GetConfirmation {
 		return "User offline and does not want status change confirmations. No status change", nil
 	}
 
 	events := filterBusyEvents(res.Events)
-	busyStatus := model.STATUS_DND
+	busyStatus := model.StatusDnd
 	if user.Settings.ReceiveNotificationsDuringMeeting {
-		busyStatus = model.STATUS_AWAY
+		busyStatus = model.StatusAway
 	}
 
 	if len(user.ActiveEvents) == 0 && len(events) == 0 {
 		return "No events in local or remote. No status change.", nil
+	}
+
+	currentCustomStatus, err := m.PluginAPI.GetMattermostUserCustomStatus(user.MattermostUserID)
+	if err != nil {
+		return "", err
 	}
 
 	if len(user.ActiveEvents) > 0 && len(events) == 0 {
@@ -203,10 +208,12 @@ func (m *mscalendar) setStatusFromCalendarView(user *store.User, status *model.S
 			if user.LastStatus != "" {
 				message = fmt.Sprintf("User is no longer busy in calendar. Set status to previous status (%s)", user.LastStatus)
 			}
-			err := m.setStatusOrAskUser(user, status, events, true)
+			err := m.setStatusOrAskUser(user, status, currentCustomStatus, events, true)
 			if err != nil {
 				return "", err
 			}
+		} else {
+			m.handleCustomStatusFreeStatus(user, currentCustomStatus)
 		}
 
 		err := m.Store.StoreUserActiveEvents(user.MattermostUserID, []string{})
@@ -232,6 +239,7 @@ func (m *mscalendar) setStatusFromCalendarView(user *store.User, status *model.S
 			if status.Manual {
 				user.LastStatus = currentStatus
 			}
+			m.handleCustomStatusBusyStatus(user, currentCustomStatus)
 			_ = m.Store.StoreUser(user)
 			err = m.Store.StoreUserActiveEvents(user.MattermostUserID, remoteHashes)
 			if err != nil {
@@ -239,7 +247,7 @@ func (m *mscalendar) setStatusFromCalendarView(user *store.User, status *model.S
 			}
 			return "User was already marked as busy. No status change.", nil
 		}
-		err = m.setStatusOrAskUser(user, status, events, false)
+		err = m.setStatusOrAskUser(user, status, currentCustomStatus, events, false)
 		if err != nil {
 			return "", err
 		}
@@ -271,14 +279,16 @@ func (m *mscalendar) setStatusFromCalendarView(user *store.User, status *model.S
 
 	message := "User is already busy. No status change."
 	if currentStatus != busyStatus {
-		err := m.setStatusOrAskUser(user, status, events, false)
+		err := m.setStatusOrAskUser(user, status, currentCustomStatus, events, false)
 		if err != nil {
 			return "", err
 		}
 		message = fmt.Sprintf("User was free, but is now busy. Set status to busy (%s).", busyStatus)
+	} else {
+		m.handleCustomStatusBusyStatus(user, currentCustomStatus)
 	}
 
-	err := m.Store.StoreUserActiveEvents(user.MattermostUserID, remoteHashes)
+	err = m.Store.StoreUserActiveEvents(user.MattermostUserID, remoteHashes)
 	if err != nil {
 		return "", err
 	}
@@ -290,22 +300,38 @@ func (m *mscalendar) setStatusFromCalendarView(user *store.User, status *model.S
 // - currentStatus: currentStatus, to decide whether to store this status when the user is free. This gets assigned to user.LastStatus at the beginning of the meeting.
 // - events: the list of events that are triggering this status change
 // - isFree: whether the user is free or busy, to decide to which status to change
-func (m *mscalendar) setStatusOrAskUser(user *store.User, currentStatus *model.Status, events []*remote.Event, isFree bool) error {
-	toSet := model.STATUS_ONLINE
+func (m *mscalendar) setStatusOrAskUser(user *store.User, currentStatus *model.Status, currentCustomStatus *model.CustomStatus, events []*remote.Event, isFree bool) error {
+	toSet := model.StatusOnline
 	if isFree && user.LastStatus != "" {
 		toSet = user.LastStatus
 		user.LastStatus = ""
 	}
 
+	customStatusToSet := user.LastCustomStatus
+	if isFree {
+		if currentCustomStatus != nil && currentCustomStatus.Text != config.CustomStatusText {
+			customStatusToSet = currentCustomStatus
+		}
+		user.LastCustomStatus = nil
+	}
+
 	if !isFree {
-		toSet = model.STATUS_DND
+		toSet = model.StatusDnd
+		customStatusToSet = &model.CustomStatus{
+			Emoji: config.CalendarEmojiText,
+			Text:  config.CustomStatusText,
+		}
 		if user.Settings.ReceiveNotificationsDuringMeeting {
-			toSet = model.STATUS_AWAY
+			toSet = model.StatusAway
 		}
 		if !user.Settings.GetConfirmation {
 			user.LastStatus = ""
 			if currentStatus.Manual {
 				user.LastStatus = currentStatus.Status
+			}
+			user.LastCustomStatus = nil
+			if currentCustomStatus != nil && currentCustomStatus.Text != config.CustomStatusText {
+				user.LastCustomStatus = currentCustomStatus
 			}
 		}
 	}
@@ -320,11 +346,17 @@ func (m *mscalendar) setStatusOrAskUser(user *store.User, currentStatus *model.S
 		if appErr != nil {
 			return appErr
 		}
+		// If customStatusToSet is nil that means the user is free remove the current custom status otherwise update it with the new value
+		if customStatusToSet == nil {
+			_ = m.PluginAPI.RemoveMattermostUserCustomStatus(user.MattermostUserID)
+		} else {
+			_ = m.PluginAPI.UpdateMattermostUserCustomStatus(user.MattermostUserID, customStatusToSet)
+		}
 		return nil
 	}
 
 	url := fmt.Sprintf("%s%s%s", m.Config.PluginURLPath, config.PathPostAction, config.PathConfirmStatusChange)
-	_, err = m.Poster.DMWithAttachments(user.MattermostUserID, views.RenderStatusChangeNotificationView(events, toSet, url))
+	_, err = m.Poster.DMWithAttachments(user.MattermostUserID, views.RenderStatusChangeNotificationView(events, toSet, customStatusToSet, url))
 	if err != nil {
 		return err
 	}
@@ -394,4 +426,30 @@ func filterBusyEvents(events []*remote.Event) []*remote.Event {
 		}
 	}
 	return result
+}
+
+func (m *mscalendar) handleCustomStatusFreeStatus(user *store.User, currentCustomStatus *model.CustomStatus) {
+	if currentCustomStatus == nil || currentCustomStatus.Text != config.CustomStatusText {
+		return
+	}
+	fmt.Println("Custom status: ", currentCustomStatus)
+	fmt.Println("Last status: ", user.LastStatus)
+	if user.LastCustomStatus != nil {
+		_ = m.PluginAPI.UpdateMattermostUserCustomStatus(user.MattermostUserID, user.LastCustomStatus)
+		user.LastCustomStatus = nil
+	} else {
+		_ = m.PluginAPI.RemoveMattermostUserCustomStatus(user.MattermostUserID)
+	}
+}
+
+func (m *mscalendar) handleCustomStatusBusyStatus(user *store.User, currentCustomStatus *model.CustomStatus) {
+	if currentCustomStatus != nil && currentCustomStatus.Text == config.CustomStatusText {
+		return
+	}
+	user.LastCustomStatus = currentCustomStatus
+	customStatus := &model.CustomStatus{
+		Text:  config.CustomStatusText,
+		Emoji: config.CalendarEmojiText,
+	}
+	_ = m.PluginAPI.UpdateMattermostUserCustomStatus(user.MattermostUserID, customStatus)
 }

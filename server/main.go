@@ -1,7 +1,7 @@
 package main
 
 import (
-	mattermostplugin "github.com/mattermost/mattermost-server/v5/plugin"
+	mattermostplugin "github.com/mattermost/mattermost-server/v6/plugin"
 
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/mscalendar"
