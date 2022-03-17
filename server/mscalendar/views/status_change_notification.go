@@ -3,7 +3,6 @@ package views
 import (
 	"encoding/json"
 	"fmt"
-	"net/url"
 	"time"
 
 	"github.com/mattermost/mattermost-server/v5/model"
@@ -34,15 +33,14 @@ func RenderStatusChangeNotificationView(events []*remote.Event, status, url stri
 }
 
 func RenderEventWillStartLine(subject, weblink string, startTime time.Time) string {
-	link, _ := url.QueryUnescape(weblink)
-	eventString := fmt.Sprintf("Your event [%s](%s) will start soon.", subject, link)
+	eventString := fmt.Sprintf("Your event [%s](%s) will start soon.", subject, weblink)
 	if subject == "" {
-		eventString = fmt.Sprintf("[An event with no subject](%s) will start soon.", link)
+		eventString = fmt.Sprintf("[An event with no subject](%s) will start soon.", weblink)
 	}
 	if startTime.Before(time.Now()) {
-		eventString = fmt.Sprintf("Your event [%s](%s) is ongoing.", subject, link)
+		eventString = fmt.Sprintf("Your event [%s](%s) is ongoing.", subject, weblink)
 		if subject == "" {
-			eventString = fmt.Sprintf("[An event with no subject](%s) is ongoing.", link)
+			eventString = fmt.Sprintf("[An event with no subject](%s) is ongoing.", weblink)
 		}
 	}
 	return eventString

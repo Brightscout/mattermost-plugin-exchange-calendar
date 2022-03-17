@@ -46,7 +46,9 @@ func (s *pluginStore) SetSetting(userID, settingID string, value interface{}) er
 		}
 		user.Settings.ReceiveReminders = storableValue
 	case DailySummarySettingID:
-		return s.updateDailySummarySettingForUser(user, value)
+		if err := s.updateDailySummarySettingForUser(user, value); err != nil {
+			return err
+		}
 	default:
 		return fmt.Errorf("setting %s not found", settingID)
 	}
