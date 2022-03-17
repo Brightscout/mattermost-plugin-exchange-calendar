@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	calendarViewTimeWindowSize = 10 * time.Minute
+	calendarViewTimeWindowSize      = 10 * time.Minute
 	StatusSyncJobInterval           = 5 * time.Minute
 	upcomingEventNotificationTime   = 10 * time.Minute
 	upcomingEventNotificationWindow = (StatusSyncJobInterval * 11) / 10 // 110% of the interval
@@ -213,7 +213,7 @@ func (m *mscalendar) setStatusFromCalendarView(user *store.User, status *model.S
 				return "", err
 			}
 		} else {
-			m.handleCustomStatusFreeStatus(user, currentCustomStatus)
+			m.handleFreeCustomStatus(user, currentCustomStatus)
 		}
 
 		err := m.Store.StoreUserActiveEvents(user.MattermostUserID, []string{})
@@ -239,7 +239,7 @@ func (m *mscalendar) setStatusFromCalendarView(user *store.User, status *model.S
 			if status.Manual {
 				user.LastStatus = currentStatus
 			}
-			m.handleCustomStatusBusyStatus(user, currentCustomStatus)
+			m.handleBusyCustomStatus(user, currentCustomStatus)
 			_ = m.Store.StoreUser(user)
 			err = m.Store.StoreUserActiveEvents(user.MattermostUserID, remoteHashes)
 			if err != nil {
@@ -285,7 +285,7 @@ func (m *mscalendar) setStatusFromCalendarView(user *store.User, status *model.S
 		}
 		message = fmt.Sprintf("User was free, but is now busy. Set status to busy (%s).", busyStatus)
 	} else {
-		m.handleCustomStatusBusyStatus(user, currentCustomStatus)
+		m.handleBusyCustomStatus(user, currentCustomStatus)
 	}
 
 	err = m.Store.StoreUserActiveEvents(user.MattermostUserID, remoteHashes)
@@ -318,7 +318,7 @@ func (m *mscalendar) setStatusOrAskUser(user *store.User, currentStatus *model.S
 	if !isFree {
 		toSet = model.StatusDnd
 		customStatusToSet = &model.CustomStatus{
-			Emoji: config.CalendarEmojiText,
+			Emoji: config.CustomStatusEmoji,
 			Text:  config.CustomStatusText,
 		}
 		if user.Settings.ReceiveNotificationsDuringMeeting {
@@ -428,12 +428,10 @@ func filterBusyEvents(events []*remote.Event) []*remote.Event {
 	return result
 }
 
-func (m *mscalendar) handleCustomStatusFreeStatus(user *store.User, currentCustomStatus *model.CustomStatus) {
+func (m *mscalendar) handleFreeCustomStatus(user *store.User, currentCustomStatus *model.CustomStatus) {
 	if currentCustomStatus == nil || currentCustomStatus.Text != config.CustomStatusText {
 		return
 	}
-	fmt.Println("Custom status: ", currentCustomStatus)
-	fmt.Println("Last status: ", user.LastStatus)
 	if user.LastCustomStatus != nil {
 		_ = m.PluginAPI.UpdateMattermostUserCustomStatus(user.MattermostUserID, user.LastCustomStatus)
 		user.LastCustomStatus = nil
@@ -442,14 +440,14 @@ func (m *mscalendar) handleCustomStatusFreeStatus(user *store.User, currentCusto
 	}
 }
 
-func (m *mscalendar) handleCustomStatusBusyStatus(user *store.User, currentCustomStatus *model.CustomStatus) {
+func (m *mscalendar) handleBusyCustomStatus(user *store.User, currentCustomStatus *model.CustomStatus) {
 	if currentCustomStatus != nil && currentCustomStatus.Text == config.CustomStatusText {
 		return
 	}
 	user.LastCustomStatus = currentCustomStatus
 	customStatus := &model.CustomStatus{
 		Text:  config.CustomStatusText,
-		Emoji: config.CalendarEmojiText,
+		Emoji: config.CustomStatusEmoji,
 	}
 	_ = m.PluginAPI.UpdateMattermostUserCustomStatus(user.MattermostUserID, customStatus)
 }

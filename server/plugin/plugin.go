@@ -90,7 +90,6 @@ func (p *Plugin) OnActivate() error {
 		return errors.New("failed to configure: Exchange Server credentials to be set in the config")
 	}
 
-	_ = p.initEnv(&p.env, pluginAPIClient, "")
 	bundlePath, err := p.API.GetBundlePath()
 	if err != nil {
 		return errors.Wrap(err, "couldn't get bundle path")

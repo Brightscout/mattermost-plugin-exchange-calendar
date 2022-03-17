@@ -280,8 +280,8 @@ func isCanceledError(err error) bool {
 func (api *api) handleCustomStatusChange(w http.ResponseWriter, request *model.PostActionIntegrationRequest, user *store.User) {
 	currentCustomStatus, err := api.PluginAPI.GetMattermostUserCustomStatus(user.MattermostUserID)
 	if err != nil {
-		utils.SlackAttachmentError(w, "Cannot get user custom status.")
-		api.Logger.Debugf("cannot get user custom status, err=%s", err)
+		utils.SlackAttachmentError(w, "Cannot get user's custom status.")
+		api.Logger.Debugf("cannot get user's custom status, err=%s", err)
 		return
 	}
 
@@ -290,12 +290,14 @@ func (api *api) handleCustomStatusChange(w http.ResponseWriter, request *model.P
 		utils.SlackAttachmentError(w, `No recognizable value for property "removeCustomStatus".`)
 		return
 	}
+
 	if removeCustomStatus.(bool) {
 		if currentCustomStatus != nil && currentCustomStatus.Text == config.CustomStatusText {
 			_ = api.PluginAPI.RemoveMattermostUserCustomStatus(user.MattermostUserID)
 		}
 		return
 	}
+
 	customStatusText, ok := request.Context["customStatusText"]
 	if !ok {
 		utils.SlackAttachmentError(w, `No recognizable value for property "customStatusText".`)
@@ -313,7 +315,7 @@ func (api *api) handleCustomStatusChange(w http.ResponseWriter, request *model.P
 	}
 	customStatusParsedExpiresAt, err := time.Parse("2006-01-02 15:04:05 -0700 MST", customStatusExpiresAt.(string))
 	if err != nil {
-		utils.SlackAttachmentError(w, `error while parsing custom status expiresAt value".`)
+		utils.SlackAttachmentError(w, `Error while parsing custom status expiresAt value".`)
 		return
 	}
 	customStatusDuration, ok := request.Context["customStatusDuration"]

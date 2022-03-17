@@ -48,8 +48,8 @@ type PluginAPI interface {
 	UpdateMattermostUserStatus(mattermostUserID, status string) (*model.Status, error)
 	UpdateMattermostUserCustomStatus(mattermostUserID string, customStatus *model.CustomStatus) error
 	RemoveMattermostUserCustomStatus(mattermostUserID string) error
-	GetPost(postID string) (*model.Post, error)
 	GetMattermostUserCustomStatus(mattermostUserID string) (*model.CustomStatus, error)
+	GetPost(postID string) (*model.Post, error)
 }
 
 type Env struct {

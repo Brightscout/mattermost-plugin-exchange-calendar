@@ -51,6 +51,6 @@ const (
 	Required  = "required"
 	Optional  = "optional"
 
-	CalendarEmojiText = "calendar"
+	CustomStatusEmoji = "calendar"
 	CustomStatusText  = "In a meeting"
 )
