@@ -62,6 +62,20 @@ func (mr *MockStoreMockRecorder) DeletePanelPostID(arg0 interface{}) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeletePanelPostID", reflect.TypeOf((*MockStore)(nil).DeletePanelPostID), arg0)
 }
 
+// DeleteSubscriptionIndex mocks base method.
+func (m *MockStore) DeleteSubscriptionIndex() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteSubscriptionIndex")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteSubscriptionIndex indicates an expected call of DeleteSubscriptionIndex.
+func (mr *MockStoreMockRecorder) DeleteSubscriptionIndex() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSubscriptionIndex", reflect.TypeOf((*MockStore)(nil).DeleteSubscriptionIndex))
+}
+
 // DeleteUser mocks base method.
 func (m *MockStore) DeleteUser(arg0 string) error {
 	m.ctrl.T.Helper()
@@ -116,6 +130,20 @@ func (m *MockStore) DeleteUserSubscription(arg0 *store.User, arg1 string) error 
 func (mr *MockStoreMockRecorder) DeleteUserSubscription(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUserSubscription", reflect.TypeOf((*MockStore)(nil).DeleteUserSubscription), arg0, arg1)
+}
+
+// DeleteUserSubscriptionFromIndex mocks base method.
+func (m *MockStore) DeleteUserSubscriptionFromIndex(arg0 string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteUserSubscriptionFromIndex", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteUserSubscriptionFromIndex indicates an expected call of DeleteUserSubscriptionFromIndex.
+func (mr *MockStoreMockRecorder) DeleteUserSubscriptionFromIndex(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUserSubscriptionFromIndex", reflect.TypeOf((*MockStore)(nil).DeleteUserSubscriptionFromIndex), arg0)
 }
 
 // DeleteUserWelcomePost mocks base method.
@@ -221,6 +249,21 @@ func (m *MockStore) LoadSubscription(arg0 string) (*store.Subscription, error) {
 func (mr *MockStoreMockRecorder) LoadSubscription(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoadSubscription", reflect.TypeOf((*MockStore)(nil).LoadSubscription), arg0)
+}
+
+// LoadSubscriptionIndex mocks base method.
+func (m *MockStore) LoadSubscriptionIndex() (store.SubscriptionIndex, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LoadSubscriptionIndex")
+	ret0, _ := ret[0].(store.SubscriptionIndex)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// LoadSubscriptionIndex indicates an expected call of LoadSubscriptionIndex.
+func (mr *MockStoreMockRecorder) LoadSubscriptionIndex() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoadSubscriptionIndex", reflect.TypeOf((*MockStore)(nil).LoadSubscriptionIndex))
 }
 
 // LoadUser mocks base method.
@@ -478,6 +521,20 @@ func (m *MockStore) StoreUserSubscription(arg0 *store.User, arg1 *store.Subscrip
 func (mr *MockStoreMockRecorder) StoreUserSubscription(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StoreUserSubscription", reflect.TypeOf((*MockStore)(nil).StoreUserSubscription), arg0, arg1)
+}
+
+// StoreUserSubscriptionInIndex mocks base method.
+func (m *MockStore) StoreUserSubscriptionInIndex(arg0 *store.User, arg1 *store.Subscription) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "StoreUserSubscriptionInIndex", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// StoreUserSubscriptionInIndex indicates an expected call of StoreUserSubscriptionInIndex.
+func (mr *MockStoreMockRecorder) StoreUserSubscriptionInIndex(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StoreUserSubscriptionInIndex", reflect.TypeOf((*MockStore)(nil).StoreUserSubscriptionInIndex), arg0, arg1)
 }
 
 // StoreUserWelcomePost mocks base method.

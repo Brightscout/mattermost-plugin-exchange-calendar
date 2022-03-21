@@ -38,10 +38,10 @@ func (m *MockRemote) EXPECT() *MockRemoteMockRecorder {
 }
 
 // HandleWebhook mocks base method.
-func (m *MockRemote) HandleWebhook(arg0 http.ResponseWriter, arg1 *http.Request) []*remote.Notification {
+func (m *MockRemote) HandleWebhook(arg0 http.ResponseWriter, arg1 *http.Request) *remote.Notification {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "HandleWebhook", arg0, arg1)
-	ret0, _ := ret[0].([]*remote.Notification)
+	ret0, _ := ret[0].(*remote.Notification)
 	return ret0
 }
 
@@ -52,17 +52,17 @@ func (mr *MockRemoteMockRecorder) HandleWebhook(arg0, arg1 interface{}) *gomock.
 }
 
 // MakeClient mocks base method.
-func (m *MockRemote) MakeClient(arg0 context.Context, arg1 *oauth2.Token) remote.Client {
+func (m *MockRemote) MakeClient(arg0 context.Context) remote.Client {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "MakeClient", arg0, arg1)
+	ret := m.ctrl.Call(m, "MakeClient", arg0)
 	ret0, _ := ret[0].(remote.Client)
 	return ret0
 }
 
 // MakeClient indicates an expected call of MakeClient.
-func (mr *MockRemoteMockRecorder) MakeClient(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockRemoteMockRecorder) MakeClient(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MakeClient", reflect.TypeOf((*MockRemote)(nil).MakeClient), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MakeClient", reflect.TypeOf((*MockRemote)(nil).MakeClient), arg0)
 }
 
 // MakeSuperuserClient mocks base method.
