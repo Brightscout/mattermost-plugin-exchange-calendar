@@ -273,6 +273,7 @@ func TestShouldPostDailySummary(t *testing.T) {
 			shouldError: false,
 		},
 		{
+			name:        "Different timezone, wrong time",
 			enabled:     true,
 			postTime:    "7:20FM", // Invalid time
 			timeZone:    "Mountain Standard Time",
@@ -280,6 +281,7 @@ func TestShouldPostDailySummary(t *testing.T) {
 			shouldError: true,
 		},
 		{
+			name:        "Invalid timezone, right time",
 			enabled:     true,
 			postTime:    "7:00AM",
 			timeZone:    "Moon Time",
