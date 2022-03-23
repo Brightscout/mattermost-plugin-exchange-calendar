@@ -20,30 +20,26 @@ import (
 )
 
 func TestProcessAllDailySummary(t *testing.T) {
-	for _, tc := range []struct {
-		name          string
+	for name, tc := range map[string]struct {
 		err           string
 		runAssertions func(deps *Dependencies, client remote.Client)
 	}{
-		{
-			name: "Error fetching index",
-			err:  "index store error",
+		"Error fetching index": {
+			err: "index store error",
 			runAssertions: func(deps *Dependencies, client remote.Client) {
 				s := deps.Store.(*mock_store.MockStore)
 				s.EXPECT().LoadUserIndex().Return(nil, errors.New("index store error"))
 			},
 		},
-		{
-			name: "No users",
-			err:  "",
+		"No users": {
+			err: "",
 			runAssertions: func(deps *Dependencies, client remote.Client) {
 				s := deps.Store.(*mock_store.MockStore)
 				s.EXPECT().LoadUserIndex().Return(store.UserIndex{}, nil)
 			},
 		},
-		{
-			name: "Error fetching events",
-			err:  "error fetching events",
+		"Error fetching events": {
+			err: "error fetching events",
 			runAssertions: func(deps *Dependencies, client remote.Client) {
 				s := deps.Store.(*mock_store.MockStore)
 				s.EXPECT().LoadUserIndex().Return(store.UserIndex{{
@@ -71,9 +67,8 @@ func TestProcessAllDailySummary(t *testing.T) {
 				mockClient.EXPECT().DoBatchViewCalendarRequests(gomock.Any()).Return([]*remote.ViewCalendarResponse{}, errors.New("error fetching events"))
 			},
 		},
-		{
-			name: "User receives their daily summary",
-			err:  "",
+		"User receives their daily summary": {
+			err: "",
 			runAssertions: func(deps *Dependencies, client remote.Client) {
 				s := deps.Store.(*mock_store.MockStore)
 				s.EXPECT().LoadUserIndex().Return(store.UserIndex{{
@@ -151,7 +146,7 @@ func TestProcessAllDailySummary(t *testing.T) {
 Wednesday February 12
 
 | Time | Subject |
-| :--: | :-- |
+| :--: | :--: |
 | 9:00AM - 11:00AM | [The subject]() |`).Return("postID2", nil).Times(1),
 				)
 
@@ -165,7 +160,7 @@ Wednesday February 12
 			},
 		},
 	} {
-		t.Run(tc.name, func(t *testing.T) {
+		t.Run(name, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 

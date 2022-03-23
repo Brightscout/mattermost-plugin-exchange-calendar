@@ -5,6 +5,7 @@ package mscalendar
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -21,9 +22,17 @@ import (
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/bot/mock_bot"
 )
 
+// Constants ...
+const (
+	MockUserMattermostID = "user_mm_id"
+	MockUserRemoteID     = "user_remote_id"
+	MockUserMail         = "user_email@example.com"
+	EventID              = "event_id"
+)
+
 func TestSyncStatusAll(t *testing.T) {
 	moment := time.Now().UTC()
-	eventHash := "event_id " + moment.Format(time.RFC3339)
+	eventHash := getEventHash()
 	busyEvent := &remote.Event{ICalUID: "event_id", Start: remote.NewDateTime(moment, "UTC"), ShowAs: "Busy"}
 
 	for name, tc := range map[string]struct {
@@ -118,28 +127,25 @@ func TestSyncStatusAll(t *testing.T) {
 
 			c, papi, s, logger := client.(*mock_remote.MockClient), deps.PluginAPI.(*mock_plugin_api.MockPluginAPI), deps.Store.(*mock_store.MockStore), deps.Logger.(*mock_bot.MockLogger)
 
-			mockUserMattermostID := "user_mm_id"
-			mockUserRemoteID := "user_remote_id"
-			mockUserMail := "user_email@example.com"
 			mockUser := &store.User{
-				MattermostUserID: mockUserMattermostID,
+				MattermostUserID: MockUserMattermostID,
 				Remote: &remote.User{
-					ID:   mockUserRemoteID,
-					Mail: mockUserMail,
+					ID:   MockUserRemoteID,
+					Mail: MockUserMail,
 				},
 				Settings:     store.Settings{UpdateStatus: true, GetConfirmation: tc.getConfirmation},
 				ActiveEvents: tc.activeEvents,
 			}
-			s.EXPECT().LoadUser(mockUserMattermostID).Return(mockUser, nil).Times(1)
+			s.EXPECT().LoadUser(MockUserMattermostID).Return(mockUser, nil).Times(1)
 
 			c.EXPECT().DoBatchViewCalendarRequests(gomock.Any()).Return([]*remote.ViewCalendarResponse{
-				{Events: tc.remoteEvents, RemoteUserID: mockUserRemoteID, Error: tc.apiError},
+				{Events: tc.remoteEvents, RemoteUserID: MockUserRemoteID, Error: tc.apiError},
 			}, nil)
 
-			papi.EXPECT().GetMattermostUserStatusesByIds([]string{mockUserMattermostID}).Return([]*model.Status{{Status: tc.currentStatus, Manual: tc.currentStatusManual, UserId: mockUserMattermostID}}, nil)
+			papi.EXPECT().GetMattermostUserStatusesByIds([]string{MockUserMattermostID}).Return([]*model.Status{{Status: tc.currentStatus, Manual: tc.currentStatusManual, UserId: MockUserMattermostID}}, nil)
 
 			if tc.newStatus == "" {
-				papi.EXPECT().UpdateMattermostUserStatus(mockUserMattermostID, gomock.Any()).Times(0)
+				papi.EXPECT().UpdateMattermostUserStatus(MockUserMattermostID, gomock.Any()).Times(0)
 			} else {
 				if (tc.currentStatusManual && !tc.getConfirmation) ||
 					(tc.currentStatusManual && tc.currentStatus == "dnd") {
@@ -148,17 +154,17 @@ func TestSyncStatusAll(t *testing.T) {
 					}
 					s.EXPECT().StoreUser(mockUser).Return(nil).Times(1)
 				}
-				papi.EXPECT().UpdateMattermostUserStatus(mockUserMattermostID, tc.newStatus).Return(nil, nil)
+				papi.EXPECT().UpdateMattermostUserStatus(MockUserMattermostID, tc.newStatus).Return(nil, nil)
 			}
 
 			if tc.eventsToStore == nil {
-				s.EXPECT().StoreUserActiveEvents(mockUserMattermostID, gomock.Any()).Return(nil).Times(0)
+				s.EXPECT().StoreUserActiveEvents(MockUserMattermostID, gomock.Any()).Return(nil).Times(0)
 			} else {
-				s.EXPECT().StoreUserActiveEvents(mockUserMattermostID, tc.eventsToStore).Return(nil).Times(1)
+				s.EXPECT().StoreUserActiveEvents(MockUserMattermostID, tc.eventsToStore).Return(nil).Times(1)
 			}
 
 			if tc.shouldLogError {
-				logger.EXPECT().Warnf("Error getting availability for %s. err=%s", mockUserMail, tc.apiError.Message).Times(1)
+				logger.EXPECT().Warnf("Error getting availability for %s. err=%s", MockUserMail, tc.apiError.Message).Times(1)
 			} else {
 				logger.EXPECT().Warnf(gomock.Any()).Times(0)
 			}
@@ -172,9 +178,6 @@ func TestSyncStatusAll(t *testing.T) {
 }
 
 func TestSyncStatusUserConfig(t *testing.T) {
-	mockUserMattermostID := "user_mm_id"
-	mockUserRemoteID := "user_remote_id"
-
 	for name, tc := range map[string]struct {
 		settings      store.Settings
 		runAssertions func(deps *Dependencies, client remote.Client)
@@ -198,14 +201,14 @@ func TestSyncStatusUserConfig(t *testing.T) {
 				busyEvent := &remote.Event{ICalUID: "event_id", Start: remote.NewDateTime(time.Now().UTC(), "UTC"), ShowAs: "Busy"}
 
 				c.EXPECT().DoBatchViewCalendarRequests(gomock.Any()).Times(1).Return([]*remote.ViewCalendarResponse{
-					{Events: []*remote.Event{busyEvent}, RemoteUserID: mockUserRemoteID},
+					{Events: []*remote.Event{busyEvent}, RemoteUserID: MockUserRemoteID},
 				}, nil)
-				papi.EXPECT().GetMattermostUserStatusesByIds([]string{mockUserMattermostID}).Return([]*model.Status{{Status: "online", Manual: true, UserId: mockUserMattermostID}}, nil)
+				papi.EXPECT().GetMattermostUserStatusesByIds([]string{MockUserMattermostID}).Return([]*model.Status{{Status: "online", Manual: true, UserId: MockUserMattermostID}}, nil)
 
 				s.EXPECT().StoreUser(gomock.Any()).Return(nil).Times(1)
-				s.EXPECT().StoreUserActiveEvents(mockUserMattermostID, []string{getEventHash()})
-				poster.EXPECT().DMWithAttachments(mockUserMattermostID, gomock.Any()).Times(1)
-				papi.EXPECT().UpdateMattermostUserStatus(mockUserMattermostID, gomock.Any()).Times(0)
+				s.EXPECT().StoreUserActiveEvents(MockUserMattermostID, []string{getEventHash()})
+				poster.EXPECT().DMWithAttachments(MockUserMattermostID, gomock.Any()).Times(1)
+				papi.EXPECT().UpdateMattermostUserStatus(MockUserMattermostID, gomock.Any()).Times(0)
 			},
 		},
 	} {
@@ -216,11 +219,11 @@ func TestSyncStatusUserConfig(t *testing.T) {
 			env, client := makeStatusSyncTestEnv(ctrl)
 
 			s := env.Dependencies.Store.(*mock_store.MockStore)
-			s.EXPECT().LoadUser(mockUserMattermostID).Return(&store.User{
-				MattermostUserID: mockUserMattermostID,
+			s.EXPECT().LoadUser(MockUserMattermostID).Return(&store.User{
+				MattermostUserID: MockUserMattermostID,
 				Remote: &remote.User{
-					ID:   mockUserRemoteID,
-					Mail: "user_email@example.com",
+					ID:   MockUserRemoteID,
+					Mail: MockUserMail,
 				},
 				Settings: tc.settings,
 			}, nil).Times(1)
@@ -298,29 +301,26 @@ func TestReminders(t *testing.T) {
 
 			c, s, papi, poster, logger := client.(*mock_remote.MockClient), deps.Store.(*mock_store.MockStore), deps.PluginAPI.(*mock_plugin_api.MockPluginAPI), deps.Poster.(*mock_bot.MockPoster), deps.Logger.(*mock_bot.MockLogger)
 
-			mockUserMattermostID := "user_mm_id"
-			mockUserRemoteID := "user_remote_id"
-			mockUserMail := "user_email@example.com"
-			loadUser := s.EXPECT().LoadUser(mockUserMattermostID).Return(&store.User{
-				MattermostUserID: mockUserMattermostID,
+			loadUser := s.EXPECT().LoadUser(MockUserMattermostID).Return(&store.User{
+				MattermostUserID: MockUserMattermostID,
 				Remote: &remote.User{
-					ID:   mockUserRemoteID,
-					Mail: mockUserMail,
+					ID:   MockUserRemoteID,
+					Mail: MockUserMail,
 				},
 				Settings: store.Settings{ReceiveReminders: true},
 			}, nil)
 			c.EXPECT().DoBatchViewCalendarRequests(gomock.Any()).Return([]*remote.ViewCalendarResponse{
-				{Events: tc.remoteEvents, RemoteUserID: mockUserRemoteID, Error: tc.apiError},
+				{Events: tc.remoteEvents, RemoteUserID: MockUserRemoteID, Error: tc.apiError},
 			}, nil)
 
 			if tc.numReminders > 0 {
-				papi.EXPECT().GetMattermostUser(mockUserMattermostID).Return(&model.User{
+				papi.EXPECT().GetMattermostUser(MockUserMattermostID).Return(&model.User{
 					Timezone: model.StringMap{
 						"useAutomaticTimezone": "true",
 						"automaticTimezone":    "UTC",
 					},
 				}, nil)
-				poster.EXPECT().DM(mockUserMattermostID, "%s", gomock.Any()).Times(tc.numReminders)
+				poster.EXPECT().DM(MockUserMattermostID, "%s", gomock.Any()).Times(tc.numReminders)
 				loadUser.Times(2)
 			} else {
 				poster.EXPECT().DM(gomock.Any(), gomock.Any()).Times(0)
@@ -328,7 +328,7 @@ func TestReminders(t *testing.T) {
 			}
 
 			if tc.shouldLogError {
-				logger.EXPECT().Warnf("Error getting availability for %s. err=%s", mockUserMail, tc.apiError.Message).Times(1)
+				logger.EXPECT().Warnf("Error getting availability for %s. err=%s", MockUserMail, tc.apiError.Message).Times(1)
 			} else {
 				logger.EXPECT().Warnf(gomock.Any()).Times(0)
 			}
@@ -362,9 +362,9 @@ func makeStatusSyncTestEnv(ctrl *gomock.Controller) (Env, remote.Client) {
 
 	s.EXPECT().LoadUserIndex().Return(store.UserIndex{
 		&store.UserShort{
-			MattermostUserID: "user_mm_id",
-			RemoteID:         "user_remote_id",
-			Email:            "user_email@example.com",
+			MattermostUserID: MockUserMattermostID,
+			RemoteID:         MockUserRemoteID,
+			Email:            MockUserMail,
 		},
 	}, nil).Times(1)
 
@@ -374,5 +374,5 @@ func makeStatusSyncTestEnv(ctrl *gomock.Controller) (Env, remote.Client) {
 }
 
 func getEventHash() string {
-	return "event_id " + time.Now().UTC().Format(time.RFC3339)
+	return fmt.Sprintf("%s %s", EventID, time.Now().UTC().Format(time.RFC3339))
 }
