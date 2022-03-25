@@ -110,7 +110,7 @@ func (p *Plugin) OnActivate() error {
 	}
 
 	// Auto-connect all the users present on server
-	p.ConnectUsers()
+	go p.ConnectUsers()
 
 	return nil
 }
@@ -273,7 +273,7 @@ func (p *Plugin) ExecuteCommand(c *plugin.Context, args *model.CommandArgs) (*mo
 	}
 
 	if out != "" {
-		env.Poster.Ephemeral(args.UserId, args.ChannelId, out)
+		env.Poster.Ephemeral(args.UserId, args.ChannelId, "%s", out)
 	}
 
 	response := &model.CommandResponse{}

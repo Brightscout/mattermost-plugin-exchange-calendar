@@ -8,3 +8,14 @@ type Subscription struct {
 	WebhookNotificationUrl string `json:"webhookNotificationUrl,omitempty"`
 	CreatorID              string `json:"creatorId,omitempty"`
 }
+
+type SubscriptionBatchSingleRequest struct {
+	Email        string       `json:"email"`
+	Subscription Subscription `json:"subscription"`
+}
+
+type SubscriptionBatchSingleResponse struct {
+	Email        string         `json:"email"`
+	Subscription *Subscription  `json:"subscription"`
+	Error        *ErrorResponse `json:"error"`
+}

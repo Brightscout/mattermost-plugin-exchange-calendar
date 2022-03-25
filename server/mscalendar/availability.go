@@ -409,7 +409,7 @@ func (m *mscalendar) notifyUpcomingEvents(mattermostUserID string, events []*rem
 				m.Logger.Warnf("notifyUpcomingEvent error rendering schedule item. err=%v", err)
 				continue
 			}
-			_, err = m.Poster.DM(mattermostUserID, message)
+			_, err = m.Poster.DM(mattermostUserID, "%s", message)
 			if err != nil {
 				m.Logger.Warnf("notifyUpcomingEvents error creating DM. err=%v", err)
 				continue

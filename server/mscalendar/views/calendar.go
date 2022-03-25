@@ -2,7 +2,6 @@ package views
 
 import (
 	"fmt"
-	"net/url"
 	"sort"
 	"time"
 
@@ -55,14 +54,9 @@ func renderEvent(event *remote.Event, asRow bool, timeZone string) (string, erro
 		format = "| %s - %s | [%s](%s) |"
 	}
 
-	link, err := url.QueryUnescape(event.Weblink)
-	if err != nil {
-		return "", err
-	}
-
 	subject := EnsureSubject(event.Subject)
 
-	return fmt.Sprintf(format, start, end, subject, link), nil
+	return fmt.Sprintf(format, start, end, subject, event.Weblink), nil
 }
 
 func groupEventsByDate(events []*remote.Event) [][]*remote.Event {

@@ -17,7 +17,7 @@ type Client interface {
 	CreateMySubscription(remoteUserEmail string, notificationURL string) (*Subscription, error)
 	DeclineEvent(remoteUserEmail, eventID string) error
 	DeleteCalendar(remoteUserEmail, calendarID string) (*Calendar, error)
-	DeleteSubscription(subscriptionID string) error
+	DeleteSubscription(remoteUserEmail, subscriptionID string) error
 	FindMeetingTimes(remoteUserEmail string, meetingParams *FindMeetingTimesParameters) (*MeetingTimeSuggestionResults, error)
 	GetCalendars(remoteUserEmail string) ([]*Calendar, error)
 	GetDefaultCalendarView(remoteUserEmail string, startTime, endTime time.Time) ([]*Event, error)
@@ -30,4 +30,6 @@ type Client interface {
 	TentativelyAcceptEvent(remoteUserEmail, eventID string) error
 	GetSuperuserToken() (string, error)
 	GetUsers(emails []*string) ([]*UserBatchSingleResponse, error)
+	GetWebhookNotificationURL() string
+	DoBatchSubscriptionRequests([]SubscriptionBatchSingleRequest) ([]*SubscriptionBatchSingleResponse, error)
 }

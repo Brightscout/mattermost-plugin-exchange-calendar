@@ -13,6 +13,7 @@ import (
 
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils"
 )
 
 type calendarViewSingleRequest struct {
@@ -89,11 +90,7 @@ func (c *client) DoBatchViewCalendarRequests(allParams []*remote.ViewCalendarPar
 }
 
 func prepareEventBatchRequests(requests []*calendarViewSingleRequest) []calendarViewBatchRequest {
-	numOfBatches := len(requests) / maxNumRequestsPerBatch
-	if len(requests) % maxNumRequestsPerBatch != 0 {
-		numOfBatches++
-	}
-
+	numOfBatches := utils.GetTotalNumberOfBatches(len(requests), maxNumRequestsPerBatch)
 	result := []calendarViewBatchRequest{}
 
 	for i := 0; i < numOfBatches; i++ {
