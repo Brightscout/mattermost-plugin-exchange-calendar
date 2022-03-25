@@ -42,7 +42,7 @@ func RenderCalendarView(events []*remote.Event, timeZone string) (string, error)
 
 func renderTableHeader() string {
 	return `| Time | Subject |
-| :--: | :-- |`
+| :--: | :--: |`
 }
 
 func renderEvent(event *remote.Event, asRow bool, timeZone string) (string, error) {
