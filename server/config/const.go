@@ -53,4 +53,7 @@ const (
 	Organizer = "organizer"
 	Required  = "required"
 	Optional  = "optional"
+
+	CustomStatusEmoji = "calendar"
+	CustomStatusText  = "In a meeting"
 )

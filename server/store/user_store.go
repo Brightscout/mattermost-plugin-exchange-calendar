@@ -11,6 +11,7 @@ import (
 
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/kvstore"
+	"github.com/mattermost/mattermost-server/v6/model"
 )
 
 type UserStore interface {
@@ -42,6 +43,7 @@ type User struct {
 	Settings          Settings `json:"mattermostSettings,omitempty"`
 	ActiveEvents      []string `json:"events"`
 	LastStatus        string
+	LastCustomStatus  *model.CustomStatus
 	WelcomeFlowStatus WelcomeFlowStatus `json:"mattermostFlags,omitempty"`
 }
 
@@ -52,6 +54,7 @@ type Settings struct {
 	ReceiveReminders                  bool
 	ReceiveNotificationsDuringMeeting bool
 	DailySummary                      *DailySummaryUserSettings
+	UpdateCustomStatus                bool
 }
 
 type DailySummaryUserSettings struct {

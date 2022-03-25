@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mattermost/mattermost-server/v5/model"
+	"github.com/mattermost/mattermost-server/v6/model"
 
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/mscalendar/views"
@@ -262,7 +262,7 @@ func NewPostActionForEventResponse(eventID, response, url string) []*model.PostA
 
 	pa := &model.PostAction{
 		Name: "Response",
-		Type: model.POST_ACTION_TYPE_SELECT,
+		Type: model.PostActionTypeSelect,
 		Integration: &model.PostActionIntegration{
 			URL:     url,
 			Context: context,
