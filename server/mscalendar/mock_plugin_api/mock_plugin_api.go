@@ -64,6 +64,21 @@ func (mr *MockPluginAPIMockRecorder) GetMattermostUserByUsername(arg0 interface{
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMattermostUserByUsername", reflect.TypeOf((*MockPluginAPI)(nil).GetMattermostUserByUsername), arg0)
 }
 
+// GetMattermostUserCustomStatus mocks base method.
+func (m *MockPluginAPI) GetMattermostUserCustomStatus(arg0 string) (*model.CustomStatus, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetMattermostUserCustomStatus", arg0)
+	ret0, _ := ret[0].(*model.CustomStatus)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetMattermostUserCustomStatus indicates an expected call of GetMattermostUserCustomStatus.
+func (mr *MockPluginAPIMockRecorder) GetMattermostUserCustomStatus(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMattermostUserCustomStatus", reflect.TypeOf((*MockPluginAPI)(nil).GetMattermostUserCustomStatus), arg0)
+}
+
 // GetMattermostUserStatus mocks base method.
 func (m *MockPluginAPI) GetMattermostUserStatus(arg0 string) (*model.Status, error) {
 	m.ctrl.T.Helper()
@@ -122,6 +137,34 @@ func (m *MockPluginAPI) IsSysAdmin(arg0 string) (bool, error) {
 func (mr *MockPluginAPIMockRecorder) IsSysAdmin(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsSysAdmin", reflect.TypeOf((*MockPluginAPI)(nil).IsSysAdmin), arg0)
+}
+
+// RemoveMattermostUserCustomStatus mocks base method.
+func (m *MockPluginAPI) RemoveMattermostUserCustomStatus(arg0 string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RemoveMattermostUserCustomStatus", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RemoveMattermostUserCustomStatus indicates an expected call of RemoveMattermostUserCustomStatus.
+func (mr *MockPluginAPIMockRecorder) RemoveMattermostUserCustomStatus(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveMattermostUserCustomStatus", reflect.TypeOf((*MockPluginAPI)(nil).RemoveMattermostUserCustomStatus), arg0)
+}
+
+// UpdateMattermostUserCustomStatus mocks base method.
+func (m *MockPluginAPI) UpdateMattermostUserCustomStatus(arg0 string, arg1 *model.CustomStatus) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateMattermostUserCustomStatus", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateMattermostUserCustomStatus indicates an expected call of UpdateMattermostUserCustomStatus.
+func (mr *MockPluginAPIMockRecorder) UpdateMattermostUserCustomStatus(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateMattermostUserCustomStatus", reflect.TypeOf((*MockPluginAPI)(nil).UpdateMattermostUserCustomStatus), arg0, arg1)
 }
 
 // UpdateMattermostUserStatus mocks base method.

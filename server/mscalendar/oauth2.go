@@ -26,28 +26,6 @@ type OAuth2 interface {
 	CompleteUserConnect(authedUserID string, timzone model.StringMap, me *remote.User) error
 }
 
-// func NewOAuth2App(env Env) oauth2connect.App {
-// 	return &oauth2App{
-// 		Env: env,
-// 	}
-// }
-
-// func (app *oauth2App) InitOAuth2(mattermostUserID string) (url string, err error) {
-// 	user, err := app.Store.LoadUser(mattermostUserID)
-// 	if err == nil {
-// 		return "", fmt.Errorf("user is already connected to %s", user.Remote.Mail)
-// 	}
-
-// 	conf := app.Remote.NewOAuth2Config()
-// 	state := fmt.Sprintf("%v_%v", model.NewId()[0:15], mattermostUserID)
-// 	err = app.Store.StoreOAuth2State(state)
-// 	if err != nil {
-// 		return "", err
-// 	}
-
-// 	return conf.AuthCodeURL(state, oauth2.AccessTypeOffline), nil
-// }
-
 func (m *mscalendar) CompleteOAuth2ForUsers(users []*model.User) error {
 	var emails []*string
 	emailUserMap := make(map[string]*model.User)

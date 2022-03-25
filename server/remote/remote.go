@@ -17,7 +17,7 @@ type Remote interface {
 	MakeClient(context.Context) Client
 	MakeSuperuserClient(ctx context.Context) (Client, error)
 	NewOAuth2Config() *oauth2.Config
-	HandleWebhook(http.ResponseWriter, *http.Request) *Notification
+	HandleWebhook(http.ResponseWriter, *http.Request) (bool, *Notification, error)
 }
 
 var Makers = map[string]func(*config.Config, bot.Logger) Remote{}

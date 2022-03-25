@@ -56,4 +56,7 @@ const (
 
 	CustomStatusEmoji = "calendar"
 	CustomStatusText  = "In a meeting"
+
+	SubscriptionStatusOK          = "OK"
+	SubscriptionStatusUnsubscribe = "Unsubscribe"
 )

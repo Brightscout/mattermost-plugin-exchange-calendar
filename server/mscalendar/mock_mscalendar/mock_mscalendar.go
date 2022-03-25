@@ -12,7 +12,7 @@ import (
 	remote "github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
 	store "github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/store"
 	gomock "github.com/golang/mock/gomock"
-	model "github.com/mattermost/mattermost-server/v5/model"
+	model "github.com/mattermost/mattermost-server/v6/model"
 )
 
 // MockMSCalendar is a mock of MSCalendar interface.

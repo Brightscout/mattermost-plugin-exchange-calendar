@@ -112,6 +112,8 @@ func (c *Command) Handle() (string, bool, error) {
 		handler = c.requireConnectedUser(c.requireAdminUser(c.debugAvailability))
 	case "settings":
 		handler = c.requireConnectedUser(c.settings)
+	case "syncsubscriptions":
+		handler = c.syncSubscriptions
 	}
 	out, mustRedirectToDM, err := handler(parameters...)
 	if err != nil {

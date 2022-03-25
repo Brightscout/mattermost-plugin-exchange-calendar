@@ -38,11 +38,13 @@ func (m *MockRemote) EXPECT() *MockRemoteMockRecorder {
 }
 
 // HandleWebhook mocks base method.
-func (m *MockRemote) HandleWebhook(arg0 http.ResponseWriter, arg1 *http.Request) *remote.Notification {
+func (m *MockRemote) HandleWebhook(arg0 http.ResponseWriter, arg1 *http.Request) (bool, *remote.Notification, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "HandleWebhook", arg0, arg1)
-	ret0, _ := ret[0].(*remote.Notification)
-	return ret0
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(*remote.Notification)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
 }
 
 // HandleWebhook indicates an expected call of HandleWebhook.

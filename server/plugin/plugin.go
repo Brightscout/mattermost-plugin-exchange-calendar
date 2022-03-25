@@ -35,10 +35,6 @@ import (
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/telemetry"
 )
 
-// const (
-// 	licenseErrorMessage = "The %s plugin requires an E20, Professional, or Enterprise license."
-// )
-
 type Env struct {
 	mscalendar.Env
 	bot                   bot.Bot
@@ -68,22 +64,11 @@ func NewWithEnv(env mscalendar.Env) *Plugin {
 
 func (p *Plugin) OnActivate() error {
 	pluginAPIClient := pluginapiclient.NewClient(p.API, p.Driver)
-	// conf := pluginAPIClient.Configuration.GetConfig()
-	// license := pluginAPIClient.System.GetLicense()
-	// if !enterprise.HasEnterpriseFeatures(conf, license) {
-	// 	return errors.Errorf(licenseErrorMessage, config.ApplicationName)
-	// }
 	stored := config.StoredConfig{}
 	err := p.API.LoadPluginConfiguration(&stored)
 	if err != nil {
 		return errors.WithMessage(err, "failed to load plugin configuration")
 	}
-
-	// if stored.OAuth2Authority == "" ||
-	// 	stored.OAuth2ClientID == "" ||
-	// 	stored.OAuth2ClientSecret == "" {
-	// 	return errors.New("failed to configure: OAuth2 credentials to be set in the config")
-	// }
 
 	_ = p.initEnv(&p.env, pluginAPIClient, "")
 	if stored.EWSProxyServerBaseURL == "" || stored.EWSProxyServerAuthKey == "" {

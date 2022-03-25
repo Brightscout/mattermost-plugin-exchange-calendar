@@ -105,6 +105,7 @@ func (m *mscalendar) SyncUserSubscriptions() error {
 	// Load all user subscriptions
 	subscriptionIndex, err := m.Store.LoadSubscriptionIndex()
 	if err != nil {
+		m.Logger.Errorf("Error occurred while fetching subscriptionIndex from store. err=%s", err.Error())
 		return err
 	}
 	totalSubscribedUsers := len(subscriptionIndex)
@@ -114,6 +115,7 @@ func (m *mscalendar) SyncUserSubscriptions() error {
 
 	err = m.Filter(withSuperuserClient)
 	if err != nil {
+		m.Logger.Errorf("Error occurred while creating superuser client. err=%s", err.Error())
 		return err
 	}
 	// Create new subscription for users and store it
@@ -142,6 +144,7 @@ func (m *mscalendar) SyncUserSubscriptions() error {
 	}
 	responses, err := m.client.DoBatchSubscriptionRequests(requests)
 	if err != nil {
+		m.Logger.Errorf("Error occurred while subscribing users. err=%s", err.Error())
 		return err
 	}
 	for _, response := range responses {
@@ -162,10 +165,12 @@ func (m *mscalendar) SyncUserSubscriptions() error {
 		}
 		err = m.Store.StoreUserSubscription(user, storedSub)
 		if err != nil {
+			m.Logger.Errorf("Error occurred while storing subscription for user with email %s. err=%s", response.Email, err.Error())
 			return err
 		}
 		err = m.Store.StoreUserSubscriptionInIndex(user, storedSub)
 		if err != nil {
+			m.Logger.Errorf("Error occurred while storing subscription for user with email %s. err=%s", response.Email, err.Error())
 			return err
 		}
 	}
