@@ -170,7 +170,7 @@ func (m *mscalendar) SyncUserSubscriptions() error {
 		}
 		err = m.Store.StoreUserSubscriptionInIndex(user, storedSub)
 		if err != nil {
-			m.Logger.Errorf("Error occurred while storing subscription for user with email %s. err=%s", response.Email, err.Error())
+			m.Logger.Errorf("Error occurred while storing subscription in index for user with email %s. err=%s", response.Email, err.Error())
 			return err
 		}
 	}
