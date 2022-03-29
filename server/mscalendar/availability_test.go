@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/golang/mock/gomock"
-	"github.com/mattermost/mattermost-server/v5/model"
+	"github.com/mattermost/mattermost-server/v6/model"
 	"github.com/stretchr/testify/require"
 
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
@@ -40,28 +40,37 @@ func TestSyncStatusAll(t *testing.T) {
 		apiError            *remote.APIError
 		activeEvents        []string
 		currentStatus       string
+		currentCustomStatus *model.CustomStatus
 		currentStatusManual bool
 		newStatus           string
+		newCustomStatus     *model.CustomStatus
+		removeCustomStatus  bool
 		eventsToStore       []string
 		shouldLogError      bool
 		getConfirmation     bool
 	}{
-		"Most common case, no events local or remote. No status change.": {
+		"Most common case, no events local or remote. No status and custom status change.": {
 			remoteEvents:        []*remote.Event{},
 			activeEvents:        []string{},
 			currentStatus:       "online",
+			currentCustomStatus: nil,
 			currentStatusManual: true,
 			newStatus:           "",
+			newCustomStatus:     nil,
+			removeCustomStatus:  false,
 			eventsToStore:       nil,
 			shouldLogError:      false,
 			getConfirmation:     false,
 		},
-		"New remote event. Change status to DND.": {
+		"New remote event. Change status to DND and custom status to In a Meeting.": {
 			remoteEvents:        []*remote.Event{busyEvent},
 			activeEvents:        []string{},
 			currentStatus:       "online",
+			currentCustomStatus: nil,
 			currentStatusManual: true,
 			newStatus:           "dnd",
+			newCustomStatus:     &model.CustomStatus{Text: config.CustomStatusText, Emoji: config.CustomStatusEmoji},
+			removeCustomStatus:  false,
 			eventsToStore:       []string{eventHash},
 			shouldLogError:      false,
 			getConfirmation:     false,
@@ -70,28 +79,37 @@ func TestSyncStatusAll(t *testing.T) {
 			remoteEvents:        []*remote.Event{},
 			activeEvents:        []string{eventHash},
 			currentStatus:       "dnd",
+			currentCustomStatus: &model.CustomStatus{Text: config.CustomStatusText, Emoji: config.CustomStatusEmoji},
 			currentStatusManual: true,
 			newStatus:           "online",
+			newCustomStatus:     nil,
+			removeCustomStatus:  true,
 			eventsToStore:       []string{},
 			shouldLogError:      false,
 			getConfirmation:     false,
 		},
-		"Locally stored event is still happening. No status change.": {
+		"Locally stored event is still happening. No status and custom status change.": {
 			remoteEvents:        []*remote.Event{busyEvent},
 			activeEvents:        []string{eventHash},
 			currentStatus:       "dnd",
+			currentCustomStatus: &model.CustomStatus{Text: config.CustomStatusText, Emoji: config.CustomStatusEmoji},
 			currentStatusManual: true,
 			newStatus:           "",
+			newCustomStatus:     nil,
+			removeCustomStatus:  false,
 			eventsToStore:       nil,
 			shouldLogError:      false,
 			getConfirmation:     false,
 		},
-		"User has manually changed his status to online during event. Locally stored event should be ignored and no status change.": {
+		"User has manually changed his status to online and removed custom status during event. Locally stored event should be ignored and no status and custom status change.": {
 			remoteEvents:        []*remote.Event{busyEvent},
 			activeEvents:        []string{eventHash},
 			currentStatus:       "online",
+			currentCustomStatus: nil,
 			currentStatusManual: true,
 			newStatus:           "",
+			newCustomStatus:     nil,
+			removeCustomStatus:  false,
 			eventsToStore:       nil,
 			shouldLogError:      false,
 			getConfirmation:     false,
@@ -100,8 +118,11 @@ func TestSyncStatusAll(t *testing.T) {
 			remoteEvents:        []*remote.Event{{ID: "event_id_2", Start: remote.NewDateTime(moment, "UTC"), ShowAs: "free"}},
 			activeEvents:        []string{},
 			currentStatus:       "online",
+			currentCustomStatus: nil,
 			currentStatusManual: true,
 			newStatus:           "",
+			newCustomStatus:     nil,
+			removeCustomStatus:  false,
 			eventsToStore:       nil,
 			shouldLogError:      false,
 			getConfirmation:     false,
@@ -110,8 +131,11 @@ func TestSyncStatusAll(t *testing.T) {
 			remoteEvents:        nil,
 			activeEvents:        []string{eventHash},
 			currentStatus:       "online",
+			currentCustomStatus: nil,
 			currentStatusManual: true,
 			newStatus:           "",
+			newCustomStatus:     nil,
+			removeCustomStatus:  false,
 			eventsToStore:       nil,
 			apiError:            &remote.APIError{Code: "403", Message: "Forbidden"},
 			shouldLogError:      true,
@@ -155,6 +179,27 @@ func TestSyncStatusAll(t *testing.T) {
 					s.EXPECT().StoreUser(mockUser).Return(nil).Times(1)
 				}
 				papi.EXPECT().UpdateMattermostUserStatus(MockUserMattermostID, tc.newStatus).Return(nil, nil)
+			}
+
+			if (len(filterBusyEvents(tc.remoteEvents)) != 0 || len(tc.activeEvents) != 0) && !tc.shouldLogError {
+				papi.EXPECT().GetMattermostUserCustomStatus(mockUser.MattermostUserID).Return(tc.currentCustomStatus, nil).Times(1)
+			}
+
+			if tc.newCustomStatus == nil && !tc.removeCustomStatus {
+				papi.EXPECT().UpdateMattermostUserCustomStatus(MockUserMattermostID, gomock.Any()).Times(0)
+			} else {
+				if tc.currentCustomStatus != nil && !tc.getConfirmation &&
+					tc.newCustomStatus != nil && tc.newCustomStatus.Text == config.CustomStatusText {
+					// If current custom status is not nil and getConfirmation is false and new custom status text is In a Meeting
+					// then we will store the lastCustomStatus of a user
+					mockUser.LastCustomStatus = tc.currentCustomStatus
+					s.EXPECT().StoreUser(mockUser).Return(nil).Times(1)
+				}
+				if tc.removeCustomStatus {
+					papi.EXPECT().RemoveMattermostUserCustomStatus(MockUserMattermostID).Return(nil).Times(1)
+				} else if tc.newCustomStatus != nil {
+					papi.EXPECT().UpdateMattermostUserCustomStatus(MockUserMattermostID, tc.newCustomStatus).Return(nil).Times(1)
+				}
 			}
 
 			if tc.eventsToStore == nil {
@@ -209,6 +254,7 @@ func TestSyncStatusUserConfig(t *testing.T) {
 				s.EXPECT().StoreUserActiveEvents(MockUserMattermostID, []string{getEventHash()})
 				poster.EXPECT().DMWithAttachments(MockUserMattermostID, gomock.Any()).Times(1)
 				papi.EXPECT().UpdateMattermostUserStatus(MockUserMattermostID, gomock.Any()).Times(0)
+				papi.EXPECT().GetMattermostUserCustomStatus(MockUserMattermostID).Times(1)
 			},
 		},
 	} {

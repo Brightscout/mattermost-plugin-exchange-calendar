@@ -4,8 +4,6 @@
 package api
 
 import (
-	"fmt"
-
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/mscalendar"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/httputils"
@@ -24,8 +22,6 @@ func Init(h *httputils.Handler, env mscalendar.Env, notificationProcessor mscale
 	}
 	apiRouter := h.Router.PathPrefix(config.PathAPI).Subrouter()
 	apiRouter.HandleFunc("/authorized", api.getAuthorized).Methods("GET")
-	apiRouter.HandleFunc(fmt.Sprintf("%s%s", config.PathSync, config.PathSubscription), api.syncActionSubscription).Methods("GET")
-	apiRouter.HandleFunc(fmt.Sprintf("%s/{subscriptionID:.+}", config.PathSubscription), api.getSubscriptionByID).Methods("GET")
 
 	notificationRouter := h.Router.PathPrefix(config.PathGetNotification).Subrouter()
 	notificationRouter.HandleFunc(config.PathEvent, api.notification).Methods("POST")

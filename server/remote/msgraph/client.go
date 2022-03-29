@@ -17,7 +17,6 @@ type client struct {
 	ctx context.Context
 
 	httpClient *http.Client
-	// rbuilder   *msgraph.GraphServiceRequestBuilder
 
 	conf *config.Config
 	bot.Logger

@@ -4,7 +4,7 @@
 package msgraph
 
 import (
-	"encoding/json"
+	"encoding/xml"
 
 	"io/ioutil"
 	"net/http"
@@ -12,34 +12,29 @@ import (
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
 )
 
-type webhook struct {
-	ChangeType     string `json:"changeType"`
-	SubscriptionID string `json:"subscriptionId"`
-	EventID        string `json:"eventId"`
-}
-
-func (r *impl) HandleWebhook(w http.ResponseWriter, req *http.Request) *remote.Notification {
+func (r *impl) HandleWebhook(w http.ResponseWriter, req *http.Request) (bool, *remote.Notification, error) {
 	rawData, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		r.logger.Infof("ews: failed to process webhook: `%v`.", err)
-		return nil
+		return false, nil, err
 	}
 
-	var webhookResponse webhook
-	err = json.Unmarshal(rawData, &webhookResponse)
+	var webhookResponse remote.WebhookResponseEnvelope
+	err = xml.Unmarshal(rawData, &webhookResponse)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		r.logger.Infof("ews: failed to process webhook: `%v`.", err)
-		return nil
+		return false, nil, err
 	}
 
 	n := &remote.Notification{
-		ChangeType:     webhookResponse.ChangeType,
-		SubscriptionID: webhookResponse.SubscriptionID,
-		EventID:        webhookResponse.EventID,
+		SubscriptionID: webhookResponse.Body.SendNotification.ResponseMessages.SendNotificationResponseMessage.Notification.SubscriptionID,
+		EventID:        webhookResponse.Body.SendNotification.ResponseMessages.SendNotificationResponseMessage.Notification.CreatedEvent.Item.EventID,
 	}
 
-	w.WriteHeader(http.StatusAccepted)
-	return n
+	// statusEvent indicates whether the webhook request from the Exchange server is for a status check or it contains notification data
+	statusEvent := webhookResponse.Body.SendNotification.ResponseMessages.SendNotificationResponseMessage.Notification.StatusEvent
+
+	return statusEvent != nil, n, nil
 }
