@@ -33,7 +33,7 @@ func (r *impl) HandleWebhook(w http.ResponseWriter, req *http.Request) (bool, *r
 		EventID:        webhookResponse.Body.SendNotification.ResponseMessages.SendNotificationResponseMessage.Notification.CreatedEvent.Item.EventID,
 	}
 
-	// statusEvent indicates whether the webhook request from exchange server is for status check or it contains notification data
+	// statusEvent indicates whether the webhook request from the Exchange server is for a status check or it contains notification data
 	statusEvent := webhookResponse.Body.SendNotification.ResponseMessages.SendNotificationResponseMessage.Notification.StatusEvent
 
 	return statusEvent != nil, n, nil

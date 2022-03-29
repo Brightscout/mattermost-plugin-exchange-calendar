@@ -188,12 +188,12 @@ func TestSyncStatusAll(t *testing.T) {
 			if tc.newCustomStatus == nil && !tc.removeCustomStatus {
 				papi.EXPECT().UpdateMattermostUserCustomStatus(MockUserMattermostID, gomock.Any()).Times(0)
 			} else {
-				if (tc.currentCustomStatus != nil && !tc.getConfirmation) ||
-					(tc.currentCustomStatus != nil && tc.currentCustomStatus.Text == config.CustomStatusText) {
-					if tc.newCustomStatus != nil && tc.newCustomStatus.Text == config.CustomStatusText {
-						mockUser.LastCustomStatus = tc.currentCustomStatus
-						s.EXPECT().StoreUser(mockUser).Return(nil).Times(1)
-					}
+				if tc.currentCustomStatus != nil && !tc.getConfirmation &&
+					tc.newCustomStatus != nil && tc.newCustomStatus.Text == config.CustomStatusText {
+					// If current custom status is not nil and getConfirmation is false and new custom status text is In a Meeting
+					// then we will store the lastCustomStatus of a user
+					mockUser.LastCustomStatus = tc.currentCustomStatus
+					s.EXPECT().StoreUser(mockUser).Return(nil).Times(1)
 				}
 				if tc.removeCustomStatus {
 					papi.EXPECT().RemoveMattermostUserCustomStatus(MockUserMattermostID).Return(nil).Times(1)

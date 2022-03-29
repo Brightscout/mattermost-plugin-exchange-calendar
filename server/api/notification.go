@@ -30,6 +30,19 @@ func (api *api) notification(w http.ResponseWriter, req *http.Request) {
 		subscriptionStatusText = config.SubscriptionStatusUnsubscribe
 		isStatusCheck = true
 	}
+
+	if !isStatusCheck {
+		err = api.NotificationProcessor.Enqueue(&remote.Notification{
+			ChangeType:     notification.ChangeType,
+			SubscriptionID: notification.SubscriptionID,
+			EventID:        notification.EventID,
+		})
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+	}
+
 	w.WriteHeader(http.StatusOK)
 	soapResponse := remote.SOAPEnvelope{
 		Body: remote.SOAPBody{
@@ -44,18 +57,4 @@ func (api *api) notification(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	_, _ = w.Write(marshalledResponse)
-
-	if isStatusCheck {
-		// Return if it is a status check call or user is already unsubscribed from notifications
-		return
-	}
-
-	err = api.NotificationProcessor.Enqueue(&remote.Notification{
-		ChangeType:     notification.ChangeType,
-		SubscriptionID: notification.SubscriptionID,
-		EventID:        notification.EventID,
-	})
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-	}
 }

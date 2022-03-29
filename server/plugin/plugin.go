@@ -21,6 +21,7 @@ import (
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/api"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/command"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/config"
+	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/enterprise"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/jobs"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/mscalendar"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/remote"
@@ -33,6 +34,10 @@ import (
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/pluginapi"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/settingspanel"
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/utils/telemetry"
+)
+
+const (
+	licenseErrorMessage = "The %s plugin requires an E20, Professional, or Enterprise license."
 )
 
 type Env struct {
@@ -64,6 +69,11 @@ func NewWithEnv(env mscalendar.Env) *Plugin {
 
 func (p *Plugin) OnActivate() error {
 	pluginAPIClient := pluginapiclient.NewClient(p.API, p.Driver)
+	conf := pluginAPIClient.Configuration.GetConfig()
+	license := pluginAPIClient.System.GetLicense()
+	if !enterprise.HasEnterpriseFeatures(conf, license) {
+		return errors.Errorf(licenseErrorMessage, config.ApplicationName)
+	}
 	stored := config.StoredConfig{}
 	err := p.API.LoadPluginConfiguration(&stored)
 	if err != nil {
