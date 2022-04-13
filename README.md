@@ -36,7 +36,7 @@ This plugin supports a two-way integration between Mattermost and a Microsoft Ex
 
 ## Prerequisite
 
-This plugin communicates with Microsoft Exchange Server though a companion service, the [Mattermost Plugin Exchange EWS Proxy](https://github.com/Brightscout/mattermost-plugin-exchange-ews-proxy). Please ensure this service is installed and available to the Mattermost servers running this plugin.
+This plugin communicates with Microsoft Exchange Server through a companion service, the [Mattermost Plugin Exchange EWS Proxy](https://github.com/Brightscout/mattermost-plugin-exchange-ews-proxy). Please ensure this service is installed and available to the Mattermost servers running this plugin.
 
 ## Installation
 
