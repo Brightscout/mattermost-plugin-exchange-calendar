@@ -3,8 +3,9 @@
     "name": "Microsoft Exchange Calendar",
     "description": "Microsoft Exchange Calendar Integration",
     "support_url": "https://github.com/Brightscout/mattermost-plugin-exchange-calendar/issues",
+    "release_notes_url": "https://github.com/Brightscout/mattermost-plugin-exchange-calendar/releases/tag/v2.1.0",
     "icon_path": "assets/profile.svg",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "min_server_version": "5.24.0",
     "server": {
         "executables": {

@@ -1,17 +1,16 @@
-# Mattermost Plugin Exchange Calendar
+# Mattermost Microsoft Exchange Calendar Plugin
 
 ## Table of Contents
 
 - [License](#license)
 - [Overview](#overview)
 - [Features](#features)
-- [Setup](#setup)
-- [Building the plugin](#building-the-plugin)
+- [Prerequisite](#prerequisite)
 - [Installation](#installation)
-  - [Using a Github release](#using-a-github-release)
-  - [Using a local build](#using-a-local-build)
 - [Configuration](#configuration)
 - [Development](#development)
+  - [Setup](#setup)
+  - [Building the plugin](#building-the-plugin)
   - [Deploying with Local Mode](#deploying-with-local-mode)
   - [Deploying with credentials](#deploying-with-credentials)
 
@@ -21,28 +20,50 @@ See the [LICENSE](./LICENSE) file for license rights and limitations.
 
 ## Overview
 
-This plugin supports a two-way integration between Mattermost and a Microsoft Exchange Calendar. For a stable production release, please download the latest version from the Plugin Marketplace and you can follow the instructions to [install](#installation) and [configure](#configuration) the plugin.
+This plugin supports a two-way integration between Mattermost and a Microsoft Exchange Calendar. For a stable production release, please download the latest version from the Plugin Marketplace and follow the instructions to [install](#installation) and [configure](#configuration) the plugin.
 
 **Note:** This plugin only supports the integration with on-premise Microsoft Exchange Server 2016+. For Azure/Office365 support please see [Mattermost Microsoft Calendar Plugin](https://github.com/mattermost/mattermost-plugin-mscalendar).
 
 ## Features
 
 - Daily summary of calendar events.
-- Automatic user status synchronization into Mattermost.
-- Create calendar events from Mattermost.
+- View your calendar events for the week.
+- Automatically update your status when you are in a meeting.
 - Get notifications for new calendar events on Mattermost.
 - Accept or decline calendar event invites from Mattermost.
 
-## Setup
+## Prerequisite
 
-Make sure you have the following components installed:
+This plugin communicates with Microsoft Exchange Server through a companion service, the [Mattermost Plugin Exchange EWS Proxy](https://github.com/Brightscout/mattermost-plugin-exchange-ews-proxy). Please ensure this service is installed and available to the Mattermost servers running this plugin.
+
+## Installation
+
+1. Go to the [releases page of this GitHub repository](https://github.com/Brightscout/mattermost-plugin-exchange-calendar/releases) and download the latest release for your Mattermost server.
+2. Upload this file in the Mattermost **System Console > Plugins > Management** page to install the plugin. To learn more about how to upload a plugin, [see the documentation](https://docs.mattermost.com/administration/plugins.html#plugin-uploads).
+
+## Configuration
+
+- Go to the Microsoft Exchange Calendar plugin configuration page on Mattermost as **System Console > Plugins > Microsoft Exchange Calendar**.
+
+- On the Microsoft Exchange Calendar plugin configuration page, you need to configure the following:
+  - **EWS Proxy Server URL**: Enter the base URL of the EWS Proxy Server.
+
+  - **EWS Proxy Server Authentication Key**: The authentication key used by the [mattermost-plugin-exchange-ews-proxy](https://github.com/Brightscout/mattermost-plugin-exchange-ews-proxy) to authenticate API requests from this plugin.
+  
+ You may use the `Regenerate` button to generate a new key. Ensure that the key is configured in the mattermost-plugin-exchange-ews-proxy's `.env` file so that the proxy can authenticate API requests made by this plugin.
+
+## Development
+
+### Setup
+
+Make sure you have the following components installed:  
 
 - Go - v1.16 - [Getting Started](https://golang.org/doc/install)
     > **Note:** If you have installed Go to a custom location, make sure the `$GOROOT` variable is set properly. Refer [Installing to a custom location](https://golang.org/doc/install#install).
 
 - Make
 
-## Building the plugin
+### Building the plugin
 
 Run the following command in the plugin repo to prepare a compiled, distributable plugin zip:
 
@@ -50,36 +71,7 @@ Run the following command in the plugin repo to prepare a compiled, distributabl
 make dist
 ```
 
-**Note**: After a successful build, a `.tar.gz` file in `/dist` folder will be created which can be uploaded to Mattermost.
-
-## Installation
-
-### Using a Github release
-
-1. Go to the [releases page of this GitHub repository](https://github.com/Brightscout/mattermost-plugin-exchange-calendar/releases) and download the latest release for your Mattermost server.
-2. Upload this file in the Mattermost **System Console > Plugins > Management** page to install the plugin. To learn more about how to upload a plugin, [see the documentation](https://docs.mattermost.com/administration/plugins.html#plugin-uploads).
-
-### Using a local build
-
-Upload the zip file created during the build and found in the `dist` folder using the Mattermost **System Console > Plugins > Management** page to install the plugin. To learn more about how to upload a plugin, [see the documentation](https://docs.mattermost.com/administration/plugins.html#plugin-uploads).
-
-## Configuration
-
-- Go to the Microsoft Calendar plugin configuration page on Mattermost as **System Console > Plugins > Microsoft Exchange Calendar**.
-
-    ![image](https://user-images.githubusercontent.com/72438220/154666704-7f8c0162-4295-4c07-a528-8cf62b598afd.png)
-
-- On the Microsoft Exchange Calendar plugin configuration page, you need to enter data for the following fields:
-  - **EWS Proxy Server URL**: The base URL of the EWS Proxy Server.
-    ![image](https://user-images.githubusercontent.com/85667960/155668473-22ca1177-1c3c-42bf-9c85-69bf0780adf8.png)
-
-  - **EWS Proxy Server Authentication Key**: The authentication key used by the [mattermost-plugin-exchange-ews-proxy](https://github.com/Brightscout/mattermost-plugin-exchange-ews-proxy) for authenticating API requests from this plugin.
- You can click on the `Regenerate` button to generate a new key. Ensure that the key is set in the mattermost-plugin-exchange-ews-proxy `.env` file so that the proxy can authenticate all the API calls made by this Mattermost plugin.
- ![image](https://user-images.githubusercontent.com/85667960/155668567-14dc2dd6-1d05-46af-923a-d2b39ce03c76.png)
-
-## Development
-
-To avoid having to manually install your plugin, build and deploy your plugin using one of the following options.
+After a successful build, a `.tar.gz` file in `/dist` folder will be created which can be uploaded to Mattermost. To avoid having to manually install your plugin, deploy your plugin using one of the following options.
 
 ### Deploying with Local Mode
 
