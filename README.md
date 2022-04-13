@@ -2,19 +2,17 @@
 
 ## Table of Contents
 
-- [Mattermost Microsoft Exchange Calendar Plugin](#mattermost-microsoft-exchange-calendar-plugin)
-  - [Table of Contents](#table-of-contents)
-  - [License](#license)
-  - [Overview](#overview)
-  - [Features](#features)
-  - [Prerequisite](#prerequisite)
-  - [Installation](#installation)
-  - [Configuration](#configuration)
-  - [Development](#development)
-    - [Setup](#setup)
-    - [Building the plugin](#building-the-plugin)
-    - [Deploying with Local Mode](#deploying-with-local-mode)
-    - [Deploying with credentials](#deploying-with-credentials)
+- [License](#license)
+- [Overview](#overview)
+- [Features](#features)
+- [Prerequisite](#prerequisite)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Development](#development)
+  - [Setup](#setup)
+  - [Building the plugin](#building-the-plugin)
+  - [Deploying with Local Mode](#deploying-with-local-mode)
+  - [Deploying with credentials](#deploying-with-credentials)
 
 ## License
 
