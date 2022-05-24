@@ -7,6 +7,7 @@ import "github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/util
 type StoredConfig struct {
 	EWSProxyServerBaseURL string
 	EWSProxyServerAuthKey string
+	StatusSyncJobInterval int64
 
 	EnableStatusSync   bool
 	EnableDailySummary bool

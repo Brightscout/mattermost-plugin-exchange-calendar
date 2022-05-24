@@ -4,6 +4,8 @@
 package jobs
 
 import (
+	"time"
+
 	"github.com/Brightscout/mattermost-plugin-exchange-mscalendar/server/mscalendar"
 )
 
@@ -11,10 +13,10 @@ import (
 const statusSyncJobID = "status_sync"
 
 // NewStatusSyncJob creates a RegisteredJob with the parameters specific to the StatusSyncJob
-func NewStatusSyncJob() RegisteredJob {
+func NewStatusSyncJob(env mscalendar.Env) RegisteredJob {
 	return RegisteredJob{
 		id:       statusSyncJobID,
-		interval: mscalendar.StatusSyncJobInterval,
+		interval: time.Minute * time.Duration(env.StatusSyncJobInterval),
 		work:     runSyncJob,
 	}
 }

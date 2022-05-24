@@ -174,6 +174,9 @@ func (p *Plugin) OnConfigurationChange() (err error) {
 	if err != nil {
 		return errors.WithMessage(err, "failed to load plugin configuration")
 	}
+	if stored.StatusSyncJobInterval <= 0 {
+		return errors.New("status sync job interval should be greater than 0")
+	}
 
 	mattermostSiteURL := p.API.GetConfig().ServiceSettings.SiteURL
 	if mattermostSiteURL == nil {
@@ -188,6 +191,17 @@ func (p *Plugin) OnConfigurationChange() (err error) {
 
 	p.updateEnv(func(e *Env) {
 		_ = p.initEnv(e, pluginAPIClient, pluginURL)
+		previousConfig := e.Config
+		if previousConfig != nil &&
+			previousConfig.StatusSyncJobInterval != stored.StatusSyncJobInterval &&
+			e.jobManager != nil {
+			if err = env.jobManager.Close(); err != nil {
+				e.Logger.Warnf("Failed to close job manager. err=%v", err)
+				e.configError = err
+				return
+			}
+			e.jobManager = nil
+		}
 		e.StoredConfig = stored
 		e.Config.MattermostSiteURL = *mattermostSiteURL
 		e.Config.MattermostSiteHostname = mattermostURL.Hostname()
@@ -238,7 +252,7 @@ func (p *Plugin) OnConfigurationChange() (err error) {
 
 		if e.jobManager == nil {
 			e.jobManager = jobs.NewJobManager(p.API, e.Env)
-			e.jobManager.AddJob(jobs.NewStatusSyncJob())
+			e.jobManager.AddJob(jobs.NewStatusSyncJob(e.Env))
 			e.jobManager.AddJob(jobs.NewDailySummaryJob())
 		}
 	})
