@@ -77,7 +77,7 @@
                 "key": "StatusSyncJobInterval",
                 "display_name": "Status Sync Job Interval",
                 "type": "number",
-                "help_text": "Time in minutes after which the status sync job runs again.(in minutes)"
+                "help_text": "Time in minutes after which the status sync job re-runs."
             }
         ]
     }

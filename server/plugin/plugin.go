@@ -192,9 +192,7 @@ func (p *Plugin) OnConfigurationChange() (err error) {
 	p.updateEnv(func(e *Env) {
 		_ = p.initEnv(e, pluginAPIClient, pluginURL)
 		previousConfig := e.Config
-		if previousConfig != nil &&
-			previousConfig.StatusSyncJobInterval != stored.StatusSyncJobInterval &&
-			e.jobManager != nil {
+		if previousConfig != nil &&	previousConfig.StatusSyncJobInterval != stored.StatusSyncJobInterval && e.jobManager != nil {
 			if err = env.jobManager.Close(); err != nil {
 				e.Logger.Warnf("Failed to close job manager. err=%v", err)
 				e.configError = err
