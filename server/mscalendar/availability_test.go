@@ -396,7 +396,11 @@ func makeStatusSyncTestEnv(ctrl *gomock.Controller) (Env, remote.Client) {
 	mockLogger := mock_bot.NewMockLogger(ctrl)
 
 	env := Env{
-		Config: &config.Config{},
+		Config: &config.Config{
+			StoredConfig: config.StoredConfig{
+				StatusSyncJobInterval: 5,
+			},
+		},
 		Dependencies: &Dependencies{
 			Store:     s,
 			Logger:    mockLogger,
