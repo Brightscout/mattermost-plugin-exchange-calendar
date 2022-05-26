@@ -18,9 +18,7 @@ import (
 
 const (
 	calendarViewTimeWindowSize      = 10 * time.Minute
-	StatusSyncJobInterval           = 5 * time.Minute
 	upcomingEventNotificationTime   = 10 * time.Minute
-	upcomingEventNotificationWindow = (StatusSyncJobInterval * 11) / 10 // 110% of the interval
 )
 
 type Availability interface {
@@ -393,7 +391,7 @@ func (m *mscalendar) notifyUpcomingEvents(mattermostUserID string, events []*rem
 		upcomingTime := time.Now().Add(upcomingEventNotificationTime)
 		start := event.Start.Time()
 		diff := start.Sub(upcomingTime)
-
+		upcomingEventNotificationWindow := (time.Minute * time.Duration(m.StatusSyncJobInterval) * 11) / 10 // 110% of the interval
 		if (diff < upcomingEventNotificationWindow) && (diff > -upcomingEventNotificationWindow) {
 			var err error
 			if timezone == "" {

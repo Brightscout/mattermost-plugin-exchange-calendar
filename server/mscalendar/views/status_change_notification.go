@@ -18,13 +18,11 @@ var prettyStatuses = map[string]string{
 }
 
 func RenderStatusChangeNotificationView(events []*remote.Event, status string, customStatus *model.CustomStatus, url string) *model.SlackAttachment {
-	for _, e := range events {
-		if e.Start.Time().After(time.Now()) {
-			return statusChangeAttachments(e, status, customStatus, url)
-		}
+	nEvents := len(events)
+	if nEvents > 0 {
+		return statusChangeAttachments(events[0], status, customStatus, url)
 	}
 
-	nEvents := len(events)
 	if nEvents > 0 && status == model.StatusDnd {
 		return statusChangeAttachments(events[nEvents-1], status, customStatus, url)
 	}
