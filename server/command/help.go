@@ -11,7 +11,10 @@ import (
 
 func (c *Command) help(parameters ...string) (string, bool, error) {
 	resp := ""
-	for _, cmd := range cmds {
+	for _, cmd := range commandsWhenAutoConnectIsFalse {
+		if c.Config.AutoConnectUsers && cmd.Trigger == "connect" {
+			continue
+		}
 		desc := cmd.Trigger
 		if cmd.HelpText != "" {
 			desc += " - " + cmd.HelpText
