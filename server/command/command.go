@@ -46,7 +46,7 @@ var commandsWhenAutoConnectIsDisabled = []*model.AutocompleteData{
 	model.NewAutocompleteData("help", "", "Read help text for the commands"),
 }
 
-var commandsWhenAutoConnectEnabled = []*model.AutocompleteData{
+var commandsWhenAutoConnectIsEnabled = []*model.AutocompleteData{
 	model.NewAutocompleteData("disconnect", "", "Disconnect from your Microsoft Account"),
 	model.NewAutocompleteData("summary", "", "View your events for today, or edit the settings for your daily summary."),
 	model.NewAutocompleteData("viewcal", "", "View your events for the upcoming week."),
@@ -61,7 +61,7 @@ var commandsWhenAutoConnectEnabled = []*model.AutocompleteData{
 func Register(client *pluginapilicense.Client, autoConnectUsers bool) error {
 	var cmds []*model.AutocompleteData
 	if autoConnectUsers {
-		cmds = commandsWhenAutoConnectEnabled
+		cmds = commandsWhenAutoConnectIsEnabled
 	} else {
 		cmds = commandsWhenAutoConnectIsDisabled
 	}
