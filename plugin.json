@@ -83,7 +83,7 @@
                 "key": "AutoConnectUsers",
                 "display_name": "Auto-Connect Users:",
                 "type": "bool",
-                "help_text": "When set to 'true' all the users on Mattermost are automatically connected to exchange-calender via ews-proxy-server.",
+                "help_text": "When set to 'true', all the users on Mattermost are automatically connected to Exchange via EWS proxy server.",
                 "default": true
             }
         ]

@@ -34,7 +34,7 @@ func getNotConnectedText() string {
 
 type handleFunc func(parameters ...string) (string, bool, error)
 
-var commandsWhenAutoConnectIsFalse = []*model.AutocompleteData{
+var commandsWhenAutoConnectIsDisabled = []*model.AutocompleteData{
 	model.NewAutocompleteData("connect", "", "Connect to your Microsoft account"),
 	model.NewAutocompleteData("disconnect", "", "Disconnect from your Microsoft Account"),
 	model.NewAutocompleteData("summary", "", "View your events for today, or edit the settings for your daily summary."),
@@ -46,7 +46,7 @@ var commandsWhenAutoConnectIsFalse = []*model.AutocompleteData{
 	model.NewAutocompleteData("help", "", "Read help text for the commands"),
 }
 
-var commandsWhenAutoConnectIsTrue = []*model.AutocompleteData{
+var commandsWhenAutoConnectEnabled = []*model.AutocompleteData{
 	model.NewAutocompleteData("disconnect", "", "Disconnect from your Microsoft Account"),
 	model.NewAutocompleteData("summary", "", "View your events for today, or edit the settings for your daily summary."),
 	model.NewAutocompleteData("viewcal", "", "View your events for the upcoming week."),
@@ -61,9 +61,9 @@ var commandsWhenAutoConnectIsTrue = []*model.AutocompleteData{
 func Register(client *pluginapilicense.Client, autoConnectUsers bool) error {
 	var cmds []*model.AutocompleteData
 	if autoConnectUsers {
-		cmds = commandsWhenAutoConnectIsTrue
+		cmds = commandsWhenAutoConnectEnabled
 	} else {
-		cmds = commandsWhenAutoConnectIsFalse
+		cmds = commandsWhenAutoConnectIsDisabled
 	}
 
 	names := []string{}

@@ -180,12 +180,14 @@ func (p *Plugin) OnConfigurationChange() (err error) {
 		return errors.New("status sync job interval should be greater than 0")
 	}
 
-	if err = command.UnRegister(pluginAPIClient); err != nil {
-		return errors.Wrap(err, "failed to unregister slash command")
-	}
+	if p.getEnv().Config != nil && p.getEnv().Config.AutoConnectUsers != stored.AutoConnectUsers {
+		if err = command.UnRegister(pluginAPIClient); err != nil {
+			return errors.Wrap(err, "failed to unregister slash command")
+		}
 
-	if err = command.Register(pluginAPIClient, stored.AutoConnectUsers); err != nil {
-		return errors.Wrap(err, "failed to register slash command")
+		if err = command.Register(pluginAPIClient, stored.AutoConnectUsers); err != nil {
+			return errors.Wrap(err, "failed to register slash command")
+		}
 	}
 
 	mattermostSiteURL := p.API.GetConfig().ServiceSettings.SiteURL
@@ -380,13 +382,7 @@ func (p *Plugin) initEnv(e *Env, client *pluginapiclient.Client, pluginURL strin
 }
 
 func (p *Plugin) UserHasLoggedIn(c *plugin.Context, user *model.User) {
-	stored := config.StoredConfig{}
-	if err := p.API.LoadPluginConfiguration(&stored); err != nil {
-		p.API.LogError(fmt.Sprintf("failed to load plugin configuration. Error: %s", err.Error()))
-		return
-	}
-
-	if stored.AutoConnectUsers {
+	if p.getEnv().Config.AutoConnectUsers {
 		// Auto-connect the user to ms-calendar after he logs in
 		m := mscalendar.New(p.getEnv().Env, "")
 		if _, err := m.GetRemoteUser(user.Id); err == nil {
@@ -395,7 +391,7 @@ func (p *Plugin) UserHasLoggedIn(c *plugin.Context, user *model.User) {
 		}
 
 		if err := m.CompleteOAuth2(user.Id); err != nil {
-			p.API.LogError(fmt.Sprintf("error occurred while connecting user to mscalendar with email: %s. Error: %s", user.Email, err.Error()))
+			p.API.LogError("Error occurred while connecting user to mscalendar", "Email", user.Email, "Error", err.Error())
 		}
 	}
 }
