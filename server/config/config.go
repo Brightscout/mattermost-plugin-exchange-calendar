@@ -8,6 +8,7 @@ type StoredConfig struct {
 	EWSProxyServerBaseURL string
 	EWSProxyServerAuthKey string
 	StatusSyncJobInterval int64
+	AutoConnectUsers      bool
 
 	EnableStatusSync   bool
 	EnableDailySummary bool

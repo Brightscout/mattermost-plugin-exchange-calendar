@@ -78,6 +78,13 @@
                 "display_name": "Status Sync Job Interval",
                 "type": "number",
                 "help_text": "Time in minutes after which the status sync job re-runs."
+            },
+            {
+                "key": "AutoConnectUsers",
+                "display_name": "Auto-Connect Users:",
+                "type": "bool",
+                "help_text": "When set to 'true', all the users on Mattermost are automatically connected to Exchange via EWS proxy server.",
+                "default": true
             }
         ]
     }

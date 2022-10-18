@@ -34,7 +34,7 @@ func getNotConnectedText() string {
 
 type handleFunc func(parameters ...string) (string, bool, error)
 
-var cmds = []*model.AutocompleteData{
+var commandsWhenAutoConnectIsDisabled = []*model.AutocompleteData{
 	model.NewAutocompleteData("connect", "", "Connect to your Microsoft account"),
 	model.NewAutocompleteData("disconnect", "", "Disconnect from your Microsoft Account"),
 	model.NewAutocompleteData("summary", "", "View your events for today, or edit the settings for your daily summary."),
@@ -46,8 +46,26 @@ var cmds = []*model.AutocompleteData{
 	model.NewAutocompleteData("help", "", "Read help text for the commands"),
 }
 
+var commandsWhenAutoConnectIsEnabled = []*model.AutocompleteData{
+	model.NewAutocompleteData("disconnect", "", "Disconnect from your Microsoft Account"),
+	model.NewAutocompleteData("summary", "", "View your events for today, or edit the settings for your daily summary."),
+	model.NewAutocompleteData("viewcal", "", "View your events for the upcoming week."),
+	model.NewAutocompleteData("settings", "", "Edit your user personal settings."),
+	model.NewAutocompleteData("subscribe", "", "Enable notifications for event invitations and updates."),
+	model.NewAutocompleteData("unsubscribe", "", "Disable notifications for event invitations and updates."),
+	model.NewAutocompleteData("info", "", "Read information about this version of the plugin."),
+	model.NewAutocompleteData("help", "", "Read help text for the commands"),
+}
+
 // Register should be called by the plugin to register all necessary commands
-func Register(client *pluginapilicense.Client) error {
+func Register(client *pluginapilicense.Client, autoConnectUsers bool) error {
+	var cmds []*model.AutocompleteData
+	if autoConnectUsers {
+		cmds = commandsWhenAutoConnectIsEnabled
+	} else {
+		cmds = commandsWhenAutoConnectIsDisabled
+	}
+
 	names := []string{}
 	for _, subCommand := range cmds {
 		names = append(names, subCommand.Trigger)
@@ -73,6 +91,11 @@ func Register(client *pluginapilicense.Client) error {
 		AutocompleteData:     cmd,
 		AutocompleteIconData: iconData,
 	})
+}
+
+// UnRegister should be called by the plugin to unregister a command previously registered via Register.
+func UnRegister(client *pluginapilicense.Client) error {
+	return client.SlashCommand.Unregister("", config.CommandTrigger)
 }
 
 // Handle should be called by the plugin when a command invocation is received from the Mattermost server.

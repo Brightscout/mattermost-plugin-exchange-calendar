@@ -94,7 +94,7 @@ func (p *Plugin) OnActivate() error {
 		return err
 	}
 
-	err = command.Register(pluginAPIClient)
+	err = command.Register(pluginAPIClient, stored.AutoConnectUsers)
 	if err != nil {
 		return errors.Wrap(err, "failed to register command")
 	}
@@ -105,7 +105,9 @@ func (p *Plugin) OnActivate() error {
 	}
 
 	// Auto-connect all the users present on server
-	go p.ConnectUsers()
+	if stored.AutoConnectUsers {
+		go p.ConnectUsers()
+	}
 
 	return nil
 }
@@ -176,6 +178,16 @@ func (p *Plugin) OnConfigurationChange() (err error) {
 	}
 	if stored.StatusSyncJobInterval <= 0 {
 		return errors.New("status sync job interval should be greater than 0")
+	}
+
+	if p.getEnv().Config != nil && p.getEnv().Config.AutoConnectUsers != stored.AutoConnectUsers {
+		if err = command.UnRegister(pluginAPIClient); err != nil {
+			return errors.Wrap(err, "failed to unregister slash command")
+		}
+
+		if err = command.Register(pluginAPIClient, stored.AutoConnectUsers); err != nil {
+			return errors.Wrap(err, "failed to register slash command")
+		}
 	}
 
 	mattermostSiteURL := p.API.GetConfig().ServiceSettings.SiteURL
@@ -370,16 +382,16 @@ func (p *Plugin) initEnv(e *Env, client *pluginapiclient.Client, pluginURL strin
 }
 
 func (p *Plugin) UserHasLoggedIn(c *plugin.Context, user *model.User) {
-	// Auto-connect the user to ms-calendar after he logs in
-	m := mscalendar.New(p.getEnv().Env, "")
-	_, err := m.GetRemoteUser(user.Id)
-	if err == nil {
-		// If user is already connected do nothing
-		return
-	}
+	if p.getEnv().Config.AutoConnectUsers {
+		// Auto-connect the user to ms-calendar after he logs in
+		m := mscalendar.New(p.getEnv().Env, "")
+		if _, err := m.GetRemoteUser(user.Id); err == nil {
+			// If user is already connected do nothing
+			return
+		}
 
-	err = m.CompleteOAuth2(user.Id)
-	if err != nil {
-		p.API.LogError(fmt.Sprintf("error occurred while connecting user to mscalendar with email: %s. Error: %s", user.Email, err.Error()))
+		if err := m.CompleteOAuth2(user.Id); err != nil {
+			p.API.LogError("Error occurred while connecting user to mscalendar", "Email", user.Email, "Error", err.Error())
+		}
 	}
 }
