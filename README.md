@@ -52,6 +52,8 @@ This plugin communicates with Microsoft Exchange Server through a companion serv
   
  You may use the `Regenerate` button to generate a new key. Ensure that the key is configured in the mattermost-plugin-exchange-ews-proxy's `.env` file so that the proxy can authenticate API requests made by this plugin.
 
+  - **Auto-Connect Users**: When set to 'true', all the users on Mattermost are automatically connected to Exchange via EWS proxy server.
+
 ## Development
 
 ### Setup
