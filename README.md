@@ -54,6 +54,8 @@ This plugin communicates with Microsoft Exchange Server through a companion serv
 
   - **Auto-Connect Users**: When set to 'true', all the users on Mattermost are automatically connected to Exchange via EWS proxy server.
 
+    **Note:** If an admin changes this setting from `false` -> `true`, then he/she has to disable and re-enable the plugin to auto-connect all the logged-in users. If he/she does not do so, then only the users who log in to Mattermost after the setting was enabled will auto-connect.
+
 ## Development
 
 ### Setup
