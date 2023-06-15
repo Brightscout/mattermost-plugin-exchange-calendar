@@ -52,6 +52,10 @@ This plugin communicates with Microsoft Exchange Server through a companion serv
   
  You may use the `Regenerate` button to generate a new key. Ensure that the key is configured in the mattermost-plugin-exchange-ews-proxy's `.env` file so that the proxy can authenticate API requests made by this plugin.
 
+  - **Auto-Connect Users**: When set to `true`, all the Mattermost users will be connected to Exchange Calendar automatically.
+
+    **Note:** If the value is changed from `false` to `true`, only the users who log into Mattermost after the setting has been changed will be auto-connected. The administrator must disable and re-enable the plugin in order to auto-connect all the currently logged-in users.
+
 ## Development
 
 ### Setup
