@@ -56,7 +56,11 @@ func (m *mscalendar) CompleteOAuth2ForUsers(users []*model.User) error {
 			continue
 		}
 
-		user := emailUserMap[userDetails.User.Mail]
+		var user *model.User
+		if userDetails.User != nil {
+			user = emailUserMap[userDetails.User.Mail]
+		}
+
 		if user == nil {
 			m.Logger.Warnf("Couldn't find user with email %s.", userDetails.User.Mail)
 			continue
