@@ -52,10 +52,20 @@ func (m *mscalendar) CompleteOAuth2ForUsers(users []*model.User) error {
 
 	for _, userDetails := range usersDetails {
 		if userDetails.Error != nil {
-			m.Logger.Warnf("Error while fetching user with email %s. err=%s", userDetails.User.Mail, userDetails.Error.Message)
+			m.Logger.Warnf("Error while fetching user %+v. err=%s", userDetails.User, userDetails.Error.Message)
 			continue
 		}
-		user := emailUserMap[userDetails.User.Mail]
+
+		var user *model.User
+		if userDetails.User != nil {
+			user = emailUserMap[userDetails.User.Mail]
+		}
+
+		if user == nil {
+			m.Logger.Warnf("Couldn't find user with email %s.", userDetails.User.Mail)
+			continue
+		}
+
 		err := m.CompleteUserConnect(user.Id, user.Timezone, userDetails.User)
 		if err != nil {
 			m.Logger.Warnf("Error connecting user with email %s. err=%s", user.Email, err.Error())
